@@ -1,2 +1,0 @@
-# Project-specific bazelrc settings
-# NOTE: While empty, this is referenced by the release workflow
