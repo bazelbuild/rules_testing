@@ -1,7 +1,5 @@
 """Various utilities to aid with testing."""
 
-# Test automatic import to Google.
-
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
 
