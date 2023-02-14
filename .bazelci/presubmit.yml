@@ -1,0 +1,11 @@
+buildifier: latest
+validate_config: 1
+matrix:
+  platform: ["ubuntu2004", "windows", "macos"]
+  bazel: ["latest", "5.x"]
+tasks:
+  all_tests:
+    platform: ${{platform}}
+    bazel: ${{bazel}}
+    test_targets:
+      - "..."
