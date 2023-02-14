@@ -49,9 +49,3 @@ jobs:
           body_path: release_notes.txt
           fail_on_unmatched_files: true
           files: rules_testing-*.tar.gz
-
-changelog:
-  categories:
-    - title: Other Changes
-      labels:
-        - "*"
