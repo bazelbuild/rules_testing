@@ -48,4 +48,4 @@ jobs:
           generate_release_notes: true
           body_path: release_notes.txt
           fail_on_unmatched_files: true
-          files: rules_mylang-*.tar.gz
+          files: rules_testing-*.tar.gz
