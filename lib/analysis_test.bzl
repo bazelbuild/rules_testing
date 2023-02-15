@@ -36,7 +36,12 @@ def _impl_function_name(impl):
     impl_name = str(impl)
     impl_name = impl_name.partition("<function ")[-1]
     impl_name = impl_name.rpartition(">")[0]
-    return impl_name.partition(" ")[0]
+    impl_name = impl_name.partition(" ")[0]
+
+    # Strip leading/trailing underscores so that test functions can
+    # have private names. This better allows unused tests to be flagged by
+    # buildifier (indicating a bug or code to delete)
+    return impl_name.strip("_")
 
 def _fail(env, msg):
     """Unconditionally causes the current test to fail.
@@ -194,7 +199,7 @@ def analysis_test(
         attr_values = {"target": target},
     )
 
-def test_suite(name, tests):
+def test_suite(name, tests, test_kwargs = {}):
     """Instantiates given test macros and gathers their main targets into a `test_suite`.
 
     Use this function to wrap all tests into a single target.
@@ -215,17 +220,19 @@ def test_suite(name, tests):
 
     ```
     load("//path/to/your/package:tests.bzl", "simple_test_suite")
-    simple_test_suite("simple_test_suite")
+    simple_test_suite(name = "simple_test_suite")
     ```
 
     Args:
       name: The name of the `test_suite` target.
-      tests: A list of test macros, each taking `name` as a parameter.
+      tests: A list of test macros, each taking `name` as a parameter, which
+            will be passed the computed name of the test.
+      test_kwargs: Additional kwargs to pass onto each test function call.
     """
     test_targets = []
     for call in tests:
         test_name = _impl_function_name(call)
-        call(test_name)
+        call(name = test_name, **test_kwargs)
         test_targets.append(test_name)
 
     native.test_suite(

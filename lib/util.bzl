@@ -7,13 +7,18 @@ load("@bazel_skylib//lib:types.bzl", "types")
 load("@bazel_skylib//lib:unittest.bzl", "analysistest")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
+_SKIP_CI_TAGS = [
+    # copybara-marker: skip-ci-tag
+]
+
 # We add the manual tag to prevent implicitly building and running the subject
 # targets. When the rule-under-test is a test rule, it prevents trying to run
 # it. For binary rules, it prevents implicitly building it (and thus activating
 # more validation logic) when --build_tests_only is enabled.
 PREVENT_IMPLICIT_BUILDING_TAGS = [
     "manual",  # Prevent `bazel ...` from directly building them
-]
+    # copybara-marker: skip-coverage-tag
+] + _SKIP_CI_TAGS
 PREVENT_IMPLICIT_BUILDING = {"tags": PREVENT_IMPLICIT_BUILDING_TAGS}
 
 def merge_kwargs(*kwargs):
@@ -198,8 +203,8 @@ def skip_test(name):
     """
     _skip_test(
         name = name,
-        target_compatible_with = ["//third_party/bazel_platforms:incompatible"],
-        tags = ["notap"],
+        target_compatible_with = ["@platforms//:incompatible"],
+        tags = _SKIP_CI_TAGS,
     )
 
 def _skip_test_impl(ctx):
