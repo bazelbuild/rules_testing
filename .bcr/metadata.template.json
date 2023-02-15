@@ -1,0 +1,15 @@
+{
+  "homepage": "https://github.com/bazelbuild/rules_testing",
+  "maintainers": [
+    {
+      "email": "rlevasseur@google.com",
+      "github": "rickeylev",
+      "name": "Richard Levaseur"
+    }
+  ],
+  "repository": [
+    "github:bazelbuild/rules_testing"
+  ],
+  "versions": [],
+  "yanked_versions": {}
+}
