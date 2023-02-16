@@ -911,9 +911,10 @@ def file_subject_test(name):
 
 def _file_subject_test(env, target):
     fake_env = _fake_env(env)
+    package = target.label.package
     expect = truth.expect(fake_env)
     subject = expect.that_file(target.files.to_list()[0])
-    subject.short_path_equals("third_party/bazel_rules/rules_testing/tests/testdata/file1.txt")
+    subject.short_path_equals(package + "/testdata/file1.txt")
     _assert_no_failures(fake_env, env = env)
 
     subject.short_path_equals("landon-and-hope-forever.txt")
@@ -922,7 +923,7 @@ def _file_subject_test(env, target):
         [
             "value of: file",
             "expected: landon-and-hope-forever.txt",
-            "actual: third_party/bazel_rules/rules_testing/tests/testdata/file1.txt",
+            "actual: {}/testdata/file1.txt".format(package),
         ],
         env = env,
     )
@@ -933,7 +934,10 @@ def _file_subject_test(env, target):
             format_str_kwargs = {"custom": "file1.txt"},
         ),
     )
-    subject.short_path_equals("third_party/bazel_rules/rules_testing/tests/testdata/{custom}")
+
+    # NOTE: We purposefully don't use `{package}` because we're just
+    # testing the `{custom}` keyword
+    subject.short_path_equals(package + "/testdata/{custom}")
     _assert_no_failures(fake_env, env = env)
 
     _end(env, fake_env)
