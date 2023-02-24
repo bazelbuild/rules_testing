@@ -1,0 +1,5 @@
+# Basic tests to verify things work under bzlmod
+
+load(":tests.bzl", "bzlmod_test_suite")
+
+bzlmod_test_suite(name = "bzlmod_tests")
