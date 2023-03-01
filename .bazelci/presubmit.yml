@@ -5,7 +5,7 @@ matrix:
   bazel: ["latest", "5.x"]
 tasks:
   all_tests:
-    name: "Bazel v${{bazel}}"
+    name: "Bazel v" ${{$matrix.bazel}}
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
