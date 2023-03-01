@@ -8,7 +8,8 @@ tasks:
     #name: ${{ format('Bazel v{0}', bazel) }}
     #name: "${{bazel}}"
     #name: ${{'my name'}}
-    name: ${{bazel}}
+    # works name: ${{bazel}}
+    name: "My name"
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
