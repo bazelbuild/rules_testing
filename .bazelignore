@@ -1,0 +1,3 @@
+# Ignore directories that contain nested WORKSPACE or MODULE.bazel files.
+# This allows //... to Just Work
+e2e
