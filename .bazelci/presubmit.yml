@@ -7,7 +7,7 @@ tasks:
   all_tests:
     #name: ${{ format('Bazel v{0}', bazel) }}
     #name: "${{bazel}}"
-    name: Bazel $matrix.bazel
+    name: ${{'my name'}}
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
