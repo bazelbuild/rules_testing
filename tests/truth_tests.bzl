@@ -1199,7 +1199,7 @@ def _target_subject_test(env, target):
     subject = truth.expect(fake_env).that_target(target)
 
     # First a static string, no formatting parameters
-    result = subject.action_generating("third_party/bazel_rules/rules_testing/tests/default_runfile1.txt")
+    result = subject.action_generating("{package}/default_runfile1.txt")
     ut_asserts.true(env, result != None, msg = "action_generating gave None")
 
     # Now try it with formatting parameters
