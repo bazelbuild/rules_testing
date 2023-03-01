@@ -18,6 +18,8 @@ load("@bazel_skylib//lib:unittest.bzl", ut_asserts = "asserts")
 load("//lib:truth.bzl", "matching", "subjects", "truth")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
 
+_IS_BAZEL_6_OR_HIGHER = (testing.ExecutionInfo == testing.ExecutionInfo)
+
 _suite = []
 
 def _fake_env(env):
@@ -760,7 +762,8 @@ def _execution_info_test(env, target):
     subject = truth.expect(fake_env).that_target(target).provider(testing.ExecutionInfo)
     subject.requirements().contains_exactly({"EIKEY1": "EIVALUE1"})
     _assert_no_failures(fake_env, env = env)
-    subject.exec_group().equals("THE_EXEC_GROUP")
+    if _IS_BAZEL_6_OR_HIGHER:
+        subject.exec_group().equals("THE_EXEC_GROUP")
     _assert_no_failures(fake_env, env = env)
     _end(env, fake_env)
 
@@ -1305,6 +1308,11 @@ def _test_helper_impl(ctx):
         ],
         mnemonic = "Action1",
     )
+    if _IS_BAZEL_6_OR_HIGHER:
+        exec_info_bazel_6_kwargs = {"exec_group": "THE_EXEC_GROUP"}
+    else:
+        exec_info_bazel_6_kwargs = {}
+
     return [
         DefaultInfo(
             default_runfiles = ctx.runfiles(
@@ -1318,7 +1326,7 @@ def _test_helper_impl(ctx):
             environment = {"EKEY1": "EVALUE1", "EKEY2": "EVALUE2"},
             inherited_environment = ["INHERIT1", "INHERIT2"],
         ),
-        testing.ExecutionInfo({"EIKEY1": "EIVALUE1"}, exec_group = "THE_EXEC_GROUP"),
+        testing.ExecutionInfo({"EIKEY1": "EIVALUE1"}, **exec_info_bazel_6_kwargs),
         OutputGroupInfo(
             some_group = depset([_empty_file(ctx, "output_group_file.txt")]),
         ),
