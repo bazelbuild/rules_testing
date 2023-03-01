@@ -10,7 +10,8 @@ tasks:
     #name: ${{'my name'}}
     # works name: ${{bazel}}
     # works name: "My name"
-    name: Bazel ${{bazel}}
+    # Doesn't work name: Bazel ${{bazel}}
+    name: "Bazel ${{bazel}}"
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
