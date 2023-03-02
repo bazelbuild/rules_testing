@@ -45,6 +45,7 @@ bzl_library(
 bzl_library(
     name = "util_bzl",
     srcs = ["util.bzl"],
+    # Do not sort: order differs between Google and GitHub; fails lint checks.
     visibility = [
         "//devtools/python/blaze:__subpackages__",
         "//:__subpackages__",
