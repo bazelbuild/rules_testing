@@ -17,22 +17,8 @@
 load("@bazel_skylib//lib:unittest.bzl", ut_asserts = "asserts")
 load("//lib:truth.bzl", "matching", "subjects", "truth")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
-load("//lib:util.bzl", "util")
 
 _suite = []
-
-_TEST_FILES_ATTR = {
-    "test_files": attr.label(
-        default = ":truth_tests_data_files",
-        allow_files = True,
-    ),
-}
-_HELPER_ATTR = {
-    "_helper": attr.label(
-        default = ":truth_tests_helper",
-        aspects = [util.testing_aspect],
-    ),
-}
 
 def _fake_env(env):
     failures = []
@@ -1304,20 +1290,6 @@ def _assert_failure(fake_env, expected_strs, *, env, msg = ""):
                 ),
             )
     fake_env.reset()
-
-def _fake_action(outputs = depset()):
-    return struct(
-        mnemonic = "FakeAction",
-        outputs = outputs,
-        argv = None,
-    )
-
-def _fake_ctx(attrs = struct()):
-    return struct(
-        label = Label("//fake/tests:fake_test"),
-        workspace_name = "fake_workspace",
-        attr = attrs,
-    )
 
 def _test_helper_impl(ctx):
     action_output = ctx.actions.declare_file("action.txt")

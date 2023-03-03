@@ -143,8 +143,9 @@ def _expect_new(env, meta):
         A struct representing an `Expect` object.
     """
 
-    # buildifier: disable=uninitialized
     meta = meta or _expect_meta_new(env)
+
+    # buildifier: disable=uninitialized
     public = struct(
         # keep sorted start
         meta = meta,

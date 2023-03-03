@@ -222,6 +222,7 @@ def skip_test(name):
     )
 
 def _skip_test_impl(ctx):
+    _ = ctx  # @unused
     fail("Should have been skipped")
 
 _skip_test = rule(
