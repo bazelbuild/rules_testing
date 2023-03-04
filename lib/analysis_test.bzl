@@ -55,7 +55,7 @@ def _fail(env, msg):
     # There isn't a better way to output the message in Starlark, so use print.
     # buildifier: disable=print
     print(full_msg)
-    env.failures.append(full_msg)
+    env._failures.append(full_msg)
 
 def _begin_analysis_test(ctx):
     """Begins a unit test.
@@ -70,29 +70,32 @@ def _begin_analysis_test(ctx):
           in verbatim.
 
     Returns:
-      A test environment struct that must be passed to assertions and finally to
-      `unittest.end`. Do not rely on internal details about the fields in this
-      struct as it may change.
+        An analysis_test "environment" struct. The following fields are public:
+          * ctx: the underlying rule ctx
+          * expect: a truth Expect object (see truth.bzl).
+          * fail: A function to register failures for later reporting.
+
+        Other attributes are private, internal details and may change at any time. Do not rely
+        on internal details.
     """
     target = getattr(ctx.attr, "target")
     target = target[0] if type(target) == type([]) else target
     failures = []
-    env1 = struct(
+    failures_env = struct(
         ctx = ctx,
         failures = failures,
     )
-    env2 = struct(
+    truth_env = struct(
         ctx = ctx,
-        failures = failures,
-        fail = lambda msg: _fail(env1, msg),
+        fail = lambda msg: _fail(failures_env, msg),
     )
-    env3 = struct(
+    analysis_test_env = struct(
         ctx = ctx,
-        failures = failures,
-        fail = env2.fail,
-        expect = truth.expect(env2),
+        _failures = failures,
+        fail = truth_env.fail,
+        expect = truth.expect(truth_env),
     )
-    return env3, target
+    return analysis_test_env, target
 
 def _end_analysis_test(env):
     """Ends an analysis test and logs the results.
@@ -107,8 +110,8 @@ def _end_analysis_test(env):
       A list of providers needed to automatically register the analysis test result.
     """
     return [AnalysisTestResultInfo(
-        success = (len(env.failures) == 0),
-        message = "\n".join(env.failures),
+        success = (len(env._failures) == 0),
+        message = "\n".join(env._failures),
     )]
 
 def analysis_test(
