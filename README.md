@@ -1,5 +1,5 @@
 [![Build
-status](https://badge.buildkite.com/a82ebafd30ad56e0596dcd3a3a19f36985d064f7f7fb89e21e.svg)](https://buildkite.com/bazel/rules-testing)
+status](https://badge.buildkite.com/a82ebafd30ad56e0596dcd3a3a19f36985d064f7f7fb89e21e.svg?branch=master)](https://buildkite.com/bazel/rules-testing)
 
 # Testing Rule's Implementation
 
