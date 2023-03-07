@@ -17,12 +17,13 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 licenses(["notice"])
 
 package(
-    default_visibility = ["//visibility:public"],
+    default_visibility = ["//visibility:private"],
 )
 
 bzl_library(
     name = "analysis_test_bzl",
     srcs = ["analysis_test.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         "//lib:truth_bzl",
     ],
@@ -31,10 +32,7 @@ bzl_library(
 bzl_library(
     name = "truth_bzl",
     srcs = ["truth.bzl"],
-    visibility = [
-        "//:__subpackages__",
-        "//tools/build_defs/python/tests/base_rules:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//lib:util_bzl",
         "@bazel_skylib//lib:types",
@@ -45,12 +43,7 @@ bzl_library(
 bzl_library(
     name = "util_bzl",
     srcs = ["util.bzl"],
-    # Do not sort: order differs between Google and GitHub; fails lint checks.
-    visibility = [
-        "//devtools/python/blaze:__subpackages__",
-        "//:__subpackages__",
-        "//tools/build_defs/python/tests:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "@bazel_skylib//lib:paths",
         "@bazel_skylib//lib:types",
