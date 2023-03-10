@@ -4,8 +4,22 @@ matrix:
   platform: ["ubuntu2004", "windows", "macos"]
   bazel: ["latest", "5.x"]
 tasks:
-  all_tests:
+  all_tests_workspace:
     platform: ${{platform}}
     bazel: ${{bazel}}
+    test_targets:
+      - "..."
+  all_tests_bzlmod:
+    platform: ${{platform}}
+    bazel: latest
+    test_flags:
+      - "--enable_bzlmod"
+    test_targets:
+      - "..."
+  e2e_bzlmod:
+    platform: ${{platform}}
+    working_directory: e2e/bzlmod
+    test_flags:
+      - "--enable_bzlmod=true"
     test_targets:
       - "..."
