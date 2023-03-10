@@ -1260,6 +1260,38 @@ def _run_environment_info_subject_test(env, target):
 
 _suite.append(run_environment_info_subject_test)
 
+def _add_failure_works_test(name):
+    analysis_test(
+        name,
+        impl = _add_failure_works_test_impl,
+        target = "truth_tests_noop",
+        expect_failure = True,
+    )
+
+def _add_failure_works_test_impl(env, target):
+    """Test that the real add_failure() codepath works.
+
+    All the other tests mock out the fail() call, this is the one test that doesn't.
+    """
+    _ = target  # @unused
+
+    # NOTE: this prints a spurious message.
+    env.expect.meta.add_failure("FAKE PROBLEM", "FAKE ACTUAL")
+
+    failures = list(env._failures)
+    env._failures.clear()
+
+    if len(failures) != 1:
+        env.fail("Expected len(failures) == 1, got " + str(len(failures)))
+    else:
+        failure = failures[0]
+        if "FAKE PROBLEM" not in failure:
+            env.fail("Expected string 'FAKE PROBLEM' not found in failure message")
+        if "FAKE ACTUAL" not in failure:
+            env.fail("Expected string 'FAKE ACTUAL' not found in failure message")
+
+_suite.append(_add_failure_works_test)
+
 def _assert_no_failures(fake_env, *, env, msg = ""):
     fail_lines = [
         "expected no failures, but found failures",

@@ -55,7 +55,7 @@ def _fail(env, msg):
     # There isn't a better way to output the message in Starlark, so use print.
     # buildifier: disable=print
     print(full_msg)
-    env._failures.append(full_msg)
+    env.failures.append(full_msg)
 
 def _begin_analysis_test(ctx):
     """Begins a unit test.
@@ -91,6 +91,8 @@ def _begin_analysis_test(ctx):
     )
     analysis_test_env = struct(
         ctx = ctx,
+        # Visibility: package; only exposed so that our own tests can verify
+        # failure behavior.
         _failures = failures,
         fail = truth_env.fail,
         expect = truth.expect(truth_env),
