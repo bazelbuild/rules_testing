@@ -5,21 +5,25 @@ matrix:
   bazel: ["latest", "5.x"]
 tasks:
   all_tests_workspace:
+    name: Workspace
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
       - "..."
   all_tests_bzlmod:
+    name: Bzlmod
     platform: ${{platform}}
     bazel: latest
     test_flags:
       - "--enable_bzlmod"
+      - "--test_tag_filters=-skip-bzlmod"
     test_targets:
       - "..."
+
   e2e_bzlmod:
     platform: ${{platform}}
     working_directory: e2e/bzlmod
     test_flags:
-      - "--enable_bzlmod=true"
+      - "--enable_bzlmod"
     test_targets:
       - "..."
