@@ -20,6 +20,11 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
+exports_files(
+    glob(["*.bzl"]),
+    visibility = ["//visibility:public"],
+)
+
 bzl_library(
     name = "analysis_test_bzl",
     srcs = ["analysis_test.bzl"],
