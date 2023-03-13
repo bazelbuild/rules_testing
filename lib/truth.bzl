@@ -190,6 +190,7 @@ def _expect_that_bool(self, value, expr = "boolean"):
         self: implicitly added.
         value: bool; the bool to check.
         expr: str; the starting "value of" expression to report in errors.
+
     Returns:
         A `BoolSubject` (see `_bool_subject_new`).
     """
@@ -266,6 +267,7 @@ def _expect_that_int(self, value, expr = "integer"):
         self: implicitly added.
         value: int; the value to check against.
         expr: str; the starting "value of" expression to report in errors.
+
     Returns:
         A struct representing an "IntSubject" (see `_int_subject_new`).
     """
@@ -277,6 +279,7 @@ def _expect_that_str(self, value):
     Args:
         self: implicitly added.
         value: str; the value to check against.
+
     Returns:
         A struct representing an "StrSubject" (see `_str_subject_new`).
     """
@@ -320,6 +323,7 @@ def _expect_where(self, **details):
         **details: str; Each named arg is added to the metadata details
             with the provided string, which is printed as part of displaying
             any failures.
+
     Returns:
         `Expect` object with separate metadata derived from the original self.
     """
@@ -408,6 +412,7 @@ def _expect_meta_derive(self, expr = None, details = None, format_str_kwargs = {
     include the context of the parent creator.
 
     Example usage:
+
         def _foo_subject_action_named(self, name):
             meta = self.meta.derive("action_named({})".format(name),
                                     "action: {}".format(...))
@@ -578,6 +583,7 @@ def _action_subject_new(action, meta):
     Method: ActionSubject.new
 
     Example usage:
+
         expect(env).that_action(action).not_contains_arg("foo")
 
     Args:
@@ -898,6 +904,7 @@ def _bool_subject_new(value, meta):
     Args:
         value: bool; the value to assert against.
         meta: `Expectmeta` struct; the metadata about the call chain.
+
     Returns:
         A "BoolSubject" struct.
     """
@@ -958,6 +965,7 @@ def _collection_subject_new(
         container_name: str; conceptual name of the container.
         sortable: bool; True if output should be sorted for display, false if not.
         element_plural_name: str; the plural word for the values in the container.
+
     Returns:
         A struct representing a "CollectionSubject".
     """
@@ -1235,6 +1243,7 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         meta: ExpectMeta struct.
         container_name: str; conceptual name of the container.
         element_plural_name: str; the plural word for the values in the container.
+
     Returns:
         A struct representing a DepsetFile object.
     """
@@ -1652,6 +1661,7 @@ def _int_subject_new(value, meta):
     Args:
         value: optional int; the value to perform asserts against; may be None.
         meta: ExpectMeta struct; the meta data about the call chain.
+
     Returns:
         A struct representing an "IntSubject".
     """
@@ -2349,6 +2359,7 @@ def _target_subject_runfiles(self):
 
     Args:
         self: implicitly added.
+
     Returns:
         A RunfilesSubject struct (see `_runfiles_subject_new`)
     """
@@ -2389,6 +2400,7 @@ def _target_subject_data_runfiles(self):
 
     Args:
         self: implicitly added.
+
     Returns:
         A RunfilesSubject struct (see `_runfiles_subject_new`)
     """
@@ -2402,6 +2414,7 @@ def _target_subject_default_outputs(self):
 
     Args:
         self: implicitly added.
+
     Returns:
         A DepsetFileSubject struct (see `_depset_file_subject_new`).
     """
@@ -2415,6 +2428,7 @@ def _target_subject_executable(self):
 
     Args:
         self: implicitly added.
+
     Returns:
         a FileSubject struct (see `_file_subject_new).
     """
@@ -2428,6 +2442,7 @@ def _target_subject_failures(self):
 
     Args:
         self: implicitly added
+
     Returns:
         A CollectionSubject (of strs).
     """
@@ -2531,6 +2546,7 @@ def _target_subject_action_generating(self, short_path):
         short_path: str; the output's short_path to match. The value is
             formatted using `format_path`, so its template keywords can be
             directly passed.
+
     Returns:
         `ActionSubject` for the matching action. If no action is found, or
         more than one action matches, then an error is raised.
@@ -3623,6 +3639,7 @@ def _match_custom(desc, func):
         desc: str; a human-friendly string describing what is matched.
         func: callable; accepts 1 positional arg (the value to match) and
             returns bool (True if it matched, False if not).
+
     Returns:
         a "Matcher" struct (see above).
     """
@@ -3647,6 +3664,7 @@ def _match_file_basename_contains(substr):
 
     Args:
         substr: str; the substring to match.
+
     Returns:
         `Matcher` (see `_match_custom()`).
     """
@@ -3679,6 +3697,7 @@ def _match_is_in(values):
 
     Args:
         values: The collection that the value must be within.
+
     Returns:
         `Matcher` (see `_match_custom()`).
     """

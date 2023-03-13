@@ -65,3 +65,14 @@ filegroup(
         "//tools/build_defs/python/tests/base_rules:__pkg__",
     ],
 )
+
+exports_files(
+    srcs = [
+        "analysis_test.bzl",
+        "truth.bzl",
+        "util.bzl",
+    ],
+    visibility = [
+        "//docgen:__pkg__",
+    ],
+)
