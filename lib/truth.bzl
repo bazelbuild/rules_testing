@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Various asserts to aid with testing.
+"""Truth-style asserts for Bazel's Starlark.
 
 These asserts follow the Truth-style way of performing assertions. This
 basically means the actual value is wrapped in a type-specific object that
@@ -22,10 +22,15 @@ provides type-specific assertion methods. This style provides several benefits:
     * Error messages with more informative context
     * Promotes code reuses at the type-level.
 
-## Example Usage:
+For more detailed documentation, see the docs on GitHub.
+
+## Basic usage
+
+NOTE: This example assumes usage of [`rules_testing`]'s [`analysis_test`]
+framework, but that framework is not required.
 
 ```
-def foo_test(env, target, actions):
+def foo_test(env, target):
     subject = env.expect.that_target(target)
     subject.runfiles().contains_at_least(["foo.txt"])
     subject.executable().equals("bar.exe")
@@ -33,58 +38,6 @@ def foo_test(env, target, actions):
     subject = env.expect.that_action(...)
     subject.contains_at_least_args(...)
 ```
-
-## Writing a new Subject
-
-Writing a new Subject involves two basic pieces:
-
-    1. Creating a constructor function, e.g. `_foo_subject_new`, that takes
-       the actual value and an `ExpectMeta` object (see `_expect_meta_new()`).
-
-    2. Adding a method to `expect` or another Subject class to
-       pass along state and instantiate the new subject; both may be modified if
-       the actual object can be independenly created or obtained through another
-       subject.
-
-       For top-level subjects, a method named `that_foo()` should be added
-       to the `expect` class.
-
-       For child-subjects, an appropriately named method should be added to
-       the parent subject, and the parent subject should call `ExpectMeta.derive()`
-       to create a new set of meta data for the child subject.
-
-The assert methods a subject provides are up to the subject, but try to follow
-the naming scheme of other subjects. The purpose of a custom subject is to make
-it easier to write tests that are correct and informative. It's common to have a
-combination of ergonomic asserts for common cases, and delegating to
-child-subjects for other cases.
-
-
-## Adding asserts to a subject
-
-Fundamentally, an assert method calls `ExpectMeta.add_failure()` to record
-when there is a failure. That method will wire together any surrounding context
-with the provided error message information. Otherwise an assertion is free
-to implement checks how it pleases.
-
-The naming of functions should mostly read naturally, but doesn't need to be
-perfect grammatically. Be aware of ambiguous words like "contains" or
-"matches". For example, `contains_flag("--foo")` -- does this check that
-"--flag" was specified at all (ignoring value), or that it was specified and
-has no value?
-
-Assertion functions can make use of a variety of helper methods in
-processing values, comparing them, and generating error messages. Helpers
-of particular note are:
-
-    * `_check_*`: These functions implement comparison, error formatting, and
-      error reporting.
-    * `_compare_*`: These functions implements comparison for different cases
-      and take care of various edge cases.
-    * `_format_failure_*`: These functions create human-friendly messages
-      describing both the observed values and the problem with them.
-    * `_format_problem_*`: These functions format only the problem identified.
-    * `_format_actual_*`: These functions format only the observed values.
 """
 
 load("@bazel_skylib//lib:types.bzl", "types")
@@ -114,19 +67,19 @@ def _expect(env):
     The passed in `env` object allows optional attributes to be set to
     customize behavior. Usually this is helpful for testing. See `_fake_env()`
     in truth_tests.bzl for examples.
-      * fail: callable that takes a failure message. If present, it
-        will be called instead of the regular `Except.add_failure` logic.
-      * get_provider: callable that takes 2 positional args (target and
+      * `fail`: callable that takes a failure message. If present, it
+        will be called instead of the regular `Expect.add_failure` logic.
+      * `get_provider`: callable that takes 2 positional args (target and
         provider) and returns the found provider or fails.
-      * has_provider: callable that takes 2 positional args (target and
-        provider) and returns bool (true if present) or fails.
+      * `has_provider`: callable that takes 2 positional args (a [`Target`] and
+        a [`provider`]) and returns [`bool`] (`True` if present, `False` otherwise) or fails.
 
     Args:
         env: unittest env struct, or some approximation. There are several
             attributes that override regular behavior; see above doc.
 
     Returns:
-        A struct representing an "expect object".
+        [`Expect`] object
     """
     return _expect_new(env, None)
 
@@ -137,10 +90,10 @@ def _expect_new(env, meta):
 
     Args:
         env: unittest env struct or some approximation.
-        meta: ExpectMeta; metadata about call chain and state.
+        meta: ([`ExpectMeta`]) metadata about call chain and state.
 
     Returns:
-        A struct representing an `Expect` object.
+        [`Expect`] object
     """
 
     meta = meta or _expect_meta_new(env)
@@ -170,10 +123,10 @@ def _expect_that_action(self, action):
 
     Args:
         self: implicitly added.
-        action: The `Action` to check.
+        action: ([`Action`]) the action to check.
 
     Returns:
-        A struct representing an "ActionSubject" (see `_action_subject_new`)
+        [`ActionSubject`] object.
     """
     return _action_subject_new(
         action,
@@ -188,11 +141,11 @@ def _expect_that_bool(self, value, expr = "boolean"):
 
     Args:
         self: implicitly added.
-        value: bool; the bool to check.
-        expr: str; the starting "value of" expression to report in errors.
+        value: ([`bool`]) the bool to check.
+        expr: ([`str`]) the starting "value of" expression to report in errors.
 
     Returns:
-        A `BoolSubject` (see `_bool_subject_new`).
+        [`BoolSubject`] object.
     """
     return _bool_subject_new(
         value,
@@ -205,10 +158,10 @@ def _expect_that_collection(self, collection, expr = "collection"):
     Args:
         self: implicitly added.
         collection: The collection (list or depset) to assert.
-        expr: str; the starting "value of" expression to report in errors.
+        expr: ([`str`]) the starting "value of" expression to report in errors.
 
     Returns:
-        A struct representing an "CollectionSubject" (see `_collection_subject_new`)
+        [`CollectionSubject`] object.
     """
     return _collection_subject_new(collection, self.meta.derive(expr))
 
@@ -219,10 +172,10 @@ def _expect_that_depset_of_files(self, depset_files):
 
     Args:
         self: implicitly added.
-        depset_files: The depset of files to assert.
+        depset_files: ([`depset`] of [`File`]) the values to assert on.
 
     Returns:
-        A struct representing an "DepsetFileSubject" (see `_depset_file_new`)
+        [`DepsetFileSubject`] object.
     """
     return _depset_file_subject_new(depset_files, self.meta.derive("depset_files"))
 
@@ -233,11 +186,11 @@ def _expect_that_dict(self, mapping, meta = None):
 
     Args:
         self: implicitly added
-        mapping: dict; the values to assert on
-        meta: ExpectMeta; optional custom call chain information to use instead
+        mapping: ([`dict`]) the values to assert on
+        meta: ([`ExpectMeta`]) optional custom call chain information to use instead
 
     Returns:
-        A `DictSubject` (see `_dict_subject_new`).
+        [`DictSubject`] object.
     """
     meta = meta or self.meta.derive("dict")
     return _dict_subject_new(mapping, meta = meta)
@@ -249,11 +202,11 @@ def _expect_that_file(self, file, meta = None):
 
     Args:
         self: implicitly added.
-        file: The file to assert.
-        meta: ExpectMeta; optional custom call chain information to use instead
+        file: ([`File`]) the value to assert.
+        meta: ([`ExpectMeta`]) optional custom call chain information to use instead
 
     Returns:
-        A `FileSubject` struct (see `_file_subject_new`)
+        [`FileSubject`] object.
     """
     meta = meta or self.meta.derive("file")
     return _file_subject_new(file, meta = meta)
@@ -265,11 +218,11 @@ def _expect_that_int(self, value, expr = "integer"):
 
     Args:
         self: implicitly added.
-        value: int; the value to check against.
-        expr: str; the starting "value of" expression to report in errors.
+        value: ([`int`]) the value to check against.
+        expr: ([`str`]) the starting "value of" expression to report in errors.
 
     Returns:
-        A struct representing an "IntSubject" (see `_int_subject_new`).
+        [`IntSubject`] object.
     """
     return _int_subject_new(value, self.meta.derive(expr))
 
@@ -278,10 +231,10 @@ def _expect_that_str(self, value):
 
     Args:
         self: implicitly added.
-        value: str; the value to check against.
+        value: ([`str`]) the value to check against.
 
     Returns:
-        A struct representing an "StrSubject" (see `_str_subject_new`).
+        [`StrSubject`] object.
     """
     return _str_subject_new(value, self.meta.derive("string"))
 
@@ -294,10 +247,10 @@ def _expect_that_target(self, target):
 
     Args:
         self: implicitly added.
-        target: Target; subject target to check against.
+        target: ([`Target`]) subject target to check against.
 
     Returns:
-        A struct representing a "TargetSubject" (see `_target_subject_new`).
+        [`TargetSubject`] object.
     """
     return _target_subject_new(target, self.meta.derive(
         expr = "target({})".format(target.label),
@@ -320,12 +273,12 @@ def _expect_where(self, **details):
 
     Args:
         self: implicitly added.
-        **details: str; Each named arg is added to the metadata details
-            with the provided string, which is printed as part of displaying
-            any failures.
+        **details: ([`dict`] of [`str`] to value) Each named arg is added to
+            the metadata details with the provided string, which is printed as
+            part of displaying any failures.
 
     Returns:
-        `Expect` object with separate metadata derived from the original self.
+        [`Expect`] object with separate metadata derived from the original self.
     """
     meta = self.meta.derive(
         details = ["{}: {}".format(k, v) for k, v in details.items()],
@@ -342,10 +295,10 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
     series of call chains and asserts.
 
     This constructor should only be directly called by `Expect` objects. When a
-    parent Subject is creating a child-Subject, then `meta.derive()` should be
+    parent Subject is creating a child-Subject, then [`derive()`] should be
     used.
 
-    Env objects
+    ### Env objects
 
     The `env` object basically provides a way to interact with things outside
     of the truth assertions framework. This allows easier testing of the
@@ -361,25 +314,25 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
         message. Its return value is ignored. This is called when an assertion
         fails. It's generally expected that it records a failure instead of
         immediately failing.
-      * has_provider: A callable; it accepts two positional args, target and
-        provider and returns boolean. This is used to implement `Provider in
+      * has_provider: (callable) it accepts two positional args, target and
+        provider and returns [`bool`]. This is used to implement `Provider in
         target` operations.
-      * get_provider: A callable; it accepts two positional args, target and
+      * get_provider: (callable) it accepts two positional args, target and
         provider and returns the provder value. This is used to implement
         `target[Provider]`.
 
     Args:
         env: unittest env struct or some approximation.
-        exprs: list of str; the expression strings of the call chain for
+        exprs: ([`list`] of [`str`]) the expression strings of the call chain for
             the subject.
-        details: list of str; additional details to print on error. These
+        details: ([`list`] of [`str`]) additional details to print on error. These
             are usually informative details of the objects under test.
         format_str_kwargs: optional dict of format() kwargs. These kwargs
             are propagated through `derive()` calls and used when
             `ExpectMeta.format_str()` is called.
 
     Returns:
-        A struct representing an "ExpectMeta" object.
+        [`ExpectMeta`] object.
     """
     if format_str_kwargs == None:
         format_str_kwargs = {}
@@ -424,21 +377,21 @@ def _expect_meta_derive(self, expr = None, details = None, format_str_kwargs = {
 
     Args:
         self: implicitly added.
-        expr: str; human-friendly description of the call chain expression.
+        expr: ([`str`]) human-friendly description of the call chain expression.
             e.g., if `foo_subject.bar_named("baz")` returns a child-subject,
             then "bar_named("bar")" would be the expression.
-        details: optional list of str; human-friendly descriptions of additional
+        details: (optional [`list`] of [`str`]) human-friendly descriptions of additional
             detail to include in errors. This is usually additional information
             the child Subject wouldn't include itself. e.g. if
             `foo.first_action_argv().contains(1)`, returned a ListSubject, then
             including "first action: Action FooCompile" helps add context to the
             error message. If there is no additional detail to include, pass
             None.
-        format_str_kwargs: dict of format()-kwargs; additional kwargs to
-            make available to `ExpectMeta.format_str` calls.
+        format_str_kwargs: ([`dict`] of format()-kwargs) additional kwargs to
+            make available to [`format_str`] calls.
 
     Returns:
-        A new ExpectMeta struct.
+        [`ExpectMeta`] object.
     """
     if not details:
         details = []
@@ -473,10 +426,10 @@ def _expect_meta_format_str(self, template):
 
     Args:
         self: implicitly added.
-        template: str; the format template string to use.
+        template: ([`str`]) the format template string to use.
 
     Returns:
-        str; the template with parameters replaced.
+        [`str`]; the template with parameters replaced.
     """
     return template.format(**self._format_str_kwargs)
 
@@ -488,7 +441,7 @@ def _expect_meta_get_provider(self, target, provider):
 
     Args:
         self: implicitly added.
-        target: Target; the target to get the provider from.
+        target: ([`Target`]) the target to get the provider from.
         provider: The provider type to get.
     Returns:
         The found provider, or fails if not present.
@@ -506,7 +459,7 @@ def _expect_meta_has_provider(self, target, provider):
 
     Args:
         self: implicitly added.
-        target: Target; the target to check for the provider.
+        target: ([`Target`]) the target to check for the provider.
         provider: the provider type to check for.
     Returns:
         True if the target has the provider, False if not.
@@ -526,14 +479,14 @@ def _expect_meta_add_failure(self, problem, actual):
 
     Args:
         self: implicitly added.
-        problem: str; a string describing the expected value or problem
+        problem: ([`str`]) a string describing the expected value or problem
             detected, and the expected values that weren't satisfied. A colon
             should be used to separate the description from the values.
             The description should be brief and include the word "expected",
             e.g. "expected: foo", or "expected values missing: <list of missing>",
             the key point being the reader can easily take the values shown
             and look for it in the actual values displayed below it.
-        actual: str; a string describing the values observed. A colon should
+        actual: ([`str`]) a string describing the values observed. A colon should
             be used to separate the description from the observed values.
             The description should be brief and include the word "actual", e.g.,
             "actual: bar". The values should include the actual, observed,
@@ -566,7 +519,7 @@ def _expect_meta_call_fail(self, msg):
 
     Args:
         self: implicitly added.
-        msg: str; the failure message.
+        msg: ([`str`]) the failure message.
     """
     fail_func = getattr(self.env, "fail", None)
     if fail_func != None:
@@ -587,12 +540,11 @@ def _action_subject_new(action, meta):
         expect(env).that_action(action).not_contains_arg("foo")
 
     Args:
-        action: Action to check against.
-        meta: `ExpectMeta` struct of call chain information.
+        action: ([`Action`]) value to check against.
+        meta: ([`ExpectMeta`]) of call chain information.
 
     Returns:
-        A struct representing an "ActionSubject". See the `public` struct
-        in the source for the available methods.
+        [`ActionSubject`] object.
     """
 
     # buildifier: disable=uninitialized
@@ -667,10 +619,10 @@ def _action_subject_contains_at_least_args(self, args):
 
     Args:
         self: implicitly added.
-        args: list of strings; all the args must be in the argv exactly
+        args: ([`list`] of [`str`]) all the args must be in the argv exactly
             as provided. Multiplicity is respected.
     Returns
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return _collection_subject_new(
         self.action.argv,
@@ -688,7 +640,7 @@ def _action_subject_not_contains_arg(self, arg):
 
     Args:
         self: implicitly added.
-        arg: str; the arg that cannot be present in the argv.
+        arg: ([`str`]) the arg that cannot be present in the argv.
     """
     if arg in self.action.argv:
         problem, actual = _format_failure_unexpected_value(
@@ -729,12 +681,12 @@ def _action_subject_has_flags_specified(self, flags):
 
     Args:
         self: implicitly added.
-        flags: list of str; The flags to check for. Include the leading "--".
+        flags: ([`list`] of [`str`]) The flags to check for. Include the leading "--".
             Multiplicity is respected. A flag is considered present if any of
             these forms are detected: `--flag=value`, `--flag value`, or a lone
             `--flag`.
     Returns
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return _collection_subject_new(
         # Starlark dict keys maintain insertion order, so it's OK to
@@ -750,6 +702,9 @@ def _action_subject_mnemonic(self):
     """Returns a `StrSubject` for the action's mnemonic.
 
     Method: ActionSubject.mnemonic
+
+    Returns:
+        [`StrSubject`] object.
     """
     return _str_subject_new(
         self.action.mnemonic,
@@ -791,9 +746,9 @@ def _action_subject_contains_flag_values(self, flag_values):
 
     Args:
         self: implicitly added.
-        flag_values: list of (str name, str value) pairs. Include the leading "--"
-            in the flag name. Order and duplicates aren't checked. Flags without
-            a value found use `None` as their value.
+        flag_values: ([`list`] of ([`str`] name, [`str`]) tuples) Include the
+            leading "--" in the flag name. Order and duplicates aren't checked.
+            Flags without a value found use `None` as their value.
     """
     missing = []
     for flag, value in sorted(flag_values):
@@ -829,8 +784,9 @@ def _action_subject_contains_none_of_flag_values(self, flag_values):
 
     Args:
         self: implicitly added.
-        flag_values: list of (str name, str value) pairs. Include the leading
-            "--" in the flag name. Order and duplicates aren't checked.
+        flag_values: ([`list`] of ([`str`] name, [`str`] value) tuples) Include
+            the leading "--" in the flag name. Order and duplicates aren't
+            checked.
     """
     unexpected = []
     for flag, value in sorted(flag_values):
@@ -859,10 +815,10 @@ def _action_subject_contains_at_least_inputs(self, inputs):
 
     Args:
         self: implicitly added.
-        inputs: a collection of File's. All must be present. Multiplicity
+        inputs: (collection of [`File`]) All must be present. Multiplicity
             is respected.
     Returns
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return _depset_file_subject_new(
         self.action.inputs,
@@ -875,6 +831,9 @@ def _action_subject_content(self):
     """Returns a `StrSubject` for `Action.content`.
 
     Method: ActionSubject.content
+
+    Returns:
+        [`StrSubject`] object.
     """
     return _str_subject_new(
         self.action.content,
@@ -902,11 +861,11 @@ def _bool_subject_new(value, meta):
     Method: BoolSubject.new
 
     Args:
-        value: bool; the value to assert against.
-        meta: `Expectmeta` struct; the metadata about the call chain.
+        value: ([`bool`]) the value to assert against.
+        meta: ([`ExpectMeta`]) the metadata about the call chain.
 
     Returns:
-        A "BoolSubject" struct.
+        A [`BoolSubject`].
     """
     self = struct(actual = value, meta = meta)
     public = struct(
@@ -925,7 +884,7 @@ def _bool_subject_equals(self, expected):
 
     Args:
         self: implicitly added.
-        expected: bool; the expected value.
+        expected: ([`bool`]) the expected value.
     """
     if self.actual == expected:
         return
@@ -941,7 +900,7 @@ def _bool_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added.
-        unexpected: bool; the value actual cannot equal.
+        unexpected: ([`bool`]) the value actual cannot equal.
     """
     return _check_not_equals(
         actual = self.actual,
@@ -959,15 +918,18 @@ def _collection_subject_new(
 
     Method: CollectionSubject.new
 
+    Public Attributes:
+    * `actual`: The wrapped collection.
+
     Args:
-        values: collection; the values to assert against.
-        meta: `ExpectMeta` struct; the metadata about the call chain.
-        container_name: str; conceptual name of the container.
-        sortable: bool; True if output should be sorted for display, false if not.
-        element_plural_name: str; the plural word for the values in the container.
+        values: ([`collection`]) the values to assert against.
+        meta: ([`ExpectMeta`]) the metadata about the call chain.
+        container_name: ([`str`]) conceptual name of the container.
+        sortable: ([`bool`]) True if output should be sorted for display, False if not.
+        element_plural_name: ([`str`]) the plural word for the values in the container.
 
     Returns:
-        A struct representing a "CollectionSubject".
+        [`CollectionSubject`].
     """
 
     # buildifier: disable=uninitialized
@@ -1003,7 +965,7 @@ def _collection_subject_has_size(self, expected):
 
     Args:
         self: implicitly added.
-        expected: int; the expected size of the collection.
+        expected: ([`int`]) the expected size of the collection.
     """
     return _int_subject_new(
         len(self.actual),
@@ -1017,7 +979,7 @@ def _collection_subject_contains(self, expected):
 
     Args:
         self: implicitly added.
-        expected: str; the value that must be present.
+        expected: ([`str`]) the value that must be present.
     """
     matcher = matching.equals_wrapper(expected)
     return self.contains_predicate(matcher)
@@ -1038,9 +1000,9 @@ def _collection_subject_contains_exactly(self, expected):
 
     Args:
         self: implicitly added.
-        expected: list of values that must exist.
+        expected: ([`list`]) values that must exist.
     Returns
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = _to_list(expected)
     return _check_contains_exactly(
@@ -1093,9 +1055,9 @@ def _collection_subject_contains_exactly_predicates(self, expected):
 
     Args:
         self: implicitly added.
-        expected: list of predicates that must match.
+        expected: ([`list`] of [`Matcher`]) that must match.
     Returns
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = _to_list(expected)
     return _check_contains_exactly_predicates(
@@ -1129,7 +1091,7 @@ def _collection_subject_contains_none_of(self, values):
 
     Args:
         self: implicitly added
-        values: collection of values, none of which are allowed to exist.
+        values: ([`collection`]) values of which none of are allowed to exist.
     """
     _check_contains_none_of(
         collection = self.actual,
@@ -1145,7 +1107,7 @@ def _collection_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: `Matcher` object (see `matchers` struct).
+        matcher: ([`Matcher`]) (see `matchers` struct).
     """
     _check_contains_predicate(
         self.actual,
@@ -1171,10 +1133,10 @@ def _collection_subject_contains_at_least(self, expect_contains):
 
     Args:
         self: implicitly added.
-        expect_contains: list of values that must be in the collection
+        expect_contains: ([`list`]) values that must be in the collection.
 
     Returns:
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     matchers = [
         matching.equals_wrapper(expected)
@@ -1194,10 +1156,10 @@ def _collection_subject_contains_at_least_predicates(self, matchers):
 
     Args:
         self: implicitly added.
-        matchers: list of `Matcher` objects (see `matchers` struct).
+        matchers: ([`list`] of [`Matcher`]) (see `matchers` struct).
 
     Returns:
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     ordered = _check_contains_at_least_predicates(
         self.actual,
@@ -1224,7 +1186,7 @@ def _collection_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: `Matcher` object (see `matchers` struct).
+        matcher: [`Matcher`] object (see `matchers` struct).
     """
     _check_not_contains_predicate(
         self.actual,
@@ -1239,13 +1201,13 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
     Method: DepsetFileSubject.new
 
     Args:
-        files: depset of Files.
-        meta: ExpectMeta struct.
-        container_name: str; conceptual name of the container.
-        element_plural_name: str; the plural word for the values in the container.
+        files: ([`depset`] of [`File`]) the values to assert on.
+        meta: ([`ExpectMeta`]) of call chain information.
+        container_name: ([`str`]) conceptual name of the container.
+        element_plural_name: ([`str`]) the plural word for the values in the container.
 
     Returns:
-        A struct representing a DepsetFile object.
+        [`DepsetFileSubject`] object.
     """
 
     # buildifier: disable=uninitialized
@@ -1278,11 +1240,11 @@ def _depset_file_subject_contains(self, expected):
 
     Args:
         self: implicitly added
-        expected: string or File; If a string path is provided, it is compared
-            to the short path of the files and are formatted using
-            `ExpectMeta.format_str` and its current contextual keywords. Note
-            that, when using File objects, two files' configurations must be the
-            same for them to be considered equal.
+        expected: ([`str`] | [`File`]) If a string path is provided, it is
+            compared to the short path of the files and are formatted using
+            [`ExpectMeta.format_str`] and its current contextual keywords. Note
+            that, when using `File` objects, two files' configurations must be
+            the same for them to be considered equal.
     """
     if is_file(expected):
         actual = self.files
@@ -1304,14 +1266,14 @@ def _depset_file_subject_contains_at_least(self, expected):
 
     Args:
         self: implicitly added
-        expected: collection of strings or collection of Files; multiplicity
+        expected: ([`collection`] of [`str`] | collection of [`File`]) multiplicity
             is respected. If string paths are provided, they are compared to the
             short path of the files and are formatted using
             `ExpectMeta.format_str` and its current contextual keywords. Note
-            that, when using File objects, two files' configurations must be the
+            that, when using `File` objects, two files' configurations must be the
             same for them to be considered equal.
     Returns:
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = _to_list(expected)
     if len(expected) < 1 or is_file(expected[0]):
@@ -1334,10 +1296,11 @@ def _depset_file_subject_contains_any_in(self, expected):
 
     Args:
         self: implicitly added.
-        expected: collection of path strings or collection of Files; at least one
-            of the values must exist. Note that, when using File objects,
-            two files' configurations must be the same for them to be considered
-            equal.
+        expected: ([`collection`] of [`str`] paths | [`collection`] of [`File`])
+            at least one of the values must exist. Note that, when using `File`
+            objects, two files' configurations must be the same for them to be
+            considered equal. When string paths are provided, they are compared
+            to `File.short_path`.
     """
     expected = _to_list(expected)
     if len(expected) < 1 or is_file(expected[0]):
@@ -1370,11 +1333,11 @@ def _depset_file_subject_contains_at_least_predicates(self, matchers):
 
     Args:
         self: implicitly added.
-        matchers: list of `Matcher` objects (see `matchers` struct) that
-            accept File objects.
+        matchers: ([`list`] of [`Matcher`]) (see `matchers` struct) that
+            accept [`File`] objects.
 
     Returns:
-        an `Ordered` struct (see `_ordered_incorrectly_new`).
+        [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     ordered = _check_contains_at_least_predicates(
         self.files,
@@ -1400,7 +1363,7 @@ def _depset_file_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: `Matcher` (see `matching` struct) that accepts `File` objects.
+        matcher: [`Matcher`] (see `matching` struct) that accepts `File` objects.
     """
     _check_contains_predicate(
         self.files,
@@ -1420,7 +1383,7 @@ def _depset_file_subject_contains_exactly(self, paths):
 
     Args:
         self: implicitly added.
-        paths: collection of strings; the paths that must exist. These are
+        paths: ([`collection`] of [`str`]) the paths that must exist. These are
             compared to the `short_path` values of the files in the depset.
             All the paths, and no more, must exist.
     """
@@ -1455,7 +1418,7 @@ def _depset_file_subject_not_contains(self, short_path):
 
     Args:
         self: implicitly added.
-        short_path: str; the short path that should not be present.
+        short_path: ([`str`]) the short path that should not be present.
     """
     short_path = self.meta.format_str(short_path)
     matcher = _match_custom(short_path, lambda f: f.short_path == short_path)
@@ -1468,7 +1431,7 @@ def _depset_file_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: Matcher that must match; operates on File objects.
+        matcher: ([`Matcher`]) that must match. It operates on [`File`] objects.
     """
     _check_not_contains_predicate(self.files, matcher, meta = self.meta)
 
@@ -1478,8 +1441,8 @@ def _execution_info_subject_new(info, *, meta):
     Method: ExecutionInfoSubject.new
 
     Args:
-        info: A `testing.ExecutionInfo` provider struct
-        meta: `ExpectMeta` struct of call chain information.
+        info: ([`testing.ExecutionInfo`]) provider instance.
+        meta: ([`ExpectMeta`]) of call chain information.
 
     Returns:
         `ExecutionInfoSubject` struct.
@@ -1523,7 +1486,7 @@ def _execution_info_subject_exec_group(self):
         self: implicitly added
 
     Returns:
-        A `StrSubject` for the exec group.
+        A [`StrSubject`] for the exec group.
     """
     return _str_subject_new(
         self.actual.exec_group,
@@ -1536,10 +1499,10 @@ def _file_subject_new(file, meta):
     Method: FileSubject.new
 
     Args:
-        file: File; the file to assert against.
-        meta: ExpectMeta struct.
+        file: ([`File`]) the file to assert against.
+        meta: ([`ExpectMeta`])
     Returns:
-        A struct representing a FileSubject.
+        [`FileSubject`] object.
     """
 
     # buildifier: disable=uninitialized
@@ -1556,16 +1519,16 @@ def _file_subject_new(file, meta):
 def _file_subject_equals(self, expected):
     """Asserts that `expected` references the same file as `self`.
 
-    This uses Bazel's notion of File equality, which usually includes
-    the configuration, owning action, internal hash, etc of a File. The
+    This uses Bazel's notion of [`File`] equality, which usually includes
+    the configuration, owning action, internal hash, etc of a `File`. The
     particulars of comparison depend on the actual Java type implementing
-    the File object (some ignore owner, for example).
+    the `File` object (some ignore owner, for example).
 
-    NOTE: This does not compare file content; Starlark cannot read files.
+    NOTE: This does not compare file content. Starlark cannot read files.
 
     NOTE: Same files generated by different owners are likely considered
     not equal to each other. The alternative for this is to assert the
-    `File.path` paths are equal.
+    `File.path` paths are equal using [`FileSubject.path()`]
 
     Method: FileSubject.equals
     """
@@ -1581,6 +1544,9 @@ def _file_subject_path(self):
     """Returns a `StrSubject` asserting on the files `path` value.
 
     Method: FileSubject.path
+
+    Returns:
+        [`StrSubject`] object.
     """
     return _str_subject_new(
         self.file.path,
@@ -1594,7 +1560,7 @@ def _file_subject_short_path_equals(self, path):
 
     Args:
         self: implicitly added.
-        path: str; the value the file's `short_path` must be equal to.
+        path: ([`str`]) the value the file's `short_path` must be equal to.
     """
     path = self.meta.format_str(path)
     if path == self.file.short_path:
@@ -1610,8 +1576,8 @@ def _instrumented_files_info_subject_new(info, *, meta):
     Method: InstrumentedFilesInfoSubject.new
 
     Args:
-        info: An `InstrumentedFilesInfo` provider instance.
-        meta: ExpectMeta struct; the meta data about the call chain.
+        info: ([`InstrumentedFilesInfo`]) provider instance.
+        meta: ([`ExpectMeta`]) the meta data about the call chain.
 
     Returns:
         An `InstrumentedFilesInfoSubject` struct.
@@ -1659,11 +1625,11 @@ def _int_subject_new(value, meta):
     Method: IntSubject.new
 
     Args:
-        value: optional int; the value to perform asserts against; may be None.
-        meta: ExpectMeta struct; the meta data about the call chain.
+        value: (optional [`int`]) the value to perform asserts against may be None.
+        meta: ([`ExpectMeta`]) the meta data about the call chain.
 
     Returns:
-        A struct representing an "IntSubject".
+        [`IntSubject`].
     """
     if not types.is_int(value) and value != None:
         fail("int required, got: {}".format(_repr_with_type(value)))
@@ -1687,7 +1653,7 @@ def _int_subject_equals(self, other):
 
     Args:
         self: implicitly added.
-        other: number; value the subject must be equal to.
+        other: ([`int`]) value the subject must be equal to.
     """
     if self.actual == other:
         return
@@ -1703,7 +1669,7 @@ def _int_subject_is_greater_than(self, other):
 
     Args:
         self: implicitly added.
-        other: number; value the subject must be greater than.
+        other: ([`int`]) value the subject must be greater than.
     """
     if self.actual != None and other != None and self.actual > other:
         return
@@ -1719,7 +1685,7 @@ def _int_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added
-        unexpected: int; the value actual cannot equal.
+        unexpected: ([`int`]) the value actual cannot equal.
     """
     return _check_not_equals(
         actual = self.actual,
@@ -1733,11 +1699,11 @@ def _label_subject_new(label, meta):
     Method: LabelSubject.new
 
     Args:
-        label: Label; the label to check against.
-        meta: ExpectMeta; the metadata about the call chain.
+        label: ([`Label`]) the label to check against.
+        meta: ([`ExpectMeta`]) the metadata about the call chain.
 
     Returns:
-        `LabelSubject` struct.
+        [`LabelSubject`].
     """
 
     # buildifier: disable=uninitialized
@@ -1757,7 +1723,7 @@ def _label_subject_equals(self, other):
 
     Args:
         self: implicitly added.
-        other: Label or str; the expected value. If a str is passed, it
+        other: ([`Label`] | [`str`]) the expected value. If a `str` is passed, it
             will be converted to a `Label` using the `Label` function.
     """
     if types.is_string(other):
@@ -1774,7 +1740,8 @@ def _label_subject_is_in(self, any_of):
 
     Args:
         self: implicitly added.
-        any_of: collection of Labels or strs (that are parsable by Label).
+        any_of: ([`collection`] of ([`Label`] | [`str`])) If strings are
+            provided, they must be parsable by `Label`.
     """
     any_of = [
         Label(v) if types.is_string(v) else v
@@ -1788,10 +1755,10 @@ def _dict_subject_new(actual, meta, container_name = "dict", key_plural_name = "
     Method: DictSubject.new
 
     Args:
-        actual: dict; the dict to assert against.
-        meta: ExpectMeta object.
-        container_name: str; conceptual name of the dict.
-        key_plural_name: str; the plural word for the keys of the dict.
+        actual: ([`dict`]) the dict to assert against.
+        meta: ([`ExpectMeta`]) of call chain information.
+        container_name: ([`str`]) conceptual name of the dict.
+        key_plural_name: ([`str`]) the plural word for the keys of the dict.
 
     Returns:
         New `DictSubject` struct.
@@ -1819,7 +1786,7 @@ def _dict_subject_contains_at_least(self, at_least):
 
     Args:
         self: implicitly added.
-        at_least: dict; the subset of keys/values that must exist. Extra
+        at_least: ([`dict`]) the subset of keys/values that must exist. Extra
             keys are allowed. Order is not checked.
     """
     result = _compare_dicts(
@@ -1848,7 +1815,7 @@ def _dict_subject_contains_exactly(self, expected):
 
     Args:
         self: implicitly added
-        expected: dict; the values that must exist. Missing values or
+        expected: ([`dict`]) the values that must exist. Missing values or
             extra values are not allowed. Order is not checked.
     """
     result = _compare_dicts(
@@ -1879,7 +1846,7 @@ def _dict_subject_contains_none_of(self, none_of):
 
     Args:
         self: implicitly added
-        none_of: dict; the keys/values that must not exist. Order is not
+        none_of: ([`dict`]) the keys/values that must not exist. Order is not
             checked.
     """
     result = _compare_dicts(
@@ -1924,7 +1891,7 @@ def _dict_subject_keys(self):
     Args:
         self: implicitly added
     Returns:
-        `CollectionSubject` of the keys.
+        [`CollectionSubject`] of the keys.
     """
     return _collection_subject_new(
         self.actual.keys(),
@@ -1936,18 +1903,18 @@ def _dict_subject_keys(self):
 def _ordered_incorrectly_new(format_problem, format_actual, meta):
     """Creates a new `Ordered` object that fails due to incorrectly ordered values.
 
-    This creates an Ordered object that always fails. If order is correct,
-    use the _IN_ORDER constant.
+    This creates an [`Ordered`] object that always fails. If order is correct,
+    use the `_IN_ORDER` constant.
 
     Args:
-        format_problem: callable; accepts no args and returns string (the
+        format_problem: (callable) accepts no args and returns string (the
             reported problem description).
-        format_actual: callable; accepts not args and returns tring (the
+        format_actual: (callable) accepts not args and returns tring (the
             reported actual description).
-        meta: ExpectMeta; used to report the failure.
+        meta: ([`ExpectMeta`]) used to report the failure.
 
     Returns:
-        `Ordered` object.
+        [`Ordered`] object.
     """
     self = struct(
         meta = meta,
@@ -1973,8 +1940,8 @@ def _run_environment_info_subject_new(info, *, meta):
     Method: RunEnvironmentInfoSubject.new
 
     Args:
-        info: The provider instance struct.
-        meta: `ExpectMeta` struct of call chain information.
+        info: ([`RunEnvironmentInfo`]) provider instance.
+        meta: ([`ExpectMeta`]) of call chain information.
     """
 
     # buildifier: disable=uninitialized
@@ -1997,7 +1964,7 @@ def _run_environment_info_subject_environment(self):
         self: implicitly added
 
     Returns:
-        `DictSubject` of the str->str environment map.
+        [`DictSubject`] of the str->str environment map.
     """
     return _dict_subject_new(
         self.actual.environment,
@@ -2013,7 +1980,8 @@ def _run_environment_info_subject_inherited_environment(self):
         self: implicitly added
 
     Returns:
-        `CollectionSubject` of the str inherited_environment list.
+        [`CollectionSubject`] of [`str`]; from the
+        [`RunEnvironmentInfo.inherited_environment`] list.
     """
     return _collection_subject_new(
         self.actual.inherited_environment,
@@ -2026,13 +1994,14 @@ def _runfiles_subject_new(runfiles, meta, kind = None):
     Method: RunfilesSubject.new
 
     Args:
-        runfiles: runfiles; the runfiles to check against.
-        meta: `ExpectMeta` struct; the metadata about the call chain.
-        kind: optional str; what type of runfiles they are, usually "data"
+        runfiles: ([`runfiles`]) the runfiles to check against.
+        meta: ([`ExpectMeta`]) the metadata about the call chain.
+        kind: (optional [`str`]) what type of runfiles they are, usually "data"
             or "default". If not known or not applicable, use None.
 
+xxxx
     Returns:
-        A `RunfilesSubject` struct.
+        [`RunfilesSubject`] object
     """
     self = struct(
         runfiles = runfiles,
@@ -2061,7 +2030,7 @@ def _runfiles_subject_contains(self, expected):
 
     Args:
         self: implicitly added.
-        expected: str; the path to check is present. This will be formatted
+        expected: ([`str`]) the path to check is present. This will be formatted
             using `ExpectMeta.format_str` and its current contextual
             keywords. Note that paths are runfiles-root relative (i.e.
             you likely need to include the workspace name.)
@@ -2080,11 +2049,11 @@ def _runfiles_subject_contains_at_least(self, paths):
 
     Args:
         self: implicitly added.
-        paths: collection[str] or runfiles; the paths that must exist. If
-            a collection of strings is provided, they will be formatted using
-            `meta.format_str`, so its template keywords can be directly passed.
-            If a runfiles object is passed, it is converted to a set of
-            path strings.
+        paths: ((collection of [`str`]) | [`runfiles`]) the paths that must
+            exist. If a collection of strings is provided, they will be
+            formatted using [`ExpectMeta.format_str`], so its template keywords
+            can be directly passed. If a `runfiles` object is passed, it is
+            converted to a set of path strings.
     """
     if is_runfiles(paths):
         paths = runfiles_paths(self.meta.ctx.workspace_name, paths)
@@ -2107,7 +2076,7 @@ def _runfiles_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: callable that takes 1 positional arg (str path) and returns
+        matcher: callable that takes 1 positional arg ([`str`] path) and returns
             boolean.
     """
     _check_contains_predicate(
@@ -2128,7 +2097,7 @@ def _runfiles_subject_contains_exactly(self, paths):
 
     Args:
         self: implicitly added.
-        paths: collection of strings; the paths to check. These will be
+        paths: ([`collection`] of [`str`]) the paths to check. These will be
             formatted using `meta.format_str`, so its template keywords can
             be directly passed. All the paths must exist in the runfiles exactly
             as provided, and no extra paths may exist.
@@ -2163,11 +2132,11 @@ def _runfiles_subject_contains_none_of(self, paths, require_workspace_prefix = T
 
     Args:
         self: implicitly added.
-        paths: collection of str; the paths that should not exist. They should
+        paths: ([`collection`] of [`str`]) the paths that should not exist. They should
             be runfiles root-relative paths (not workspace relative). The value
             is formatted using `ExpectMeta.format_str` and the current
             contextual keywords.
-        require_workspace_prefix: bool; True to check that the path includes the
+        require_workspace_prefix: ([`bool`]) True to check that the path includes the
             workspace prefix. This is to guard against accidentallly passing a
             workspace relative path, which will (almost) never exist, and cause
             the test to always pass. Specify False if the file being checked for
@@ -2193,11 +2162,11 @@ def _runfiles_subject_not_contains(self, path, require_workspace_prefix = True):
 
     Args:
         self: implicitly added.
-        path: str; the path that should not exist. It should be a runfiles
+        path: ([`str`]) the path that should not exist. It should be a runfiles
             root-relative path (not workspace relative). The value is formatted
             using `format_str`, so its template keywords can be directly
             passed.
-        require_workspace_prefix: bool; True to check that the path includes the
+        require_workspace_prefix: ([`bool`]) True to check that the path includes the
             workspace prefix. This is to guard against accidentallly passing a
             workspace relative path, which will (almost) never exist, and cause
             the test to always pass. Specify False if the file being checked for
@@ -2223,7 +2192,7 @@ def _runfiles_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: `Matcher` that accepts a string (runfiles root-relative path).
+        matcher: [`Matcher`] that accepts a string (runfiles root-relative path).
     """
     _check_not_contains_predicate(self.actual_paths, matcher, meta = self.meta)
 
@@ -2240,11 +2209,11 @@ def _str_subject_new(actual, meta):
     Method: StrSubject.new
 
     Args:
-        actual: str; the string to check against.
-        meta: `ExpectMeta` struct of call chain information.
+        actual: ([`str`]) the string to check against.
+        meta: ([`ExpectMeta`]) of call chain information.
 
     Returns:
-        A struct representing a "StrSubject".
+        [`StrSubject`] object.
     """
     self = struct(actual = actual, meta = meta)
     public = struct(
@@ -2265,7 +2234,7 @@ def _str_subject_contains(self, substr):
 
     Args:
         self: implicitly added.
-        substr: str; the substring to check for.
+        substr: ([`str`]) the substring to check for.
     """
     if substr in self.actual:
         return
@@ -2281,7 +2250,7 @@ def _str_subject_equals(self, other):
 
     Args:
         self: implicitly added.
-        other: str; the expected value it should equal.
+        other: ([`str`]) the expected value it should equal.
     """
     if self.actual == other:
         return
@@ -2297,7 +2266,7 @@ def _str_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added.
-        unexpected: str; the value actual cannot equal.
+        unexpected: ([`str`]) the value actual cannot equal.
     """
     return _check_not_equals(
         actual = self.actual,
@@ -2323,12 +2292,15 @@ def _target_subject_new(target, meta):
 
     Method: TargetSubject.new
 
+    **Public attributes**:
+      * `actual`: The wrapped [`Target`] object.
+
     Args:
-        target: Target; the target to check against.
-        meta: ExpectMeta struct; metadata about the call chain.
+        target: ([`Target`]) the target to check against.
+        meta: ([`ExpectMeta`]) metadata about the call chain.
 
     Returns:
-        struct representing a "TargetSubject"
+        [`TargetSubject`] object
     """
     self = struct(target = target, meta = meta)
     public = struct(
@@ -2361,7 +2333,7 @@ def _target_subject_runfiles(self):
         self: implicitly added.
 
     Returns:
-        A RunfilesSubject struct (see `_runfiles_subject_new`)
+        [`RunfilesSubject`] object.
     """
     meta = self.meta.derive("runfiles()")
     return _runfiles_subject_new(self.target[DefaultInfo].default_runfiles, meta, "default")
@@ -2375,7 +2347,7 @@ def _target_subject_tags(self):
         self: implicitly added
 
     Returns:
-        `CollectionSubject` asserting the target's tags.
+        [`CollectionSubject`] asserting the target's tags.
     """
     return _collection_subject_new(
         _target_subject_get_attr(self, "tags"),
@@ -2402,7 +2374,7 @@ def _target_subject_data_runfiles(self):
         self: implicitly added.
 
     Returns:
-        A RunfilesSubject struct (see `_runfiles_subject_new`)
+        [`RunfilesSubject`] object
     """
     meta = self.meta.derive("data_runfiles()")
     return _runfiles_subject_new(self.target[DefaultInfo].data_runfiles, meta, "data")
@@ -2444,7 +2416,7 @@ def _target_subject_failures(self):
         self: implicitly added
 
     Returns:
-        A CollectionSubject (of strs).
+        [`CollectionSubject`] of [`str`].
     """
     meta = self.meta.derive("failures()")
     if AnalysisFailureInfo in self.target:
@@ -2489,7 +2461,7 @@ def _target_subject_output_group(self, name):
 
     Args:
         self: implicitly added.
-        name: str, an output group name. If it isn't present, an error is raised.
+        name: ([`str`]) an output group name. If it isn't present, an error is raised.
 
     Returns:
         DepsetFileSubject of the named output group.
@@ -2543,12 +2515,12 @@ def _target_subject_action_generating(self, short_path):
 
     Args:
         self: implicitly added.
-        short_path: str; the output's short_path to match. The value is
-            formatted using `format_path`, so its template keywords can be
+        short_path: ([`str`]) the output's short_path to match. The value is
+            formatted using [`format_str`], so its template keywords can be
             directly passed.
 
     Returns:
-        `ActionSubject` for the matching action. If no action is found, or
+        [`ActionSubject`] for the matching action. If no action is found, or
         more than one action matches, then an error is raised.
     """
 
@@ -2583,15 +2555,15 @@ def _target_subject_action_named(self, mnemonic):
 
     Method: TargetSubject.action_named
 
-    NOTE: in order to use this method, the target must have the `TestingAspectInfo`
-    provider (added by the `testing_aspect` aspect.)
+    NOTE: in order to use this method, the target must have the [`TestingAspectInfo`]
+    provider (added by the [`testing_aspect`] aspect.)
 
     Args:
         self: implicitly added.
-        mnemonic: str; the mnemonic to match
+        mnemonic: ([`str`]) the mnemonic to match
 
     Returns:
-        ActionSubject. If no action matches, or more than one action matches, an error
+        [`ActionSubject`]. If no action matches, or more than one action matches, an error
         is raised.
     """
     if TestingAspectInfo not in self.target:
@@ -2638,9 +2610,9 @@ def _target_subject_attr(self, name, *, factory = None):
 
     Args:
         self: implicitly added
-        name: str; the attribute to get. If it's an unsupported attribute, and
+        name: ([`str`]) the attribute to get. If it's an unsupported attribute, and
             no explicit factory was provided, an error will be raised.
-        factory: callable; function to create the returned subject based on
+        factory: (callable) function to create the returned subject based on
             the attribute value. If specified, it takes precedence over the
             attributes that are inherently understood. It must have the
             following signature: `def factory(value, *, meta)`, where `value` is
@@ -2693,21 +2665,21 @@ def _check_contains_exactly(
     Args:
         expect_contains: the values that must exist (and no more).
         actual_container: the values to check within.
-        format_actual: callable; accepts no args and returns str (the
+        format_actual: (callable) accepts no args and returns [`str`] (the
             description of the actual values).
-        format_expected: callable; accepts no args and returns str (
+        format_expected: (callable) accepts no args and returns [`str`] (
             description of the expected values).
-        format_missing: callable; accepts 1 position arg (list of values from
-            `expect_contains` that were missing), and returns str (description of
+        format_missing: (callable) accepts 1 position arg (list of values from
+            `expect_contains` that were missing), and returns [`str`] (description of
             the missing values).
-        format_unexpected: callable; accepts 1 positional arg (list of values from
-           `actual_container` that weren't expected), and returns str (description of
+        format_unexpected: (callable) accepts 1 positional arg (list of values from
+           `actual_container` that weren't expected), and returns [`str`] (description of
            the unexpected values).
-        format_out_of_order: callable; accepts 1 arg (a list of "MatchResult"
+        format_out_of_order: (callable) accepts 1 arg (a list of "MatchResult"
             structs, see above) and returns a string (the problem message
             reported on failure). The order of match results is the expected
             order.
-        meta: ExceptMeta struct to record failures.
+        meta: ([`ExpectMeta`]) to record failures.
     """
     result = _compare_contains_exactly_predicates(
         expect_contains = [
@@ -2760,21 +2732,21 @@ def _check_contains_exactly_predicates(
     Args:
         expect_contains: the predicates that must match (and no more).
         actual_container: the values to check within.
-        format_actual: callable; accepts no args and returns str (the
+        format_actual: (callable) accepts no args and returns [`str`] (the
             description of the actual values).
-        format_expected: callable; accepts no args and returns str (
+        format_expected: (callable) accepts no args and returns [`str`] (
             description of the expected values).
-        format_missing: callable; accepts 1 position arg (list of values from
-            `expect_contains` that were missing), and returns str (description of
+        format_missing: (callable) accepts 1 position arg (list of values from
+            `expect_contains` that were missing), and returns [`str`] (description of
             the missing values).
-        format_unexpected: callable; accepts 1 positional arg (list of values from
-           `actual_container` that weren't expected), and returns str (description of
+        format_unexpected: (callable) accepts 1 positional arg (list of values from
+           `actual_container` that weren't expected), and returns [`str`] (description of
            the unexpected values).
-        format_out_of_order: callable; accepts 1 arg (a list of "MatchResult"
+        format_out_of_order: (callable) accepts 1 arg (a list of "MatchResult"
             structs, see above) and returns a string (the problem message
             reported on failure). The order of match results is the expected
             order.
-        meta: ExceptMeta struct to record failures.
+        meta: ([`ExpectMeta`]) to record failures.
     """
     result = _compare_contains_exactly_predicates(
         expect_contains = expect_contains,
@@ -2806,15 +2778,15 @@ def _check_contains_predicate(collection, matcher, *, format_problem, format_act
     """Check that `matcher` matches any value in `collection`, and record an error if not.
 
     Args:
-        collection: collection; the collection whose values are compared against.
-        matcher: Matcher that must match.
-        format_problem: str or callable; If a string, then the problem message
+        collection: ([`collection`]) the collection whose values are compared against.
+        matcher: ([`Matcher`]) that must match.
+        format_problem: ([`str`] |  callable) If a string, then the problem message
             to use when failing. If a callable, a no-arg callable that returns
             the problem string; see `_format_problem_*` for existing helpers.
-        format_actual: str or callable; If a string, then the actual message
+        format_actual: ([`str`] |  callable) If a string, then the actual message
             to use when failing. If a callable, a no-arg callable that returns
             the actual string; see `_format_actual_*` for existing helpers.
-        meta: ExceptMeta struct to record failures
+        meta: ([`ExpectMeta`]) to record failures
     """
     for value in collection:
         if matcher.match(value):
@@ -2840,19 +2812,19 @@ def _check_contains_at_least_predicates(
     `in_order()`.
 
     Args:
-        collection: collection of values to check within.
-        matchers: collection of `Matcher` objects to match (see `matchers` struct)
-        format_missing: callable; accepts 1 positional arg (a list of the
+        collection: [`collection`] of values to check within.
+        matchers: [`collection`] of [`Matcher`] objects to match (see `matchers` struct)
+        format_missing: (callable) accepts 1 positional arg (a list of the
             `matchers` that did not match) and returns a string (the problem
             message reported on failure).
-        format_out_of_order: callable; accepts 1 arg (a list of `MatchResult`s)
+        format_out_of_order: (callable) accepts 1 arg (a list of `MatchResult`s)
             and returns a string (the problem message reported on failure). The
             order of match results is the expected order.
         format_actual: callable: accepts no args and returns a string (the
             text describing the actual value reported on failure).
-        meta: ExpectMeta struct; used for reporting errors.
+        meta: ([`ExpectMeta`]) used for reporting errors.
     Returns:
-        `Ordered` object to allow checking the order of matches.
+        [`Ordered`] object to allow checking the order of matches.
     """
 
     # We'll later update this list in-place with results. We keep the order
@@ -2903,10 +2875,10 @@ def _check_contains_none_of(*, collection, none_of, meta, sort = True):
     """Check that a collection does not have any of the `none_of` values.
 
     Args:
-        collection: the collection to values to check within
-        none_of: the values that should not exist
-        meta: ExceptMeta struct to record failures
-        sort: bool; If true, sort the values for display.
+        collection: ([`collection`]) the values to check within.
+        none_of: the values that should not exist.
+        meta: ([`ExpectMeta`]) to record failures.
+        sort: ([`bool`]) If true, sort the values for display.
     """
     unexpected = []
     for value in none_of:
@@ -2928,10 +2900,10 @@ def _check_not_contains_predicate(collection, matcher, *, meta, sort = True):
     """Check that `matcher` matches no values in `collection`.
 
     Args:
-        collection: collection; the collection whose values are compared against.
-        matcher: Matcher that must not match.
-        meta: ExceptMeta struct to record failures
-        sort: bool; If true, the collection will be sorted for display.
+        collection: ([`collection`]) the collection whose values are compared against.
+        matcher: ([`Matcher`]) that must not match.
+        meta: ([`ExpectMeta`]) to record failures
+        sort: ([`bool`]) If `True`, the collection will be sorted for display.
     """
     matches = _maybe_sorted([v for v in collection if matcher.match(v)], sort)
     if not matches:
@@ -2950,7 +2922,7 @@ def _common_subject_is_in(self, any_of):
     Args:
         self: The subject object. It must provide `actual` and `meta`
             attributes.
-        any_of: collection of values.
+        any_of: [`collection`] of values.
     """
     return _check_is_in(self.actual, _to_list(any_of), self.meta)
 
@@ -2959,8 +2931,8 @@ def _check_is_in(actual, any_of, meta):
 
     Args:
         actual: value to check for in `any_of`
-        any_of: collection of values to check within.
-        meta: ExpectMeta struct to record failures
+        any_of: [`collection`] of values to check within.
+        meta: ([`ExpectMeta`]) to record failures
     """
     if actual in any_of:
         return
@@ -2978,9 +2950,9 @@ def _check_not_equals(*, unexpected, actual, meta):
     mistakes where different data types (usually) can never be equal.
 
     Args:
-        unexpected: object; the value that actual cannot equal
-        actual: object; the observed value
-        meta: ExpectMeta object to record failures
+        unexpected: (object) the value that actual cannot equal
+        actual: (object) the observed value
+        meta: ([`ExpectMeta`]) to record failures
     """
     same_type = type(actual) == type(unexpected)
     equal = not (actual != unexpected)  # Use != to preserve semantics
@@ -3004,10 +2976,10 @@ def _match_result_new(*, found_at, matched_value, matcher):
     matched to an actual value.
 
     Args:
-        found_at: int; the position in the actual container the match
+        found_at: ([`int`]) the position in the actual container the match
             occurred at.
         matched_value: the actual value that caused the match
-        matcher: Matcher or value that matched
+        matcher: ([`Matcher`] |  value) the value that matched
 
     """
     return struct(
@@ -3039,22 +3011,22 @@ def _compare_contains_exactly_predicates(*, expect_contains, actual_container):
     to match against, which fails.
 
     Args:
-        expect_contains: collection of `Matcher`s; the predicates that must match.
+        expect_contains: ([`collection`] of `Matcher`s) the predicates that must match.
             To perform simple equalty, use `matching.equals_wrapper()`.
-        actual_container: collection; The container to check within.
+        actual_container: ([`collection`]) The container to check within.
     Returns:
         struct with the following attributes:
-        * contains_exactly: bool; True if all the predicates (and no others)
+        * contains_exactly: ([`bool`]) True if all the predicates (and no others)
               matched a distinct element; does not consider order.
-        * is_in_order: bool; True if the actuals values matched in the same
+        * is_in_order: ([`bool`]) True if the actuals values matched in the same
               order as the expected predicates. False if they were out of order.
               If `contains_exactly=False`, this attribute is undefined.
-        * missing: list; `Matcher`s from `expect_contains` that did not find a
+        * missing: [`list`] of [`Matcher`]s from `expect_contains` that did not find a
               corresponding element in `actual_container`.
-        * unexpected: list; values from `actual_container` that were not
+        * unexpected: ([`list`]) values from `actual_container` that were not
               present in `expect_contains`.
-        * matches: list of MatchResult; Information about which elements in
-              the two lists that matched each other. If
+        * matches: ([`list`] of [`MatchResult`]) information about which elements
+              in the two lists that matched each other. If
               `contains_exactly=False`, this attribute is undefined.
     """
 
@@ -3165,21 +3137,21 @@ def _list_find(search_in, search_for, *, start = 0, end = None):
     """Linear search a list for a value matching a predicate.
 
     Args:
-        search_in: list; the list to search within.
-        search_for: callable; accepts 1 positional arg (the current value)
-            and returns bool (True if matched).
-        start: int; the position within `search_in` to start at. Defaults
-            to 0 (start of list)
-        end: optional int; the position within `search_in` to stop before (i.e.
-            the value is exclusive; given a list of length 5, specifying `end=5`
-            means it will search the whole list). Defaults to the length of
-            `search_in`.
+        search_in: ([`list`]) the list to search within.
+        search_for: (callable) accepts 1 positional arg (the current value)
+            and returns `bool` (`True` if matched, `False` if not).
+        start: ([`int`]) the position within `search_in` to start at. Defaults
+            to `0` (start of list)
+        end: (optional [`int`]) the position within `search_in` to stop before
+            (i.e. the value is exclusive; given a list of length 5, specifying
+            `end=5` means it will search the whole list). Defaults to the length
+            of `search_in`.
     Returns:
-        Tuple of (int found_at, value).
+        [`tuple`] of ([`int`] found_at, value).
         * If the value was found, then `found_at` is the offset in `search_in`
           it was found at, and matched value is the element at that offset.
         * If the value was not found, then `found_at=-1`, and the matched
-          value is None.
+          value is `None`.
     """
     end = len(search_in) if end == None else end
     pos = start
@@ -3196,20 +3168,20 @@ def _compare_dicts(*, expected, actual):
     """Compares two dicts, reporting differences.
 
     Args:
-        expected: dict; the desired state of `actual`
-        actual: dict; the observed dict
+        expected: ([`dict`]) the desired state of `actual`
+        actual: ([`dict`]) the observed dict
     Returns:
         Struct with the following attributes:
-        * missing_keys: list of keys that were missing in `actual`, but present
+        * missing_keys: [`list`] of keys that were missing in `actual`, but present
           in `expected`
-        * unexpected_keys: list of keys that were present in `actual`, but not
+        * unexpected_keys: [`list`] of keys that were present in `actual`, but not
           present in `expected`
-        * incorrect_entries: dict of key -> DictEntryMismatch; of keys that
+        * incorrect_entries: ([`dict`] of key -> [`DictEntryMismatch`]) of keys that
           were in both dicts, but whose values were not equal. The value is
           a "DictEntryMismatch" struct, which is defined as a struct with
           attributes:
-            * actual: the value from `actual[key]`
-            * expected: the value from `expected[key]`
+            * `actual`: the value from `actual[key]`
+            * `expected`: the value from `expected[key]`
     """
     all_keys = {key: None for key in actual.keys()}
     all_keys.update({key: None for key in expected.keys()})
@@ -3241,11 +3213,11 @@ def _format_actual_collection(actual, name = "values", sort = True):
     """Creates an error message for the observed values of a collection.
 
     Args:
-        actual: collection; the values to show
-        name: str; the conceptual name of the collection.
-        sort: bool; If true, the collection will be sorted for display.
+        actual: ([`collection`]) the values to show
+        name: ([`str`]) the conceptual name of the collection.
+        sort: ([`bool`]) If true, the collection will be sorted for display.
     Returns:
-        str; the formatted error message.
+        [`str`]; the formatted error message.
     """
     actual = _maybe_sorted(actual, sort)
     return "actual {name}:\n{actual}".format(
@@ -3263,15 +3235,15 @@ def _format_failure_missing_all_values(
     """Create error messages when a container is missing all the expected values.
 
     Args:
-        element_plural_name: str; the plural word for the values in the container.
-        container_name: str; the conceptual name of the container.
+        element_plural_name: ([`str`]) the plural word for the values in the container.
+        container_name: ([`str`]) the conceptual name of the container.
         missing: the collection of values that are missing.
         actual: the collection of values observed.
-        sort: bool; if True, then missing and actual are sorted. If False, they
+        sort: ([`bool`]) if True, then missing and actual are sorted. If False, they
             are not sorted.
 
     Returns:
-        Tuple of (str problem, str actual), suitable for passing to ExpectMeta's
+        [`tuple`] of ([`str`] problem, [`str`] actual), suitable for passing to ExpectMeta's
         `add_failure()` method.
     """
     missing = _maybe_sorted(missing, sort)
@@ -3288,14 +3260,14 @@ def _format_failure_unexpected_values(*, none_of, unexpected, actual, sort = Tru
     """Create error messages when a container has unexpected values.
 
     Args:
-        none_of: str; description of the values that were not expected to be
+        none_of: ([`str`]) description of the values that were not expected to be
             present.
-        unexpected: collection; the values that were unexpectedly found.
-        actual: collection; the observed values.
-        sort: bool; True if the collections should be sorted for output.
+        unexpected: ([`collection`]) the values that were unexpectedly found.
+        actual: ([`collection`]) the observed values.
+        sort: ([`bool`]) True if the collections should be sorted for output.
 
     Returns:
-        Tuple of (str problem, str actual), suitable for passing to ExpectMeta's
+        [`tuple`] of ([`str`] problem, [`str`] actual), suitable for passing to ExpectMeta's
         `add_failure()` method.
     """
     unexpected = _maybe_sorted(unexpected, sort)
@@ -3311,13 +3283,13 @@ def _format_failure_unexpected_value(container_name, unexpected, actual, sort = 
     """Create error messages when a container contains a specific unexpected value.
 
     Args:
-        container_name: str; conceptual name of the container.
+        container_name: ([`str`]) conceptual name of the container.
         unexpected: the value that shouldn't have been in `actual`.
-        actual: collection; the observed values.
-        sort: bool; True if the collections should be sorted for output.
+        actual: ([`collection`]) the observed values.
+        sort: ([`bool`]) True if the collections should be sorted for output.
 
     Returns:
-        Tuple of (str problem, str actual), suitable for passing to ExpectMeta's
+        [`tuple`] of ([`str`] problem, [`str`] actual), suitable for passing to ExpectMeta's
         `add_failure()` method.
     """
     problem_msg = "expected not to contain: {}".format(unexpected)
@@ -3335,14 +3307,14 @@ def _format_problem_dict_expected(
     """Formats an expected dict, describing what went wrong.
 
     Args:
-        expected: dict, the full expected value.
-        missing_keys: list, the keys that were not found.
-        unexpected_keys: list, the keys that should not have existed
-        incorrect_entries: list of `DictEntryMismatch` struct (see _compare_dict).
-        container_name: str; conceptual name of the dict.
-        key_plural_name: str; the plural word for the keys of the dict.
+        expected: ([`dict`]) the full expected value.
+        missing_keys: ([`list`]) the keys that were not found.
+        unexpected_keys: ([`list`]) the keys that should not have existed
+        incorrect_entries: ([`list`] of [`DictEntryMismatch`]) (see [`_compare_dict`]).
+        container_name: ([`str`]) conceptual name of the `expected` dict.
+        key_plural_name: ([`str`]) the plural word for the keys of the `expected` dict.
     Returns:
-        str; the problem string
+        [`str`] that describes the problem.
     """
     problem_lines = ["expected {}: {{\n{}\n}}".format(
         container_name,
@@ -3375,10 +3347,10 @@ def _format_problem_expected_exactly(expected, sort = True):
     no more.
 
     Args:
-        expected: collection of values
-        sort: bool; True if to sort the values for display.
+        expected: ([`collection`]) the expected values.
+        sort: ([`bool`]) True if to sort the values for display.
     Returns:
-        str; the formatted problem message
+        [`str`]; the formatted problem message
     """
     expected = _maybe_sorted(expected, sort)
     return "expected exactly:\n{}".format(
@@ -3389,10 +3361,10 @@ def _format_problem_missing_any_values(any_of, sort = True):
     """Create an error message for when any of a collection of values are missing.
 
     Args:
-        any_of: collection; the set of values, any of which were missing.
-        sort: bool; True if the collection should be sorted for display.
+        any_of: ([`collection`]) the set of values, any of which were missing.
+        sort: ([`bool`]) True if the collection should be sorted for display.
     Returns:
-        str; the problem description string.
+        [`str`]; the problem description string.
     """
     any_of = _maybe_sorted(any_of, sort)
     return "expected to contain any of:\n{}".format(
@@ -3403,10 +3375,10 @@ def _format_problem_missing_required_values(missing, sort = True):
     """Create an error message for when the missing values must all be present.
 
     Args:
-        missing: collection; the values that must all be present.
-        sort: bool; True if to sort the values for display
+        missing: ([`collection`]) the values that must all be present.
+        sort: ([`bool`]) True if to sort the values for display
     Returns:
-        str; the problem description string.
+        [`str`]; the problem description string.
     """
     missing = _maybe_sorted(missing, sort)
     return "{count} missing:\n{missing}".format(
@@ -3422,11 +3394,11 @@ def _format_problem_predicates_did_not_match(
     """Create an error message for when a list of predicates didn't match.
 
     Args:
-        missing: list of `Matcher` objects (see `_match_custom`).
-        element_plural_name: str; the plural word for the values in the container.
-        container_name: str; the conceptual name of the container.
+        missing: ([`list`] of [`Matcher`]) (see `_match_custom`).
+        element_plural_name: ([`str`]) the plural word for the values in the container.
+        container_name: ([`str`]) the conceptual name of the container.
     Returns:
-        str; the problem description string.
+        [`str`]; the problem description string.
     """
 
     return "{count} expected {name} missing from {container}:\n{missing}".format(
@@ -3443,9 +3415,9 @@ def _format_problem_matched_out_of_order(matches):
     """Create an error message for when a expected values matched in the wrong order.
 
     Args:
-        matches: list of `MatchResult` objects; see `_check_contains_at_least_predicates()`.
+        matches: ([`list`] of [`MatchResult`]) see `_check_contains_at_least_predicates()`.
     Returns:
-        str; the problem description string.
+        [`str`]; the problem description string.
     """
     format_matched_value = _guess_format_value([m.matched_value for m in matches])
 
@@ -3481,11 +3453,11 @@ def _format_problem_unexpected_values(unexpected, sort = True):
     """Create an error message for when there are unexpected values.
 
     Args:
-        unexpected: list of unexpected values.
-        sort: bool; true if the values should be sorted for output.
+        unexpected: ([`list`]) the unexpected values.
+        sort: ([`bool`]) true if the values should be sorted for output.
 
     Returns:
-        str; the problem description string.
+        [`str`]; the problem description string.
     """
     unexpected = _maybe_sorted(unexpected, sort)
     return "{count} unexpected:\n{unexpected}".format(
@@ -3515,14 +3487,14 @@ def _enumerate_list_as_lines(values, prefix = "", format_value = None):
     """Format a list of values in a human-friendly list.
 
     Args:
-        values: list of values
-        prefix: str; prefix to add before each line item.
+        values: ([`list`]) the values to display, one per line.
+        prefix: ([`str`]) prefix to add before each line item.
         format_value: optional callable to convert each value to a string.
             If not specified, then an appropriate converter will be inferred
             based on the values. If specified, then the callable must accept
             1 positional arg and return a string.
     Returns:
-        str; the values formatted as a human-friendly list.
+        [`str`]; the values formatted as a human-friendly list.
     """
     if not values:
         return "{}<empty>".format(prefix)
@@ -3547,12 +3519,13 @@ def _format_dict_as_lines(mapping, prefix = "", format_value = None, sort = True
     """Format a dictionary as lines of key->value for easier reading.
 
     Args:
-        mapping: dict to show
-        prefix: str; prefix to prepend to every line.
-        format_value: callable; takes a value from the dictionary to show and
-            returns the string that shown be shown. If not specified, one
-            will be automatically determined from the dictionary's values.
-        sort: bool; true if the output should be sorted by dict key (if
+        mapping: [`dict`] to show
+        prefix: ([`str`]) prefix to prepend to every line.
+        format_value: (optional callable) takes a value from the dictionary
+            to show and returns the string that shown be shown. If not
+            specified, one will be automatically determined from the
+            dictionary's values.
+        sort: ([`bool`]) `True` if the output should be sorted by dict key (if
             the keys are sortable).
     """
     lines = []
@@ -3592,8 +3565,8 @@ def _maybe_sorted(container, allow_sorting = True):
     """Attempts to return the values of `container` in sorted order, if possible.
 
     Args:
-        container: A list (or other object convertible to list)
-        allow_sorting: bool; whether to sort even if it can be sorted. This
+        container: ([`list`] | (or other object convertible to list))
+        allow_sorting: ([`bool`]) whether to sort even if it can be sorted. This
             is primarly so that callers can avoid boilerplate when they have
             a "should it be sorted" arg, but also always convert to a list.
 
@@ -3630,18 +3603,21 @@ def _to_list(obj):
 def _match_custom(desc, func):
     """Wrap an arbitrary function up as a Matcher.
 
-    `Match` struct attributes:
-        * desc: str; a human-friendly description
-        * match: callable; accepts 1 positional arg (the value to match) and
-        returns bool (True if it matched, False if not).
+    Method: Matcher.new
+
+    `Matcher` struct attributes:
+
+    * `desc`: ([`str`]) a human-friendly description
+    * `match`: (callable) accepts 1 positional arg (the value to match) and
+        returns [`bool`] (`True` if it matched, `False` if not).
 
     Args:
-        desc: str; a human-friendly string describing what is matched.
-        func: callable; accepts 1 positional arg (the value to match) and
-            returns bool (True if it matched, False if not).
+        desc: ([`str`]) a human-friendly string describing what is matched.
+        func: (callable) accepts 1 positional arg (the value to match) and
+            returns [`bool`] (`True` if it matched, `False` if not).
 
     Returns:
-        a "Matcher" struct (see above).
+        [`Matcher`] (see above).
     """
     return struct(desc = desc, match = func)
 
@@ -3655,7 +3631,7 @@ def _match_equals_wrapper(value):
         value: object, the value that must be equal to.
 
     Returns:
-        `Matcher` (see `_match_custom()`), whose description is `value`.
+        [`Matcher`] (see `_match_custom()`), whose description is `value`.
     """
     return _match_custom(value, lambda other: other == value)
 
@@ -3663,10 +3639,10 @@ def _match_file_basename_contains(substr):
     """Match that a a `File.basename` string contains a substring.
 
     Args:
-        substr: str; the substring to match.
+        substr: ([`str`]) the substring to match.
 
     Returns:
-        `Matcher` (see `_match_custom()`).
+        [`Matcher`] (see `_match_custom()`).
     """
     return struct(
         desc = "<basename contains '{}'>".format(substr),
@@ -3677,11 +3653,11 @@ def _match_file_path_matches(pattern):
     """Match that a `File.path` string matches a glob-style pattern.
 
     Args:
-        pattern: str; the pattern to match. "*" can be used to denote
+        pattern: ([`str`]) the pattern to match. "*" can be used to denote
             "match anything".
 
     Returns:
-        Match struct (see `_match_custom`).
+        [`Matcher`] (see `_match_custom`).
     """
     parts = pattern.split("*")
     return struct(
@@ -3699,7 +3675,7 @@ def _match_is_in(values):
         values: The collection that the value must be within.
 
     Returns:
-        `Matcher` (see `_match_custom()`).
+        [`Matcher`] (see `_match_custom()`).
     """
     return struct(
         desc = "<is any of {}>".format(repr(values)),
@@ -3713,10 +3689,10 @@ def _match_never(desc):
     while providing a custom description.
 
     Args:
-        desc: str; human-friendly string.
+        desc: ([`str`]) human-friendly string.
 
     Returns:
-        `Matcher` (see `_match_custom`).
+        [`Matcher`] (see `_match_custom`).
     """
     return struct(
         desc = desc,
@@ -3733,7 +3709,7 @@ def _match_contains(contained):
         contained: the value that to-be-matched value must contain.
 
     Returns:
-        `Matcher` (see `_match_custom`).
+        [`Matcher`] (see `_match_custom`).
     """
     return struct(
         desc = "<contains {}>".format(contained),
@@ -3744,10 +3720,10 @@ def _match_str_endswith(suffix):
     """Match that a string contains another string.
 
     Args:
-        suffix: str; the suffix that must be present
+        suffix: ([`str`]) the suffix that must be present
 
     Returns:
-        `Matcher` (see `_match_custom`).
+        [`Matcher`] (see `_match_custom`).
     """
     return struct(
         desc = "<endswith '{}'>".format(suffix),
@@ -3758,12 +3734,12 @@ def _match_str_matches(pattern):
     """Match that a string matches a glob-style pattern.
 
     Args:
-        pattern: str; the pattern to match. "*" can be used to denote
-            "match anything". There is an implicit "*" at the start and
+        pattern: ([`str`]) the pattern to match. `*` can be used to denote
+            "match anything". There is an implicit `*` at the start and
             end of the pattern.
 
     Returns:
-        Match struct (see `_match_custom`).
+        [`Matcher`] object.
     """
     parts = pattern.split("*")
     return struct(
@@ -3775,10 +3751,10 @@ def _match_str_startswith(prefix):
     """Match that a string contains another string.
 
     Args:
-        prefix: str; the prefix that must be present
+        prefix: ([`str`]) the prefix that must be present
 
     Returns:
-        `Matcher` (see `_match_custom`).
+        [`Matcher`] (see `_match_custom`).
     """
     return struct(
         desc = "<startswith '{}'>".format(prefix),
