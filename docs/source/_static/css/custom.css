@@ -1,0 +1,18 @@
+.tight-table td {
+  white-space: normal !important
+}
+
+.wy-nav-content {
+    max-width: 70%;
+}
+
+.function {
+  border: thin solid grey;
+  margin-bottom: 1em;
+}
+
+.function h2 {
+  background-color: #e7f2fa;
+  border-bottom: thin solid grey;
+  padding-left: 0.5ex;
+}

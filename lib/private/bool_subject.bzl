@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""BoolSubject implementation."""
+"""# BoolSubject"""
 
 load(":check_util.bzl", "check_not_equals", "common_subject_is_in")
 
@@ -73,4 +73,6 @@ def _bool_subject_not_equals(self, unexpected):
 # buildifier: disable=name-conventions
 BoolSubject = struct(
     new = _bool_subject_new,
+    equals = _bool_subject_equals,
+    not_equals = _bool_subject_not_equals,
 )

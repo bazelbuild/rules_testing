@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""FileSubject implementation."""
+"""# FileSubject"""
 
 load(":str_subject.bzl", "StrSubject")
 
@@ -24,6 +24,7 @@ def _file_subject_new(file, meta):
     Args:
         file: ([`File`]) the file to assert against.
         meta: ([`ExpectMeta`])
+
     Returns:
         [`FileSubject`] object.
     """
@@ -97,4 +98,7 @@ def _file_subject_short_path_equals(self, path):
 # buildifier: disable=name-conventions
 FileSubject = struct(
     new = _file_subject_new,
+    equals = _file_subject_equals,
+    path = _file_subject_path,
+    short_path_equals = _file_subject_short_path_equals,
 )

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LabelSubject implementation."""
+"""# LabelSubject"""
 
 load("@bazel_skylib//lib:types.bzl", "types")
 load(":check_util.bzl", "common_subject_is_in")
@@ -78,4 +78,6 @@ def _label_subject_is_in(self, any_of):
 # buildifier: disable=name-conventions
 LabelSubject = struct(
     new = _label_subject_new,
+    equals = _label_subject_equals,
+    is_in = _label_subject_is_in,
 )

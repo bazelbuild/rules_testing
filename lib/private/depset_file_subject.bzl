@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""DepsetFileSubject implementation."""
+"""# DepsetFileSubject"""
 
 load("//lib:util.bzl", "is_file")
 load(
@@ -113,6 +113,7 @@ def _depset_file_subject_contains_at_least(self, expected):
             `ExpectMeta.format_str` and its current contextual keywords. Note
             that, when using `File` objects, two files' configurations must be the
             same for them to be considered equal.
+
     Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
@@ -280,4 +281,12 @@ def _depset_file_subject_not_contains_predicate(self, matcher):
 # buildifier: disable=name-conventions
 DepsetFileSubject = struct(
     new = _depset_file_subject_new,
+    contains = _depset_file_subject_contains,
+    contains_at_least = _depset_file_subject_contains_at_least,
+    contains_any_in = _depset_file_subject_contains_any_in,
+    contains_at_least_predicates = _depset_file_subject_contains_at_least_predicates,
+    contains_predicate = _depset_file_subject_contains_predicate,
+    contains_exactly = _depset_file_subject_contains_exactly,
+    not_contains = _depset_file_subject_not_contains,
+    not_contains_predicate = _depset_file_subject_not_contains_predicate,
 )

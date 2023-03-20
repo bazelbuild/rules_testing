@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Various utilities to aid with testing."""
+"""# Util
+
+Various utilities to aid with testing.
+"""
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")

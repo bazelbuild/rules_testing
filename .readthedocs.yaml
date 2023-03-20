@@ -1,0 +1,26 @@
+
+version: 2
+
+  #formats:
+  #  - pdf
+
+sphinx:
+  configuration: docs/source/conf.py
+
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.11"
+    nodejs: "19"
+  jobs:
+    pre_build:
+      - npm install -g @bazel/bazelisk
+      - bazel run //docs:run_sphinx_build
+      - env
+      - find .
+    post_build:
+      - find .
+
+python:
+  install:
+    - requirements: docs/requirements.txt

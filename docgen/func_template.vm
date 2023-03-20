@@ -1,0 +1,31 @@
+#set( $nl = "
+" )
+{.function}
+#[[##]]# ${funcInfo.functionName}
+
+<pre>
+${util.funcSummary($funcInfo)}
+</pre>
+
+${funcInfo.docString}
+
+#if (!$funcInfo.getParameterList().isEmpty())
+**PARAMETERS**
+#foreach ($param in $funcInfo.getParameterList())
+
+<a id="${funcInfo.functionName}-${param.name}"></a>$param.name <a href="#${funcInfo.functionName}-${param.name}" class="headerlink"></a>
+: #if(!$param.getDefaultValue().isEmpty())(_default `${param.getDefaultValue()}`_) #end
+$param.docString.replaceAll("$nl", "$nl  ")
+#end
+#end
+#if (!$funcInfo.getReturn().docString.isEmpty())
+
+RETURNS
+: ${funcInfo.getReturn().docString}
+#end
+#if (!$funcInfo.getDeprecated().docString.isEmpty())
+
+**DEPRECATED**
+
+${funcInfo.getDeprecated().docString}
+#end

@@ -12,10 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Ordered objects implementions."""
+"""# Ordered"""
+
+# This is just a stub so doc generation is nicer.
+def _ordered_in_order(self):
+    """Checks that the valures were in order.
+
+    Args:
+        self: implicitly added.
+    """
 
 IN_ORDER = struct(
-    in_order = lambda: None,
+    in_order = _ordered_in_order,
 )
 
 def _ordered_incorrectly_new(format_problem, format_actual, meta):
@@ -56,4 +64,5 @@ def _ordered_incorrectly_in_order(self):
 # buildifier: disable=name-conventions
 OrderedIncorrectly = struct(
     new = _ordered_incorrectly_new,
+    in_order = _ordered_incorrectly_in_order,
 )

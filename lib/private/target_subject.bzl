@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TargetSubject implementation."""
+"""# TargetSubject
+
+`TargetSubject` wraps a [`Target`] object and provides method for asserting
+its state.
+"""
 
 load(
     "//lib:util.bzl",
@@ -398,4 +402,18 @@ def _provider_name(provider):
 # buildifier: disable=name-conventions
 TargetSubject = struct(
     new = _target_subject_new,
+    runfiles = _target_subject_runfiles,
+    tags = _target_subject_tags,
+    get_attr = _target_subject_get_attr,
+    data_runfiles = _target_subject_data_runfiles,
+    default_outputs = _target_subject_default_outputs,
+    executable = _target_subject_executable,
+    failures = _target_subject_failures,
+    has_provider = _target_subject_has_provider,
+    label = _target_subject_label,
+    output_group = _target_subject_output_group,
+    provider = _target_subject_provider,
+    action_generating = _target_subject_action_generating,
+    action_named = _target_subject_action_named,
+    attr = _target_subject_attr,
 )

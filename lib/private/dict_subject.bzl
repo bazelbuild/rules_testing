@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""DictSubject implementation."""
+"""# DictSubject"""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":compare_util.bzl", "compare_dicts")
@@ -159,6 +159,7 @@ def _dict_subject_keys(self):
 
     Args:
         self: implicitly added
+
     Returns:
         [`CollectionSubject`] of the keys.
     """
@@ -173,4 +174,8 @@ def _dict_subject_keys(self):
 # buildifier: disable=name-conventions
 DictSubject = struct(
     new = _dict_subject_new,
+    contains_at_least = _dict_subject_contains_at_least,
+    contains_exactly = _dict_subject_contains_exactly,
+    contains_none_of = _dict_subject_contains_none_of,
+    keys = _dict_subject_keys,
 )

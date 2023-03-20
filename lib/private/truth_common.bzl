@@ -31,6 +31,7 @@ def enumerate_list_as_lines(values, prefix = "", format_value = None):
             If not specified, then an appropriate converter will be inferred
             based on the values. If specified, then the callable must accept
             1 positional arg and return a string.
+
     Returns:
         [`str`]; the values formatted as a human-friendly list.
     """

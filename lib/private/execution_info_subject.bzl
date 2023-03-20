@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""ExecutionInfoSubject implementation."""
+"""# ExecutionInfoSubject"""
 
 load(":dict_subject.bzl", "DictSubject")
 load(":str_subject.bzl", "StrSubject")
@@ -79,4 +79,6 @@ def _execution_info_subject_exec_group(self):
 # buildifier: disable=name-conventions
 ExecutionInfoSubject = struct(
     new = _execution_info_subject_new,
+    requirements = _execution_info_subject_requirements,
+    exec_group = _execution_info_subject_exec_group,
 )

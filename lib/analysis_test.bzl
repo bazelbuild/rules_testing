@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Analysis testing support."""
+"""# Analysis test
+
+Support for testing analysis phase logic, such as rules.
+"""
 
 load("//lib:truth.bzl", "truth")
 load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")

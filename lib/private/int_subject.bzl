@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""IntSubject implementation."""
+"""# IntSubject"""
 
 load("@bazel_skylib//lib:types.bzl", "types")
 load(":check_util.bzl", "check_not_equals", "common_subject_is_in")
@@ -96,4 +96,7 @@ def _int_subject_not_equals(self, unexpected):
 # buildifier: disable=name-conventions
 IntSubject = struct(
     new = _int_subject_new,
+    equals = _int_subject_equals,
+    is_greater_than = _int_subject_is_greater_than,
+    not_equals = _int_subject_not_equals,
 )

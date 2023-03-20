@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""ActionSubject implementation."""
+"""# ActionSubject"""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":depset_file_subject.bzl", "DepsetFileSubject")
@@ -96,6 +96,9 @@ def _action_subject_argv(self):
     """Returns a CollectionSubject for the action's argv.
 
     Method: ActionSubject.argv
+
+    Returns:
+        [`CollectionSubject`] object.
     """
     meta = self.meta.derive("argv()")
     return CollectionSubject.new(
@@ -117,7 +120,8 @@ def _action_subject_contains_at_least_args(self, args):
         self: implicitly added.
         args: ([`list`] of [`str`]) all the args must be in the argv exactly
             as provided. Multiplicity is respected.
-    Returns
+
+    Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return CollectionSubject.new(
@@ -181,7 +185,8 @@ def _action_subject_has_flags_specified(self, flags):
             Multiplicity is respected. A flag is considered present if any of
             these forms are detected: `--flag=value`, `--flag value`, or a lone
             `--flag`.
-    Returns
+
+    Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return CollectionSubject.new(
@@ -313,7 +318,8 @@ def _action_subject_contains_at_least_inputs(self, inputs):
         self: implicitly added.
         inputs: (collection of [`File`]) All must be present. Multiplicity
             is respected.
-    Returns
+
+    Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     return DepsetFileSubject.new(
@@ -355,4 +361,17 @@ def _action_subject_env(self):
 # buildifier: disable=name-conventions
 ActionSubject = struct(
     new = _action_subject_new,
+    parse_flags = _action_subject_parse_flags,
+    argv = _action_subject_argv,
+    contains_at_least_args = _action_subject_contains_at_least_args,
+    not_contains_arg = _action_subject_not_contains_arg,
+    substitutions = _action_subject_substitutions,
+    has_flags_specified = _action_subject_has_flags_specified,
+    mnemonic = _action_subject_mnemonic,
+    inputs = _action_subject_inputs,
+    contains_flag_values = _action_subject_contains_flag_values,
+    contains_none_of_flag_values = _action_subject_contains_none_of_flag_values,
+    contains_at_least_inputs = _action_subject_contains_at_least_inputs,
+    content = _action_subject_content,
+    env = _action_subject_env,
 )

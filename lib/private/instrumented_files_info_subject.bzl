@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""InstrumentedFilesInfoSubject implementation."""
+"""# InstrumentedFilesInfoSubject"""
 
 load(":depset_file_subject.bzl", "DepsetFileSubject")
 
@@ -68,4 +68,6 @@ def _instrumented_files_info_subject_metadata_files(self):
 # buildifier: disable=name-conventions
 InstrumentedFilesInfoSubject = struct(
     new = _instrumented_files_info_subject_new,
+    instrumented_files = _instrumented_files_info_subject_instrumented_files,
+    metadata_files = _instrumented_files_info_subject_metadata_files,
 )
