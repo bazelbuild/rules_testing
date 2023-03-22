@@ -262,7 +262,7 @@ def _depset_file_subject_not_contains(self, short_path):
         short_path: ([`str`]) the short path that should not be present.
     """
     short_path = self.meta.format_str(short_path)
-    matcher = matching.match_custom(short_path, lambda f: f.short_path == short_path)
+    matcher = matching.custom(short_path, lambda f: f.short_path == short_path)
     check_not_contains_predicate(self.files, matcher, meta = self.meta)
 
 def _depset_file_subject_not_contains_predicate(self, matcher):
