@@ -12,6 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_license//rules:license.bzl", "license")
+
+package(
+    default_applicable_licenses = [":package_license"],
+    default_visibility = ["//visibility:private"],
+)
+
 licenses(["notice"])
 
 exports_files(["LICENSE"])
+
+license(
+    name = "package_license",
+    package_name = "rules_testing",
+)

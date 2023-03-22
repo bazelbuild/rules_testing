@@ -34,9 +34,13 @@ bzl_library(
     srcs = ["truth.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//lib:util_bzl",
-        "@bazel_skylib//lib:types",
-        "@bazel_skylib//lib:unittest",
+        "//lib/private:bool_subject_bzl",
+        "//lib/private:collection_subject_bzl",
+        "//lib/private:depset_file_subject_bzl",
+        "//lib/private:expect_bzl",
+        "//lib/private:int_subject_bzl",
+        "//lib/private:label_subject_bzl",
+        "//lib/private:matching_bzl",
     ],
 )
 
