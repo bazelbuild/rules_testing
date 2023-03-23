@@ -814,6 +814,20 @@ def _depset_file_subject_test(env, target):
         env = env,
     )
 
+    subject.not_contains("does-not-contain")
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "DepsetFilesubject.not_contains success test",
+    )
+    subject.not_contains("{package}/testdata/file1.txt")
+    _assert_failure(
+        fake_env,
+        ["expected not to contain any of", "file1.txt"],
+        env = env,
+        msg = "DepsetFilesubject.not_contains failure test",
+    )
+
     _end(env, fake_env)
 
 _suite.append(depset_file_subject_test)
@@ -1305,27 +1319,25 @@ def _assert_no_failures(fake_env, *, env, msg = ""):
     fake_env.reset()
 
 def _assert_failure(fake_env, expected_strs, *, env, msg = ""):
-    ut_asserts.true(
-        env,
-        len(fake_env.failures) == 1,
-        msg = "expected exactly 1 failure, but found none",
-    )
+    if len(fake_env.failures) != 1:
+        env.fail("expected exactly 1 failure, but found {}".format(len(fake_env.failures)))
+
     if len(fake_env.failures) > 0:
         failure = fake_env.failures[0]
         for expected in expected_strs:
-            ut_asserts.true(
-                env,
-                expected in failure,
-                msg = ("\nFailure message incorrect:\n{}\n" +
-                       "===== EXPECTED ERROR SUBSTRING =====\n{}\n" +
-                       "===== END EXPECTED ERROR SUBSTRING =====\n" +
-                       "===== ACTUAL FAILURE MESSAGE =====\n{}\n" +
-                       "===== END ACTUAL FAILURE MESSAGE =====").format(
+            if expected not in failure:
+                env.fail((
+                    "\nFailure message incorrect:\n{}\n" +
+                    "===== EXPECTED ERROR SUBSTRING =====\n{}\n" +
+                    "===== END EXPECTED ERROR SUBSTRING =====\n" +
+                    "===== ACTUAL FAILURE MESSAGE =====\n{}\n" +
+                    "===== END ACTUAL FAILURE MESSAGE ====="
+                ).format(
                     msg,
                     expected,
                     failure,
-                ),
-            )
+                ))
+
     fake_env.reset()
 
 def _test_helper_impl(ctx):
