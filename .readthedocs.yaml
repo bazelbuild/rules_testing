@@ -1,8 +1,9 @@
 
 version: 2
 
-  #formats:
-  #  - pdf
+formats:
+  - pdf
+  - htmlzip
 
 sphinx:
   configuration: docs/source/conf.py
@@ -16,10 +17,6 @@ build:
     pre_build:
       - npm install -g @bazel/bazelisk
       - bazel run //docs:run_sphinx_build
-      - env
-      - find .
-    post_build:
-      - find .
 
 python:
   install:

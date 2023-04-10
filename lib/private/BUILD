@@ -21,6 +21,11 @@ package(
     default_visibility = ["//:__subpackages__"],
 )
 
+# Necessary for documentation generation
+exports_files(
+    glob(["*.bzl"]),
+)
+
 bzl_library(
     name = "matching_bzl",
     srcs = ["matching.bzl"],

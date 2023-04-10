@@ -15,12 +15,8 @@
 """# Ordered"""
 
 # This is just a stub so doc generation is nicer.
-def _ordered_in_order(self):
-    """Checks that the valures were in order.
-
-    Args:
-        self: implicitly added.
-    """
+def _ordered_in_order():
+    """Checks that the values were in order."""
 
 IN_ORDER = struct(
     in_order = _ordered_in_order,

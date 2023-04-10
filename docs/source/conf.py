@@ -1,16 +1,21 @@
 # Configuration file for the Sphinx documentation builder.
 
 # -- Project information
-
 project = 'rules_testing'
 copyright = '2023, The Bazel Authors'
 author = 'Bazel'
 
-release = '0.1'
-version = '0.1.0'
+# Readthedocs fills these in
+release = '0.0.0'
+version = release
 
 # -- General configuration
 
+# Any extensions here not built into Sphinx must also be added to
+# the dependencies of Bazel and Readthedocs.
+# * //docs:requirements.in
+# * Regenerate //docs:requirements.txt (used by readthedocs)
+# * Add the dependencies to //docs:sphinx_build
 extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
@@ -37,9 +42,15 @@ templates_path = ['_templates']
 
 html_theme = 'sphinx_rtd_theme'
 
-html_theme_options = {
-}
+# See https://sphinx-rtd-theme.readthedocs.io/en/stable/configuring.html
+# for options
+html_theme_options = {}
 
+# Keep this in sync with the stardoc templates
+html_permalinks_icon = '¶'
+
+# See https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
+# for additional extensions.
 myst_enable_extensions = [
     "fieldlist",
     "attrs_block",

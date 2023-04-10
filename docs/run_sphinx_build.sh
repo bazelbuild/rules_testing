@@ -5,13 +5,22 @@
 #
 # Build docs for Sphinx. This is usually run by the readthedocs build process.
 #
-# It can also be run locally during development using Bazel.
+# It can also be run locally during development using Bazel, in which case,
+# it will run Sphinx and start a local webserver to server HTML.
 #
 # To make the local devx nicer, run it using ibazel, and it will automatically
-# re-run sphinx.
+# update docs:
+#   ibazel run //docs:run_sphinx_build
 
-set -x
 set -e
+
+if [[ -z "$BUILD_WORKSPACE_DIRECTORY" ]]; then
+  echo "ERROR: Must be run using bazel run"
+  exit 1
+fi
+
+sphinx=$(pwd)/$1
+shift
 
 crossrefs=$1
 shift
@@ -27,16 +36,13 @@ for path in "$@"; do
 done
 
 if [[ -z "$READTHEDOCS" ]]; then
-  rm -fr $BUILD_WORKSPACE_DIRECTORY/docs/build
-  cd $BUILD_WORKSPACE_DIRECTORY/docs/source
-  sourcedir=$BUILD_WORKSPACE_DIRECTORY/docs/source
-  outdir=$BUILD_WORKSPACE_DIRECTORY/docs/build
-  doctrees=$BUILD_WORKSPACE_DIRECTORY/docs/build/doctrees
-  python -m sphinx -T -E -b html -d "$doctrees" -D language=en "$sourcedir" "$outdir"
-  #make html
-  #python -m sphinx -T -E -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
+  sourcedir="$BUILD_WORKSPACE_DIRECTORY/docs/source"
+  outdir="$BUILD_WORKSPACE_DIRECTORY/docs/_build"
+  # This avoids stale files or since-deleted files from being processed.
+  rm -fr "$outdir"
+  "$sphinx" -T -b html "$sourcedir" "$outdir"
 
-  echo "HTML build, to view, run:"
-  echo "python3 -m http.server --directory $BUILD_WORKSPACE_DIRECTORY/docs/build/html"
-  #python3 -m http.server --directory $BUILD_WORKSPACE_DIRECTORY/docs/build/html
+  echo "HTML built, to view, run:"
+  echo "python3 -m http.server --directory $outdir"
+  python3 -m http.server --directory "$outdir"
 fi

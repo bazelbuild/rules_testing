@@ -1,4 +1,3 @@
-
 [`Action`]: https://bazel.build/rules/lib/Action
 [`ActionSubject`]: /api/action_subject
 [`bool`]: https://bazel.build/rules/lib/bool
@@ -23,3 +22,5 @@
 [`StrSubject`]: /api/str_subject
 [`Target`]: https://bazel.build/rules/lib/Target
 [`TargetSubject`]: /api/target_subject
+[target-name]: https://bazel.build/concepts/labels#target-names
+[attr-label]: https://bazel.build/concepts/labels

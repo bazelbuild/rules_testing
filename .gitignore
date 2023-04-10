@@ -1,5 +1,5 @@
 # Generated sphinx docs
-docs/build/
+docs/_build/
 # Generated API docs
 /docs/source/api/
 !/docs/source/api/index.md
