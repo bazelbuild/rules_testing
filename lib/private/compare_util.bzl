@@ -117,27 +117,25 @@ def compare_contains_exactly_predicates(*, expect_contains, actual_container):
     ordered = True
 
     # Start at -1 because the first iteration adds 1
-    actual_pos = -1
-    expected_pos = -1
+    pos = -1
     loop = range(max(len(actual_queue), len(expected_queue)))
     for _ in loop:
         # Advancing the position is equivalent to removing the queues's head
-        actual_pos += 1
-        expected_pos += 1
-        if actual_pos >= len(actual_queue) and expected_pos >= len(expected_queue):
+        pos += 1
+        if pos >= len(actual_queue) and pos >= len(expected_queue):
             # Can occur when e.g. actual=[A, B], expected=[B]
             break
-        if actual_pos >= len(actual_queue):
+        if pos >= len(actual_queue):
             # Fewer actual values than expected, so the rest are missing
-            missing.extend([v[1] for v in expected_queue[expected_pos:]])
+            missing.extend([v[1] for v in expected_queue[pos:]])
             break
-        if expected_pos >= len(expected_queue):
+        if pos >= len(expected_queue):
             # More actual values than expected, so the rest are unexpected
-            unexpected.extend([v[1] for v in actual_queue[actual_pos:]])
+            unexpected.extend([v[1] for v in actual_queue[pos:]])
             break
 
-        actual_entry = actual_queue[actual_pos]
-        expected_entry = expected_queue[expected_pos]
+        actual_entry = actual_queue[pos]
+        expected_entry = expected_queue[pos]
 
         if expected_entry[1].match(actual_entry[1]):
             continue  # Happy path: both are equal and order is maintained.
@@ -145,7 +143,7 @@ def compare_contains_exactly_predicates(*, expect_contains, actual_container):
         found_at, found_entry = _list_find(
             actual_queue,
             lambda v: expected_entry[1].match(v[1]),
-            start = actual_pos,
+            start = pos,
             end = len(actual_queue),
         )
         if found_at == -1:
@@ -163,7 +161,7 @@ def compare_contains_exactly_predicates(*, expect_contains, actual_container):
         found_at, found_entry = _list_find(
             expected_queue,
             lambda entry: entry[1].match(actual_entry[1]),
-            start = expected_pos,
+            start = pos,
             end = len(expected_queue),
         )
         if found_at == -1:
