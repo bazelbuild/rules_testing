@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""RunEnvironmentInfoSubject implementation."""
+"""# RunEnvironmentInfoSubject"""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":dict_subject.bzl", "DictSubject")
@@ -75,4 +75,6 @@ def _run_environment_info_subject_inherited_environment(self):
 # buildifier: disable=name-conventions
 RunEnvironmentInfoSubject = struct(
     new = _run_environment_info_subject_new,
+    environment = _run_environment_info_subject_environment,
+    inherited_environment = _run_environment_info_subject_inherited_environment,
 )

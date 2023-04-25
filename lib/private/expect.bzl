@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Expect object implementation."""
+"""# Expect"""
 
 load(":action_subject.bzl", "ActionSubject")
 load(":bool_subject.bzl", "BoolSubject")
@@ -257,4 +257,15 @@ def _expect_where(self, **details):
 # buildifier: disable=name-conventions
 Expect = struct(
     new_from_env = _expect_new_from_env,
+    new = _expect_new,
+    that_action = _expect_that_action,
+    that_bool = _expect_that_bool,
+    that_collection = _expect_that_collection,
+    that_depset_of_files = _expect_that_depset_of_files,
+    that_dict = _expect_that_dict,
+    that_file = _expect_that_file,
+    that_int = _expect_that_int,
+    that_str = _expect_that_str,
+    that_target = _expect_that_target,
+    where = _expect_where,
 )

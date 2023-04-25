@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""RunfilesSubject implementation."""
+"""# RunfilesSubject"""
 
 load(
     "//lib:util.bzl",
@@ -255,4 +255,12 @@ def _runfiles_subject_check_workspace_prefix(self, path):
 # buildifier: disable=name-conventions
 RunfilesSubject = struct(
     new = _runfiles_subject_new,
+    contains = _runfiles_subject_contains,
+    contains_at_least = _runfiles_subject_contains_at_least,
+    contains_predicate = _runfiles_subject_contains_predicate,
+    contains_exactly = _runfiles_subject_contains_exactly,
+    contains_none_of = _runfiles_subject_contains_none_of,
+    not_contains = _runfiles_subject_not_contains,
+    not_contains_predicate = _runfiles_subject_not_contains_predicate,
+    check_workspace_prefix = _runfiles_subject_check_workspace_prefix,
 )

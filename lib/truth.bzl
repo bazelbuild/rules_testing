@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Truth-style asserts for Bazel's Starlark.
+"""# Truth
+
+Truth-style asserts for Bazel's Starlark.
 
 These asserts follow the Truth-style way of performing assertions. This
 basically means the actual value is wrapped in a type-specific object that

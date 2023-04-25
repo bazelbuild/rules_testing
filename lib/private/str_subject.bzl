@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""StrSubject implementation."""
+"""# StrSubject"""
 
 load(
     ":check_util.bzl",
@@ -109,4 +109,8 @@ def _str_subject_split(self, sep):
 # buildifier: disable=name-conventions
 StrSubject = struct(
     new = _str_subject_new,
+    contains = _str_subject_contains,
+    equals = _str_subject_equals,
+    not_equals = _str_subject_not_equals,
+    split = _str_subject_split,
 )

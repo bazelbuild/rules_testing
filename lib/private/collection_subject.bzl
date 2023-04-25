@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""CollectionSubject implementation."""
+"""# CollectionSubject"""
 
 load(
     ":check_util.bzl",
@@ -129,7 +129,8 @@ def _collection_subject_contains_exactly(self, expected):
     Args:
         self: implicitly added.
         expected: ([`list`]) values that must exist.
-    Returns
+
+    Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
@@ -184,7 +185,8 @@ def _collection_subject_contains_exactly_predicates(self, expected):
     Args:
         self: implicitly added.
         expected: ([`list`] of [`Matcher`]) that must match.
-    Returns
+
+    Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
@@ -327,4 +329,13 @@ def _collection_subject_not_contains_predicate(self, matcher):
 # buildifier: disable=name-conventions
 CollectionSubject = struct(
     new = _collection_subject_new,
+    has_size = _collection_subject_has_size,
+    contains = _collection_subject_contains,
+    contains_exactly = _collection_subject_contains_exactly,
+    contains_exactly_predicates = _collection_subject_contains_exactly_predicates,
+    contains_none_of = _collection_subject_contains_none_of,
+    contains_predicate = _collection_subject_contains_predicate,
+    contains_at_least = _collection_subject_contains_at_least,
+    contains_at_least_predicates = _collection_subject_contains_at_least_predicates,
+    not_contains_predicate = _collection_subject_not_contains_predicate,
 )

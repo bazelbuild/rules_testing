@@ -3,6 +3,8 @@
 rules_testing is a collection of utilities, libraries, and frameworks to make
 testing Starlark and Bazel rules easy and pleasant.
 
+version |version|
+
 ## Installation
 
 To use rules_testing, you need to modify `WORKSPACE` or `MODULE.bazel`
@@ -28,10 +30,20 @@ config to copy and paste.
 Analysis testing means testing something during the analysis phase of Bazel
 execution -- this is when rule logic is run.
 
-See [Analysis testing](analysis_testing.md) for how to write analysis tests.
+See [Analysis tests](/analysis_tests.md) for how to write analysis tests.
 
 ## Fluent asserts
 
 Included in rules_testing is a fluent, truth-style asserts library.
 
-See [Truth docs](truth.md) for how to use it.
+See [Truth docs](/truth.md) for how to use it.
+
+
+```{toctree}
+:glob:
+:hidden:
+
+self
+*
+api/index
+```

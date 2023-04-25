@@ -11,7 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""ExpectMeta object implementation."""
+"""# ExpectMeta
+
+ExpectMeta object implementation.
+"""
 
 load("@bazel_skylib//lib:unittest.bzl", ut_asserts = "asserts")
 
@@ -173,6 +176,7 @@ def _expect_meta_get_provider(self, target, provider):
         self: implicitly added.
         target: ([`Target`]) the target to get the provider from.
         provider: The provider type to get.
+
     Returns:
         The found provider, or fails if not present.
     """
@@ -191,6 +195,7 @@ def _expect_meta_has_provider(self, target, provider):
         self: implicitly added.
         target: ([`Target`]) the target to check for the provider.
         provider: the provider type to check for.
+
     Returns:
         True if the target has the provider, False if not.
     """
@@ -264,4 +269,10 @@ def _expect_meta_call_fail(self, msg):
 # buildifier: disable=name-conventions
 ExpectMeta = struct(
     new = _expect_meta_new,
+    derive = _expect_meta_derive,
+    format_str = _expect_meta_format_str,
+    get_provider = _expect_meta_get_provider,
+    has_provider = _expect_meta_has_provider,
+    add_failure = _expect_meta_add_failure,
+    call_fail = _expect_meta_call_fail,
 )
