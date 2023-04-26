@@ -138,7 +138,13 @@ def compare_contains_exactly_predicates(*, expect_contains, actual_container):
         expected_entry = expected_queue[pos]
 
         if expected_entry[1].match(actual_entry[1]):
-            continue  # Happy path: both are equal and order is maintained.
+            # Happy path: both are equal and order is maintained.
+            matches[expected_entry[0]] = MatchResult.new(
+                found_at = actual_entry[0],
+                matched_value = actual_entry[1],
+                matcher = expected_entry[1],
+            )
+            continue
         ordered = False
         found_at, found_entry = _list_find(
             actual_queue,
