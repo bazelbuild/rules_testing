@@ -755,6 +755,32 @@ def _collection_contains_none_of_test(env, _target):
 
 _suite.append(collection_contains_none_of_test)
 
+def collection_not_contains_test(name):
+    analysis_test(name, impl = _collection_not_contains_test, target = "truth_tests_helper")
+
+def _collection_not_contains_test(env, _target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_collection(["a"])
+
+    subject.not_contains("b")
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check not_contains passes",
+    )
+    subject.not_contains("a")
+    _assert_failure(
+        fake_env,
+        [
+            "expected not to contain",
+            "0: a",
+        ],
+        env = env,
+        msg = "check not_contains fails",
+    )
+
+_suite.append(collection_not_contains_test)
+
 def collection_not_contains_predicate_test(name):
     analysis_test(name, impl = _collection_not_contains_predicate_test, target = "truth_tests_helper")
 
@@ -922,6 +948,11 @@ def _dict_subject_test(env, _target):
         ],
         env = env,
     )
+
+    # NOTE: we use the real env for this, since we're doing a real assert
+    truth.expect(env).that_collection(
+        subject.keys().actual,
+    ).contains_exactly(["a", "b", "c"])
 
     _end(env, fake_env)
 

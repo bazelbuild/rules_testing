@@ -72,6 +72,7 @@ def _collection_subject_new(
         contains_exactly_predicates = lambda *a, **k: _collection_subject_contains_exactly_predicates(self, *a, **k),
         contains_none_of = lambda *a, **k: _collection_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _collection_subject_contains_predicate(self, *a, **k),
+        not_contains = lambda *a, **k: _collection_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _collection_subject_not_contains_predicate(self, *a, **k),
         # keep sorted end
     )
@@ -308,6 +309,14 @@ def _collection_subject_contains_at_least_predicates(self, matchers):
         meta = self.meta,
     )
     return ordered
+
+def _collection_subject_not_contains(self, value):
+    check_not_contains_predicate(
+        self.actual,
+        matcher = matching.equals_wrapper(value),
+        meta = self.meta,
+        sort = self.sortable,
+    )
 
 def _collection_subject_not_contains_predicate(self, matcher):
     """Asserts that `matcher` matches no values in the collection.
