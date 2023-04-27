@@ -29,11 +29,28 @@ python.toolchain(
     name = "python3_11",
     python_version = "3.11",
 )
-use_repo(python, "python3_11_toolchains")
 
-register_toolchains(
-    "@python3_11_toolchains//:all",
+# NOTE: use_repo() must be called for each platform that runs the docgen tools
+use_repo(
+    python,
+    "python3_11_toolchains",
+    "python3_11_x86_64-unknown-linux-gnu",
 )
+
+# NOTE: This is actualy a dev dependency, but due to
+# https://github.com/bazelbuild/bazel/issues/18248
+# it has to be non-dev to generate the repo name used
+# in the subsequent register_toolchains() call.
+dev = use_extension(
+    "//:dev_extension.bzl",
+    "dev",
+)
+dev.setup()
+use_repo(dev, "rules_testing_dev_toolchains")
+
+# NOTE: This call will be run by downstream users, so the
+# repos it mentions must exist.
+register_toolchains("@rules_testing_dev_toolchains//:all")
 
 pip = use_extension(
     "@rules_python//python:extensions.bzl",

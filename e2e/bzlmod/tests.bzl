@@ -38,4 +38,31 @@ def _simple_test_impl(env, target):
 def bzlmod_test_suite(name):
     test_suite(name = name, tests = [
         _simple_test,
+        _trigger_toolchains_test,
     ])
+
+def _needs_toolchain_impl(ctx):
+    # We just need to trigger toolchain resolution, we don't
+    # care about the result.
+    _ = ctx.toolchains["//:fake"]  # @unused
+
+_needs_toolchain = rule(
+    implementation = _needs_toolchain_impl,
+    toolchains = [config_common.toolchain_type("//:fake", mandatory = False)],
+)
+
+def _trigger_toolchains_test_impl(env, target):
+    # Building is sufficient evidence of success
+    _ = env, target  # @unused
+
+# A regression test for https://github.com/bazelbuild/rules_testing/issues/33
+def _trigger_toolchains_test(name):
+    util.helper_target(
+        _needs_toolchain,
+        name = name + "_subject",
+    )
+    analysis_test(
+        name = name,
+        impl = _trigger_toolchains_test_impl,
+        target = name + "_subject",
+    )

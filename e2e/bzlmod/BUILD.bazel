@@ -3,3 +3,7 @@
 load(":tests.bzl", "bzlmod_test_suite")
 
 bzlmod_test_suite(name = "bzlmod_tests")
+
+toolchain_type(
+    name = "fake",
+)
