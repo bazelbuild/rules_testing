@@ -1,8 +1,5 @@
 {
   "integrity": "",
   "strip_prefix": "{REPO}-{VERSION}",
-  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/rules_testing-{TAG}.tar.gz",
-  "patches": {
-    "remove_register_toolchains.patch": "sha256-TSdJKlMRNjqVEpPFjV3CItj8EKi5Zm6qabiIPVYtvnc="
-  }
+  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/rules_testing-{TAG}.tar.gz"
 }
