@@ -165,7 +165,10 @@ def analysis_test(
       config_settings: A dictionary of configuration settings to change for the target under
           test and its dependencies. This may be used to essentially change 'build flags' for
           the target under test, and may thus be utilized to test multiple targets with different
-          flags in a single build
+          flags in a single build. NOTE: When values that are labels (e.g. for the
+          --platforms flag), it's suggested to always explicitly call `Label()`
+          on the value before passing it in. This ensures the label is resolved
+          in your repository's context, not rule_testing's.
       extra_target_under_test_aspects: An optional list of aspects to apply to the target_under_test
           in addition to those set up by default for the test harness itself.
       collect_actions_recursively: If true, runs testing_aspect over all attributes, otherwise
