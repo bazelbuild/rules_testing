@@ -45,4 +45,5 @@ sphinx_stardocs(
         "//lib/private:str_subject_bzl",
         "//lib/private:target_subject_bzl",
     ],
+    tags = ["docs"],
 )

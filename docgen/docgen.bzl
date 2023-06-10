@@ -29,11 +29,6 @@ def sphinx_stardocs(name, bzl_libraries, **kwargs):
             tags)
     """
 
-    # Stardoc doesn't yet work with bzlmod; we can detect this by
-    # looking for "@@" vs "@" in labels.
-    if "@@" in str(Label("//:X")):
-        kwargs["target_compatible_with"] = ["@platforms//:incompatible"]
-
     docs = []
     for label in bzl_libraries:
         lib_name = Label(label).name.replace("_bzl", "")
