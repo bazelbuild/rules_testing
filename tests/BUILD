@@ -16,6 +16,7 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load(":analysis_test_tests.bzl", "analysis_test_test_suite")
 load(":truth_tests.bzl", "truth_test_suite")
+load(":unit_test_tests.bzl", "unit_test_test_suite")
 
 licenses(["notice"])
 
@@ -43,9 +44,15 @@ analysis_test_test_suite(name = "analysis_test_test_suite")
 
 truth_test_suite(name = "truth_tests")
 
+unit_test_test_suite(name = "unit_test_test_suite")
+
 build_test(
     name = "build_tests",
     targets = [
         "//lib:util_bzl",
+        "//lib:unit_test_bzl",
+        "//lib:analysis_test_bzl",
+        "//lib:test_suite_bzl",
+        "//lib:truth_bzl",
     ],
 )

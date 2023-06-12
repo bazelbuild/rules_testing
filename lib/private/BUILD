@@ -27,6 +27,11 @@ exports_files(
 )
 
 bzl_library(
+    name = "analysis_test_bzl",
+    srcs = ["analysis_test.bzl"],
+)
+
+bzl_library(
     name = "matching_bzl",
     srcs = ["matching.bzl"],
 )
@@ -243,4 +248,9 @@ bzl_library(
         ":str_subject_bzl",
         ":target_subject_bzl",
     ],
+)
+
+bzl_library(
+    name = "util_bzl",
+    srcs = ["util.bzl"],
 )
