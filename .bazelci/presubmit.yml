@@ -16,9 +16,19 @@ tasks:
     bazel: latest
     test_flags:
       - "--enable_bzlmod"
-      - "--test_tag_filters=-skip-bzlmod"
+      - "--test_tag_filters=-skip-bzlmod,-docs"
     test_targets:
       - "..."
+
+  docs:
+    name: Docs generation
+    platform: ubuntu2004
+    bazel: latest
+    test_flags:
+      - "--enable_bzlmod"
+    test_targets:
+      - "//docgen/..."
+      - "//docs/..."
 
   e2e_bzlmod:
     platform: ${{platform}}
