@@ -29,7 +29,7 @@ def _dev_toolchains_repo_impl(rctx):
     # If its the root module, then we're in rules_testing and
     # it's a dev dependency situation.
     if rctx.attr.is_root:
-        toolchain_build = Label("@python3_11_toolchains//:BUILD.bazel")
+        toolchain_build = Label("@python_3_11_toolchains//:BUILD.bazel")
 
         # NOTE: This is brittle. It only works because, luckily,
         # rules_python's toolchain BUILD file is essentially self-contained.
