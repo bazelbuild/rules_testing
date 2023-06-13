@@ -64,7 +64,6 @@ def _collection_subject_new(
     public = struct(
         # keep sorted start
         actual = values,
-        has_size = lambda *a, **k: _collection_subject_has_size(self, *a, **k),
         contains = lambda *a, **k: _collection_subject_contains(self, *a, **k),
         contains_at_least = lambda *a, **k: _collection_subject_contains_at_least(self, *a, **k),
         contains_at_least_predicates = lambda *a, **k: _collection_subject_contains_at_least_predicates(self, *a, **k),
@@ -72,8 +71,10 @@ def _collection_subject_new(
         contains_exactly_predicates = lambda *a, **k: _collection_subject_contains_exactly_predicates(self, *a, **k),
         contains_none_of = lambda *a, **k: _collection_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _collection_subject_contains_predicate(self, *a, **k),
+        has_size = lambda *a, **k: _collection_subject_has_size(self, *a, **k),
         not_contains = lambda *a, **k: _collection_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _collection_subject_not_contains_predicate(self, *a, **k),
+        offset = lambda *a, **k: _collection_subject_offset(self, *a, **k),
         # keep sorted end
     )
     self = struct(
@@ -334,17 +335,39 @@ def _collection_subject_not_contains_predicate(self, matcher):
         sort = self.sortable,
     )
 
+def _collection_subject_offset(self, offset, factory):
+    """Fetches an element from the collection as a subject.
+
+    Args:
+        self: implicitly added.
+        offset: ([`int`]) the offset to fetch
+        factory: ([`callable`]). The factory function to use to create
+            the subject for the offset's value. It must have the following
+            signature: `def factory(value, *, meta)`.
+
+    Returns:
+        Object created by `factory`.
+    """
+    value = self.actual[offset]
+    return factory(
+        value,
+        meta = self.meta.derive("offset({})".format(offset)),
+    )
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 CollectionSubject = struct(
-    new = _collection_subject_new,
-    has_size = _collection_subject_has_size,
+    # keep sorted start
     contains = _collection_subject_contains,
+    contains_at_least = _collection_subject_contains_at_least,
+    contains_at_least_predicates = _collection_subject_contains_at_least_predicates,
     contains_exactly = _collection_subject_contains_exactly,
     contains_exactly_predicates = _collection_subject_contains_exactly_predicates,
     contains_none_of = _collection_subject_contains_none_of,
     contains_predicate = _collection_subject_contains_predicate,
-    contains_at_least = _collection_subject_contains_at_least,
-    contains_at_least_predicates = _collection_subject_contains_at_least_predicates,
+    has_size = _collection_subject_has_size,
+    new = _collection_subject_new,
     not_contains_predicate = _collection_subject_not_contains_predicate,
+    offset = _collection_subject_offset,
+    # keep sorted end
 )

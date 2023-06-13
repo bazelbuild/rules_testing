@@ -806,6 +806,32 @@ def _collection_not_contains_predicate_test(env, _target):
 
 _suite.append(collection_not_contains_predicate_test)
 
+def collection_offset_test(name):
+    analysis_test(name, impl = _collection_offset_test, target = "truth_tests_helper")
+
+def _collection_offset_test(env, _target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_collection(["a", "b", "c"])
+
+    offset_value = subject.offset(0, factory = lambda v, meta: v)
+    ut_asserts.true(env, offset_value == "a", "unexpected offset value at 0")
+
+    offset_value = subject.offset(-1, factory = lambda v, meta: v)
+    ut_asserts.true(env, offset_value == "c", "unexpected offset value at -1")
+
+    subject.offset(1, factory = subjects.str).equals("not-b")
+
+    _assert_failure(
+        fake_env,
+        [".offset(1)"],
+        env = env,
+        msg = "offset error message context not found",
+    )
+
+    _end(env, fake_env)
+
+_suite.append(collection_offset_test)
+
 def execution_info_test(name):
     analysis_test(name, impl = _execution_info_test, target = "truth_tests_helper")
 

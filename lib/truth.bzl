@@ -48,6 +48,7 @@ load("//lib/private:depset_file_subject.bzl", "DepsetFileSubject")
 load("//lib/private:expect.bzl", "Expect")
 load("//lib/private:int_subject.bzl", "IntSubject")
 load("//lib/private:label_subject.bzl", "LabelSubject")
+load("//lib/private:str_subject.bzl", "StrSubject")
 load("//lib/private:matching.bzl", _matching = "matching")
 
 # Rather than load many symbols, just load this symbol, and then all the
@@ -66,5 +67,6 @@ subjects = struct(
     depset_file = DepsetFileSubject.new,
     int = IntSubject.new,
     label = LabelSubject.new,
+    str = StrSubject.new,
     # keep sorted end
 )
