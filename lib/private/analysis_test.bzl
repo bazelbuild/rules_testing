@@ -17,6 +17,7 @@
 Support for testing analysis phase logic, such as rules.
 """
 
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//lib:truth.bzl", "truth")
 load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")
 load("//lib/private:util.bzl", "get_test_name_from_function")
@@ -100,6 +101,7 @@ def analysis_test(
         impl,
         expect_failure = False,
         attrs = {},
+        attr_values = {},
         fragments = [],
         config_settings = {},
         extra_target_under_test_aspects = [],
@@ -135,6 +137,10 @@ def analysis_test(
           to fail. Assertions can be made on the underlying failure using truth.expect_failure
       attrs: An optional dictionary to supplement the attrs passed to the
           unit test's `rule()` constructor.
+      attr_values: An optional dictionary of kwargs to pass onto the
+          analysis test target itself (e.g. common attributes like `tags`,
+          `target_compatible_with`, or attributes from `attrs`). Note that these
+          are for the analysis test target itself, not the target under test.
       fragments: An optional list of fragment names that can be used to give rules access to
           language-specific parts of configuration.
       config_settings: A dictionary of configuration settings to change for the target under
@@ -183,5 +189,5 @@ def analysis_test(
         wrapped_impl,
         attrs = attrs,
         fragments = fragments,
-        attr_values = {"target": target},
+        attr_values = dicts.add(attr_values, {"target": target}),
     )

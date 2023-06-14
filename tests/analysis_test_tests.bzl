@@ -209,11 +209,57 @@ def _inspect_output_dirs_fake_rule(ctx):
 
 inspect_output_dirs_fake_rule = rule(implementation = _inspect_output_dirs_fake_rule)
 
+########################################
+####### common_attributes_test #######
+########################################
+
+def _test_common_attributes(name):
+    native.filegroup(name = name + "_subject")
+    _toolchain_template_vars(name = name + "_toolchain_template_vars")
+    analysis_test(
+        name = name,
+        impl = _test_common_attributes_impl,
+        target = name + "_subject",
+        attr_values = dict(
+            features = ["some-feature"],
+            tags = ["taga", "tagb"],
+            visibility = ["//visibility:private"],
+            toolchains = [name + "_toolchain_template_vars"],
+            # An empty list means "compatible with everything"
+            target_compatible_with = [],
+        ),
+    )
+
+def _test_common_attributes_impl(env, target):
+    _ = target  # @unused
+    ctx = env.ctx
+    expect = env.expect
+
+    expect.that_collection(ctx.attr.tags).contains_at_least(["taga", "tagb"])
+
+    expect.that_collection(ctx.attr.features).contains_exactly(["some-feature"])
+
+    expect.that_collection(ctx.attr.visibility).contains_exactly([
+        Label("//visibility:private"),
+    ])
+
+    expect.that_collection(ctx.attr.target_compatible_with).contains_exactly([])
+
+    expanded = ctx.expand_make_variables("cmd", "$(key)", {})
+    expect.that_str(expanded).equals("value")
+
+def _toolchain_template_vars_impl(ctx):
+    _ = ctx  # @unused
+    return [platform_common.TemplateVariableInfo({"key": "value"})]
+
+_toolchain_template_vars = rule(implementation = _toolchain_template_vars_impl)
+
 def analysis_test_test_suite(name):
     test_suite(
         name = name,
         tests = [
             test_change_setting,
+            _test_common_attributes,
             test_failure_testing,
             test_change_setting_with_failure,
             test_inspect_actions,
