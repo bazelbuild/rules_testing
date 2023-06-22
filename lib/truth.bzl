@@ -48,8 +48,8 @@ load("//lib/private:depset_file_subject.bzl", "DepsetFileSubject")
 load("//lib/private:expect.bzl", "Expect")
 load("//lib/private:int_subject.bzl", "IntSubject")
 load("//lib/private:label_subject.bzl", "LabelSubject")
-load("//lib/private:str_subject.bzl", "StrSubject")
 load("//lib/private:matching.bzl", _matching = "matching")
+load("//lib/private:str_subject.bzl", "StrSubject")
 
 # Rather than load many symbols, just load this symbol, and then all the
 # asserts will be available.

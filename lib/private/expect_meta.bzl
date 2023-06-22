@@ -233,7 +233,7 @@ def _expect_meta_add_failure(self, problem, actual):
         if detail
     ])
     if details:
-        details = "where...\n" + details
+        details = "where... (most recent context last)\n" + details
     msg = """\
 in test: {test}
 value of: {expr}

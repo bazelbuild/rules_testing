@@ -31,3 +31,5 @@ def get_test_name_from_function(func):
     # have private names. This better allows unused tests to be flagged by
     # buildifier (indicating a bug or code to delete)
     return func_name.strip("_")
+
+get_function_name = get_test_name_from_function
