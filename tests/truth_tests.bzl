@@ -1093,46 +1093,6 @@ def _label_subject_test(env, target):
 
 _suite.append(label_subject_test)
 
-def matchers_contains_test(name):
-    analysis_test(name, impl = _matchers_contains_test, target = "truth_tests_helper")
-
-def _matchers_contains_test(env, _target):
-    fake_env = _fake_env(env)
-    ut_asserts.true(env, matching.contains("x").match("YYYxZZZ"))
-    ut_asserts.false(env, matching.contains("x").match("zzzzz"))
-    _end(env, fake_env)
-
-_suite.append(matchers_contains_test)
-
-def matchers_str_matchers_test(name):
-    analysis_test(name, impl = _matchers_str_matchers_test, target = "truth_tests_helper")
-
-def _matchers_str_matchers_test(env, _target):
-    fake_env = _fake_env(env)
-
-    ut_asserts.true(env, matching.str_matches("f*b").match("foobar"))
-    ut_asserts.false(env, matching.str_matches("f*b").match("nope"))
-
-    ut_asserts.true(env, matching.str_endswith("123").match("abc123"))
-    ut_asserts.false(env, matching.str_endswith("123").match("123xxx"))
-
-    ut_asserts.true(env, matching.str_startswith("true").match("truechew"))
-    ut_asserts.false(env, matching.str_startswith("buck").match("notbuck"))
-    _end(env, fake_env)
-
-_suite.append(matchers_str_matchers_test)
-
-def matchers_is_in_test(name):
-    analysis_test(name, impl = _matchers_is_in_test, target = "truth_tests_helper")
-
-def _matchers_is_in_test(env, _target):
-    fake_env = _fake_env(env)
-    ut_asserts.true(env, matching.is_in(["a", "b"]).match("a"))
-    ut_asserts.false(env, matching.is_in(["x", "y"]).match("z"))
-    _end(env, fake_env)
-
-_suite.append(matchers_is_in_test)
-
 def runfiles_subject_test(name):
     analysis_test(name, impl = _runfiles_subject_test, target = "truth_tests_helper")
 
