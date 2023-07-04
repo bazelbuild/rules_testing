@@ -920,6 +920,14 @@ def _dict_subject_test(env, _target):
     fake_env = _fake_env(env)
     subject = truth.expect(fake_env).that_dict({"a": 1, "b": 2, "c": 3})
 
+    def factory(value, *, meta):
+        return struct(value = value, meta = meta)
+
+    actual = subject.get("a", factory = factory)
+
+    truth.expect(env).that_int(actual.value).equals(1)
+    truth.expect(env).that_collection(actual.meta._exprs).contains("get(a)")
+
     subject.contains_exactly({"a": 1, "b": 2, "c": 3})
     _assert_no_failures(fake_env, env = env)
 

@@ -39,10 +39,13 @@ def _dict_subject_new(actual, meta, container_name = "dict", key_plural_name = "
 
     # buildifier: disable=uninitialized
     public = struct(
+        # keep sorted start
         contains_exactly = lambda *a, **k: _dict_subject_contains_exactly(self, *a, **k),
         contains_at_least = lambda *a, **k: _dict_subject_contains_at_least(self, *a, **k),
         contains_none_of = lambda *a, **k: _dict_subject_contains_none_of(self, *a, **k),
+        get = lambda *a, **k: _dict_subject_get(self, *a, **k),
         keys = lambda *a, **k: _dict_subject_keys(self, *a, **k),
+        # keep sorted end
     )
     self = struct(
         actual = actual,
@@ -151,6 +154,20 @@ def _dict_subject_contains_none_of(self, none_of):
         ),
         actual = "actual: {{\n{}\n}}".format(format_dict_as_lines(self.actual)),
     )
+
+def _dict_subject_get(self, key, *, factory):
+    """Gets `key` from the actual dict wrapped in a subject.
+
+    Args:
+        self: implicitly added.
+        key: ([`object`]) the key to fetch.
+        factory: ([`callable`]) subject factory function, with the signature
+            of `def factory(value, *, meta)`, and returns the wrapped value.
+
+    Returns:
+        The return value of the `factory` arg.
+    """
+    return factory(self.actual[key], meta = self.meta.derive("get({})".format(key)))
 
 def _dict_subject_keys(self):
     """Returns a `CollectionSubject` for the dict's keys.
