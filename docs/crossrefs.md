@@ -19,7 +19,9 @@
 [`Ordered`]: /api/ordered
 [`RunfilesSubject`]: /api/runfiles_subject
 [`str`]: https://bazel.build/rules/lib/string
+[`struct`]: https://bazel.build/rules/lib/builtins/struct
 [`StrSubject`]: /api/str_subject
+[`StructSubject`]: /api/struct_subject
 [`Target`]: https://bazel.build/rules/lib/Target
 [`TargetSubject`]: /api/target_subject
 [target-name]: https://bazel.build/concepts/labels#target-names
