@@ -45,10 +45,14 @@ def foo_test(env, target):
 load("//lib/private:bool_subject.bzl", "BoolSubject")
 load("//lib/private:collection_subject.bzl", "CollectionSubject")
 load("//lib/private:depset_file_subject.bzl", "DepsetFileSubject")
+load("//lib/private:dict_subject.bzl", "DictSubject")
 load("//lib/private:expect.bzl", "Expect")
+load("//lib/private:file_subject.bzl", "FileSubject")
 load("//lib/private:int_subject.bzl", "IntSubject")
 load("//lib/private:label_subject.bzl", "LabelSubject")
+load("//lib/private:runfiles_subject.bzl", "RunfilesSubject")
 load("//lib/private:str_subject.bzl", "StrSubject")
+load("//lib/private:target_subject.bzl", "TargetSubject")
 load("//lib/private:matching.bzl", _matching = "matching")
 
 # Rather than load many symbols, just load this symbol, and then all the
@@ -65,8 +69,12 @@ subjects = struct(
     bool = BoolSubject.new,
     collection = CollectionSubject.new,
     depset_file = DepsetFileSubject.new,
+    dict = DictSubject.new,
+    file = FileSubject.new,
     int = IntSubject.new,
     label = LabelSubject.new,
+    runfiles = RunfilesSubject.new,
     str = StrSubject.new,
+    target = TargetSubject.new,
     # keep sorted end
 )
