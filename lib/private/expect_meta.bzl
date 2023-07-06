@@ -77,6 +77,7 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
         ctx = env.ctx,
         env = env,
         add_failure = lambda *a, **k: _expect_meta_add_failure(self, *a, **k),
+        current_expr = lambda *a, **k: _expect_meta_current_expr(self, *a, **k),
         derive = lambda *a, **k: _expect_meta_derive(self, *a, **k),
         format_str = lambda *a, **k: _expect_meta_format_str(self, *a, **k),
         get_provider = lambda *a, **k: _expect_meta_get_provider(self, *a, **k),
@@ -242,12 +243,24 @@ value of: {expr}
 {details}
 """.format(
         test = self.ctx.label,
-        expr = ".".join(self._exprs),
+        expr = _expect_meta_current_expr(self),
         problem = problem,
         actual = actual,
         details = details,
     )
     _expect_meta_call_fail(self, msg)
+
+def _expect_meta_current_expr(self):
+    """Get a string representing the current expression.
+
+    Args:
+        self: implicitly added.
+
+    Returns:
+        [`str`] A string representing the current expression, e.g.
+        "foo.bar(something).baz()"
+    """
+    return ".".join(self._exprs)
 
 def _expect_meta_call_fail(self, msg):
     """Adds a failure to the test run.
