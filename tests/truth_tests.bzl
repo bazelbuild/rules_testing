@@ -832,6 +832,81 @@ def _collection_offset_test(env, _target):
 
 _suite.append(collection_offset_test)
 
+def _collection_transform_test(name):
+    analysis_test(name, impl = _collection_transform_test_impl, target = "truth_tests_helper")
+
+def _collection_transform_test_impl(env, target):
+    _ = target  # @unused
+    fake_env = _fake_env(env)
+    starter = truth.expect(fake_env).that_collection(["alan", "bert", "cari"])
+
+    actual = starter.transform(
+        "values that contain a",
+        filter = lambda v: "a" in v,
+    )
+    actual.contains("not-present")
+    _assert_failure(
+        fake_env,
+        [
+            "transform()",
+            "0: alan",
+            "1: cari",
+            "transform: values that contain a",
+        ],
+        env = env,
+        msg = "transform with lambda filter",
+    )
+
+    actual = starter.transform(filter = matching.contains("b"))
+    actual.contains("not-present")
+    _assert_failure(
+        fake_env,
+        [
+            "0: bert",
+            "transform: filter=<contains b>",
+        ],
+        env = env,
+        msg = "transform with matcher filter",
+    )
+
+    def contains_c(v):
+        return "c" in v
+
+    actual = starter.transform(filter = contains_c)
+    actual.contains("not-present")
+    _assert_failure(
+        fake_env,
+        [
+            "0: cari",
+            "transform: filter=contains_c(...)",
+        ],
+        env = env,
+        msg = "transform with named function filter",
+    )
+
+    actual = starter.transform(
+        "v.upper(); match even offsets",
+        map_each = lambda v: "{}-{}".format(v[0], v[1].upper()),
+        loop = enumerate,
+    )
+    actual.contains("not-present")
+    _assert_failure(
+        fake_env,
+        [
+            "transform()",
+            "0: 0-ALAN",
+            "1: 1-BERT",
+            "2: 2-CARI",
+            "transform: v.upper(); match even offsets",
+        ],
+        env = env,
+        msg = "transform with all args",
+    )
+
+    _end(env, fake_env)
+
+_suite.append(_collection_transform_test)
+
 def execution_info_test(name):
     analysis_test(name, impl = _execution_info_test, target = "truth_tests_helper")
 

@@ -120,18 +120,19 @@ def _expect_that_bool(self, value, expr = "boolean"):
         meta = self.meta.derive(expr = expr),
     )
 
-def _expect_that_collection(self, collection, expr = "collection"):
+def _expect_that_collection(self, collection, expr = "collection", **kwargs):
     """Creates a subject for asserting collections.
 
     Args:
         self: implicitly added.
         collection: The collection (list or depset) to assert.
         expr: ([`str`]) the starting "value of" expression to report in errors.
+        **kwargs: Additional kwargs to pass onto CollectionSubject.new
 
     Returns:
         [`CollectionSubject`] object.
     """
-    return CollectionSubject.new(collection, self.meta.derive(expr))
+    return CollectionSubject.new(collection, self.meta.derive(expr), **kwargs)
 
 def _expect_that_depset_of_files(self, depset_files):
     """Creates a subject for asserting a depset of files.

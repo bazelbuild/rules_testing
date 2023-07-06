@@ -63,6 +63,7 @@ bzl_library(
         ":int_subject_bzl",
         ":matching_bzl",
         ":truth_common_bzl",
+        ":util_bzl",
     ],
 )
 

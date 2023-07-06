@@ -35,6 +35,14 @@ load(
 load(":int_subject.bzl", "IntSubject")
 load(":matching.bzl", "matching")
 load(":truth_common.bzl", "to_list")
+load(":util.bzl", "get_function_name")
+
+def _identity(v):
+    return v
+
+def _always_true(v):
+    _ = v  # @unused
+    return True
 
 def _collection_subject_new(
         values,
@@ -75,6 +83,7 @@ def _collection_subject_new(
         not_contains = lambda *a, **k: _collection_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _collection_subject_not_contains_predicate(self, *a, **k),
         offset = lambda *a, **k: _collection_subject_offset(self, *a, **k),
+        transform = lambda *a, **k: _collection_subject_transform(self, *a, **k),
         # keep sorted end
     )
     self = struct(
@@ -354,6 +363,87 @@ def _collection_subject_offset(self, offset, factory):
         meta = self.meta.derive("offset({})".format(offset)),
     )
 
+def _collection_subject_transform(
+        self,
+        desc = None,
+        *,
+        map_each = None,
+        loop = None,
+        filter = None):
+    """Transforms a collections's value and returns another CollectionSubject.
+
+    This is equivalent to applying a list comprehension over the collection values,
+    but takes care of propagating context information and wrapping the value
+    in a `CollectionSubject`.
+
+    `transform(map_each=M, loop=L, filter=F)` is equivalent to
+    `[M(v) for v in L(collection) if F(v)]`.
+
+    Args:
+        self: implicitly added.
+        desc: (optional [`str`]) a human-friendly description of the transform
+            for use in error messages. Required when a description can't be
+            inferred from the other args. The description can be inferred if the
+            filter arg is a named function (non-lambda) or Matcher object.
+        map_each: (optional [`callable`]) function to transform an element in
+            the collection. It takes one positional arg, the loop's
+            current iteration value, and its return value will be the element's
+            new value. If not specified, the values from the loop iteration are
+            returned unchanged.
+        loop: (optional [`callable`]) function to produce values from the
+            original collection and whose values are iterated over. It takes one
+            positional arg, which is the original collection. If not specified,
+            the original collection values are iterated over.
+        filter: (optional [`callable`]) function that decides what values are
+            passed onto `map_each` for inclusion in the final result. It takes
+            one positional arg, the value to match (which is the current
+            iteration value before `map_each` is applied), and returns a bool
+            (True if the value should be included in the result, False if it
+            should be skipped).
+
+    Returns:
+        [`CollectionSubject`] of the transformed values.
+    """
+    if not desc:
+        if map_each or loop:
+            fail("description required when map_each or loop used")
+
+        if matching.is_matcher(filter):
+            desc = "filter=" + filter.desc
+        else:
+            func_name = get_function_name(filter)
+            if func_name == "lambda":
+                fail("description required: description cannot be " +
+                     "inferred from lambdas. Explicitly specify the " +
+                     "description, use a named function for the filter, " +
+                     "or use a Matcher for the filter.")
+            else:
+                desc = "filter={}(...)".format(func_name)
+
+    map_each = map_each or _identity
+    loop = loop or _identity
+
+    if filter:
+        if matching.is_matcher(filter):
+            filter_func = filter.match
+        else:
+            filter_func = filter
+    else:
+        filter_func = _always_true
+
+    new_values = [map_each(v) for v in loop(self.actual) if filter_func(v)]
+
+    return _collection_subject_new(
+        new_values,
+        meta = self.meta.derive(
+            "transform()",
+            details = ["transform: {}".format(desc)],
+        ),
+        container_name = self.container_name,
+        sortable = self.sortable,
+        element_plural_name = self.element_plural_name,
+    )
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 CollectionSubject = struct(
@@ -369,5 +459,6 @@ CollectionSubject = struct(
     new = _collection_subject_new,
     not_contains_predicate = _collection_subject_not_contains_predicate,
     offset = _collection_subject_offset,
+    transform = _collection_subject_transform,
     # keep sorted end
 )

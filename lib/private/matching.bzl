@@ -214,6 +214,9 @@ def _match_parts_in_order(string, parts):
             return False
     return True
 
+def _is_matcher(obj):
+    return hasattr(obj, "desc") and hasattr(obj, "match")
+
 # For the definition of a `Matcher` object, see `_match_custom`.
 matching = struct(
     # keep sorted start
@@ -229,5 +232,6 @@ matching = struct(
     str_endswith = _match_str_endswith,
     str_matches = _match_str_matches,
     str_startswith = _match_str_startswith,
+    is_matcher = _is_matcher,
     # keep sorted end
 )
