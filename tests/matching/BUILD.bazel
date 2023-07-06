@@ -1,0 +1,3 @@
+load(":matching_tests.bzl", "matching_test_suite")
+
+matching_test_suite(name = "matching_tests")
