@@ -126,6 +126,16 @@ bzl_library(
 )
 
 bzl_library(
+    name = "default_info_subject_bzl",
+    srcs = ["default_info_subject.bzl"],
+    deps = [
+        ":depset_file_subject_bzl",
+        ":file_subject_bzl",
+        ":runfiles_subject_bzl",
+    ],
+)
+
+bzl_library(
     name = "depset_file_subject_bzl",
     srcs = ["depset_file_subject.bzl"],
     deps = [
