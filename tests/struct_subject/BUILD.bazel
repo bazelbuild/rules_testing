@@ -1,0 +1,3 @@
+load(":struct_subject_tests.bzl", "struct_subject_test_suite")
+
+struct_subject_test_suite(name = "struct_subject_tests")

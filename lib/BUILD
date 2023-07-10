@@ -46,6 +46,7 @@ bzl_library(
         "//lib/private:int_subject_bzl",
         "//lib/private:label_subject_bzl",
         "//lib/private:matching_bzl",
+        "//lib/private:struct_subject_bzl",
     ],
 )
 

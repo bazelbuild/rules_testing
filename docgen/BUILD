@@ -43,6 +43,7 @@ sphinx_stardocs(
         "//lib/private:run_environment_info_subject_bzl",
         "//lib/private:runfiles_subject_bzl",
         "//lib/private:str_subject_bzl",
+        "//lib/private:struct_subject_bzl",
         "//lib/private:target_subject_bzl",
     ],
     tags = ["docs"],

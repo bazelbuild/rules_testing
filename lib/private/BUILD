@@ -216,6 +216,11 @@ bzl_library(
 )
 
 bzl_library(
+    name = "struct_subject_bzl",
+    srcs = ["struct_subject.bzl"],
+)
+
+bzl_library(
     name = "target_subject_bzl",
     srcs = ["target_subject.bzl"],
     deps = [
@@ -247,6 +252,7 @@ bzl_library(
         ":file_subject_bzl",
         ":int_subject_bzl",
         ":str_subject_bzl",
+        ":struct_subject_bzl",
         ":target_subject_bzl",
     ],
 )

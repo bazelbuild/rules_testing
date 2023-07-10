@@ -54,6 +54,7 @@ load("//lib/private:runfiles_subject.bzl", "RunfilesSubject")
 load("//lib/private:str_subject.bzl", "StrSubject")
 load("//lib/private:target_subject.bzl", "TargetSubject")
 load("//lib/private:matching.bzl", _matching = "matching")
+load("//lib/private:struct_subject.bzl", "StructSubject")
 
 # Rather than load many symbols, just load this symbol, and then all the
 # asserts will be available.
@@ -75,6 +76,7 @@ subjects = struct(
     label = LabelSubject.new,
     runfiles = RunfilesSubject.new,
     str = StrSubject.new,
+    struct = StructSubject.new,
     target = TargetSubject.new,
     # keep sorted end
 )
