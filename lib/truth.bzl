@@ -44,6 +44,7 @@ def foo_test(env, target):
 
 load("//lib/private:bool_subject.bzl", "BoolSubject")
 load("//lib/private:collection_subject.bzl", "CollectionSubject")
+load("//lib/private:default_info_subject.bzl", "DefaultInfoSubject")
 load("//lib/private:depset_file_subject.bzl", "DepsetFileSubject")
 load("//lib/private:dict_subject.bzl", "DictSubject")
 load("//lib/private:expect.bzl", "Expect")
@@ -69,6 +70,7 @@ subjects = struct(
     # keep sorted start
     bool = BoolSubject.new,
     collection = CollectionSubject.new,
+    default_info = DefaultInfoSubject.new,
     depset_file = DepsetFileSubject.new,
     dict = DictSubject.new,
     file = FileSubject.new,

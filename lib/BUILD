@@ -41,6 +41,7 @@ bzl_library(
     deps = [
         "//lib/private:bool_subject_bzl",
         "//lib/private:collection_subject_bzl",
+        "//lib/private:default_info_subject_bzl",
         "//lib/private:depset_file_subject_bzl",
         "//lib/private:expect_bzl",
         "//lib/private:int_subject_bzl",

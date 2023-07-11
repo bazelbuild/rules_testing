@@ -7,6 +7,10 @@
     be set on tests themselves. This allows skipping tests based on platform
     or filtering out tests using `--test_tag_filters`
     ([#43](https://github.com/bazelbuild/rules_testing/issues/43))
+  * DefaultInfoSubject for asserting the builtin DefaultInfo provider
+    ([#52](https://github.com/bazelbuild/rules_testing/issues/52))
+  * StructSubject for asserting arbitrary structs.
+    ([#53](https://github.com/bazelbuild/rules_testing/issues/53))
   * (docs) Created human-friendly changelog
 
 ## [0.3.0] - 2023-07-06
