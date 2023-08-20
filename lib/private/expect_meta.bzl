@@ -36,7 +36,7 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
     The `env` object basically provides a way to interact with things outside
     of the truth assertions framework. This allows easier testing of the
     framework itself and decouples it from a particular test framework (which
-    makes it usuable by by rules_testing's analysis_test and skylib's
+    makes it usable by by rules_testing's analysis_test and skylib's
     analysistest)
 
     The `env` object requires the following attribute:
@@ -51,7 +51,7 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
         provider and returns [`bool`]. This is used to implement `Provider in
         target` operations.
       * get_provider: (callable) it accepts two positional args, target and
-        provider and returns the provder value. This is used to implement
+        provider and returns the provider value. This is used to implement
         `target[Provider]`.
 
     Args:

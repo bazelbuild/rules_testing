@@ -100,7 +100,7 @@ def maybe_sorted(container, allow_sorting = True):
     Args:
         container: ([`list`] | (or other object convertible to list))
         allow_sorting: ([`bool`]) whether to sort even if it can be sorted. This
-            is primarly so that callers can avoid boilerplate when they have
+            is primarily so that callers can avoid boilerplate when they have
             a "should it be sorted" arg, but also always convert to a list.
 
     Returns:
