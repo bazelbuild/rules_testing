@@ -31,7 +31,7 @@ def _ordered_incorrectly_new(format_problem, format_actual, meta):
     Args:
         format_problem: (callable) accepts no args and returns string (the
             reported problem description).
-        format_actual: (callable) accepts not args and returns tring (the
+        format_actual: (callable) accepts not args and returns string (the
             reported actual description).
         meta: ([`ExpectMeta`]) used to report the failure.
 

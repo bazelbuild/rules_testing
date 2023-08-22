@@ -15,7 +15,7 @@ def _file(path):
     )
 
 def _verify_matcher(env, matcher, match_true, match_false):
-    # Test postive match
+    # Test positive match
     env.expect.where(matcher = matcher.desc, value = match_true).that_bool(
         matcher.match(match_true),
         expr = "matcher.match(value)",

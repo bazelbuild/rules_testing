@@ -180,7 +180,7 @@ def _bool_subject_test(env, _target):
         fake_env,
         ["expected any of:", "None", "39", "actual: True"],
         env = env,
-        msg = "check is_in mismatchd values",
+        msg = "check is_in mismatched values",
     )
 
     _end(env, fake_env)
