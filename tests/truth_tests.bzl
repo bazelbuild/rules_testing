@@ -538,6 +538,34 @@ def _collection_contains_exactly_test(env, _target):
         msg = "check same elements out of order",
     )
 
+    subject = truth.expect(fake_env).that_collection(("one", "four", "three", "two", "five"))
+    order = subject.contains_exactly(("one", "two", "three", "four", "five"))
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check same elements with expected in different order",
+    )
+    order.in_order()
+    _assert_failure(
+        fake_env,
+        [
+            "expected values all found, but with incorrect order:",
+            "0: one found at offset 0",
+            "1: two found at offset 3",
+            "2: three found at offset 2",
+            "3: four found at offset 1",
+            "4: five found at offset 4",
+            "actual values:",
+            "0: one",
+            "1: four",
+            "2: three",
+            "3: two",
+            "4: five",
+        ],
+        env = env,
+        msg = "check same elements out of order",
+    )
+
     _end(env, fake_env)
 
 _suite.append(collection_contains_exactly_test)
