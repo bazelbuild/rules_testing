@@ -1,7 +1,7 @@
 """Tests for unit_test."""
 
-load("//lib:unit_test.bzl", "unit_test")
 load("//lib:test_suite.bzl", "test_suite")
+load("//lib:unit_test.bzl", "unit_test")
 
 def _test_basic(env):
     _ = env  # @unused

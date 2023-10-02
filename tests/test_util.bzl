@@ -14,9 +14,10 @@
 
 """Utilities for testing rules_testing code."""
 
+load("//lib:truth.bzl", "matching")
+
 # buildifier: disable=bzl-visibility
 load("//lib/private:expect_meta.bzl", "ExpectMeta")
-load("//lib:truth.bzl", "matching")
 
 def _fake_meta(real_env):
     """Create a fake ExpectMeta object for testing.

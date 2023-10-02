@@ -11,6 +11,8 @@
     ([#52](https://github.com/bazelbuild/rules_testing/issues/52))
   * StructSubject for asserting arbitrary structs.
     ([#53](https://github.com/bazelbuild/rules_testing/issues/53))
+  * CollectionSubject now supports tuples.
+    ([#69](https://github.com/bazelbuild/rules_testing/pull/69))
   * (docs) Created human-friendly changelog
 
 ## [0.3.0] - 2023-07-06

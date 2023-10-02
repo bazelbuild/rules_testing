@@ -14,9 +14,9 @@
 
 """# DefaultInfoSubject"""
 
-load(":runfiles_subject.bzl", "RunfilesSubject")
 load(":depset_file_subject.bzl", "DepsetFileSubject")
 load(":file_subject.bzl", "FileSubject")
+load(":runfiles_subject.bzl", "RunfilesSubject")
 
 def _default_info_subject_new(info, *, meta):
     """Creates a `DefaultInfoSubject`

@@ -14,8 +14,8 @@
 
 """Rules to help generate rules_testing docs."""
 
-load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
 
 def sphinx_stardocs(name, bzl_libraries, **kwargs):
     """Generate Sphinx-friendly markdown docs using Stardoc for bzl libraries.

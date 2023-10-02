@@ -51,11 +51,11 @@ load("//lib/private:expect.bzl", "Expect")
 load("//lib/private:file_subject.bzl", "FileSubject")
 load("//lib/private:int_subject.bzl", "IntSubject")
 load("//lib/private:label_subject.bzl", "LabelSubject")
+load("//lib/private:matching.bzl", _matching = "matching")
 load("//lib/private:runfiles_subject.bzl", "RunfilesSubject")
 load("//lib/private:str_subject.bzl", "StrSubject")
-load("//lib/private:target_subject.bzl", "TargetSubject")
-load("//lib/private:matching.bzl", _matching = "matching")
 load("//lib/private:struct_subject.bzl", "StructSubject")
+load("//lib/private:target_subject.bzl", "TargetSubject")
 
 # Rather than load many symbols, just load this symbol, and then all the
 # asserts will be available.
