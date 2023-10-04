@@ -3,8 +3,8 @@
 Aggregates multiple Starlark tests in a single test_suite.
 """
 
-load("//lib/private:util.bzl", "get_test_name_from_function")
 load("//lib:unit_test.bzl", "unit_test")
+load("//lib/private:util.bzl", "get_test_name_from_function")
 
 def test_suite(name, *, tests = [], basic_tests = [], test_kwargs = {}):
     """Instantiates given test macros/implementations and gathers their main targets into a `test_suite`.

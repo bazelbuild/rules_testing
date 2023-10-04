@@ -14,8 +14,8 @@
 
 """Tests for StructSubject"""
 
-load("//lib:truth.bzl", "subjects")
 load("//lib:test_suite.bzl", "test_suite")
+load("//lib:truth.bzl", "subjects")
 load("//tests:test_util.bzl", "test_util")
 
 _tests = []

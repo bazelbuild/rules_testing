@@ -126,11 +126,12 @@ def to_list(obj):
     """Attempt to convert the object to a list, else error.
 
     NOTE: This only supports objects that are typically understood as
-    lists, not any iterable. Types like `dict` and `str` are iterable,
-    but will be rejected.
+    lists, not any iterable. Types like `dict` are iterable, but will
+    be rejected.
 
     Args:
-        obj: ([`list`] | [`depset`]) The object to convert to a list.
+        obj: ([`list`] | [`depset`] | [`tuple`]) The object to convert to a
+            list.
 
     Returns:
         [`list`] of the object
@@ -141,5 +142,7 @@ def to_list(obj):
         return obj
     elif types.is_depset(obj):
         return obj.to_list()
+    elif types.is_tuple(obj):
+        return list(obj)
     else:
         fail("Unable to convert to list: {}".format(repr_with_type(obj)))
