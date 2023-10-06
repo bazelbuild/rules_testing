@@ -9,6 +9,7 @@ tasks:
     platform: ${{platform}}
     bazel: ${{bazel}}
     test_targets:
+      - "--noenable_bzlmod"
       - "..."
   all_tests_bzlmod:
     name: Bzlmod
