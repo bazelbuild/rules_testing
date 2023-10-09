@@ -8,8 +8,9 @@ tasks:
     name: Workspace
     platform: ${{platform}}
     bazel: ${{bazel}}
+    test_flags:
+      - "--noexperimental_enable_bzlmod"
     test_targets:
-      - "--noenable_bzlmod"
       - "..."
   all_tests_bzlmod:
     name: Bzlmod
