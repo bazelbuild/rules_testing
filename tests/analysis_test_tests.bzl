@@ -14,9 +14,29 @@
 
 """Unit tests for analysis_test.bzl."""
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("//lib:truth.bzl", "matching")
 load("//lib:util.bzl", "TestingAspectInfo")
+
+_TestingFlagsInfo = provider(
+    doc = "Flags used for testing",
+    fields = ["flag_a", "flag_b"],
+)
+
+def _testing_flags_impl(ctx):
+    return [_TestingFlagsInfo(
+        flag_a = ctx.attr._flag_a[BuildSettingInfo].value,
+        flag_b = ctx.attr._flag_b[BuildSettingInfo].value,
+    )]
+
+_testing_flags = rule(
+    implementation = _testing_flags_impl,
+    attrs = {
+        "_flag_a": attr.label(default = "//tests:flag_a"),
+        "_flag_b": attr.label(default = "//tests:flag_b"),
+    },
+)
 
 ###################################
 ####### change_setting_test #######
@@ -254,12 +274,115 @@ def _toolchain_template_vars_impl(ctx):
 
 _toolchain_template_vars = rule(implementation = _toolchain_template_vars_impl)
 
+def _test_custom_target_attributes_common_settings_applied(name):
+    _testing_flags(
+        name = name + "_subject",
+    )
+    analysis_test(
+        name = name,
+        impl = _test_custom_target_attributes_common_settings_applied_impl,
+        attr_values = {"subject": name + "_subject"},
+        attrs = {"subject": {"@attr": attr.label}},
+        config_settings = {
+            "//tests:flag_a": "999",
+        },
+        extra_target_under_test_aspects = [example_aspect],
+    )
+
+def _test_custom_target_attributes_common_settings_applied_impl(env, targets):
+    subject = env.expect.that_target(targets.subject)
+    subject.has_provider(TestingAspectInfo)
+    subject.has_provider(_AddedByAspectInfo)
+
+    flags = targets.subject[_TestingFlagsInfo]
+    env.expect.that_str(flags.flag_a).equals("999")
+
+def _test_custom_target_attributes_custom_settings_applied(name):
+    _testing_flags(
+        name = name + "_subject",
+    )
+    analysis_test(
+        name = name,
+        impl = _test_custom_target_attributes_custom_settings_applied_impl,
+        attr_values = {"subject": name + "_subject"},
+        attrs = {
+            "subject": {
+                "@attr": attr.label,
+                "@config_settings": {
+                    "//tests:flag_a": "inner",
+                },
+                "aspects": [_custom_attribute_aspect],
+            },
+        },
+        config_settings = {
+            "//tests:flag_a": "outer",
+            "//tests:flag_b": "outer",
+        },
+        extra_target_under_test_aspects = [example_aspect],
+    )
+
+def _test_custom_target_attributes_custom_settings_applied_impl(env, targets):
+    subject = env.expect.that_target(targets.subject)
+    subject.has_provider(TestingAspectInfo)
+    subject.has_provider(_AddedByAspectInfo)
+    subject.has_provider(_CustomAttributeAspectInfo)
+
+    flags = targets.subject[_TestingFlagsInfo]
+    env.expect.that_str(flags.flag_a).equals("inner")
+    env.expect.that_str(flags.flag_b).equals("outer")
+
+def _test_custom_target_attributes_multiple_attrs(name):
+    _testing_flags(name = name + "_subject1")
+    _testing_flags(name = name + "_subject2")
+    analysis_test(
+        name = name,
+        impl = _test_custom_target_attributes_multiple_attrs_impl,
+        attr_values = {
+            "subject1": name + "_subject1",
+            "subject2": name + "_subject2",
+        },
+        attrs = {
+            "subject1": {
+                "@attr": attr.label,
+                "@config_settings": {
+                    "//tests:flag_a": "one",
+                },
+            },
+            "subject2": {
+                "@attr": attr.label,
+                "@config_settings": {
+                    "//tests:flag_a": "two",
+                },
+            },
+        },
+    )
+
+def _test_custom_target_attributes_multiple_attrs_impl(env, targets):
+    env.expect.that_target(targets.subject1).has_provider(TestingAspectInfo)
+
+    env.expect.that_str(
+        targets.subject1[_TestingFlagsInfo].flag_a,
+    ).equals("one")
+    env.expect.that_str(
+        targets.subject2[_TestingFlagsInfo].flag_a,
+    ).equals("two")
+
+_CustomAttributeAspectInfo = provider(doc = "Aspect for a custom attribute", fields = [])
+
+def _custom_attribute_aspect_impl(_target, _ctx):
+    return [_CustomAttributeAspectInfo()]
+
+_custom_attribute_aspect = aspect(implementation = _custom_attribute_aspect_impl)
+
 def analysis_test_test_suite(name):
     test_suite(
         name = name,
         tests = [
             test_change_setting,
             _test_common_attributes,
+            _test_custom_target_attributes_common_settings_applied,
+            _test_custom_target_attributes_custom_settings_applied,
+            _test_custom_target_attributes_multiple_attrs,
             test_failure_testing,
             test_change_setting_with_failure,
             test_inspect_actions,

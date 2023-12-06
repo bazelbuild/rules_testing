@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+[0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
+
+### Added
+  * Custom target under test attributes. These are like regular custom
+    attributes, except they can also have their config settings changed and
+    they have the usual target under test aspects applied. This allows
+    testing multiple targets in one test with a mixture of configurations.
+    ([#67](https://github.com/bazelbuild/rules_testing/issues/67))
+
 ## [0.5.0] -  2023-10-04
 
 [0.5.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.5.0

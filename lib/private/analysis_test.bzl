@@ -18,6 +18,7 @@ Support for testing analysis phase logic, such as rules.
 """
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//lib:types.bzl", "types")
 load("//lib:truth.bzl", "truth")
 load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")
 load("//lib/private:util.bzl", "get_test_name_from_function")
@@ -57,8 +58,22 @@ def _begin_analysis_test(ctx):
         Other attributes are private, internal details and may change at any time. Do not rely
         on internal details.
     """
-    target = getattr(ctx.attr, "target")
-    target = target[0] if type(target) == type([]) else target
+    targets = {}
+    for attr_name in ctx.attr._target_under_test_attr_names:
+        target = getattr(ctx.attr, attr_name)
+
+        # why is this here...? is it because transitions always change it to a
+        # list? and if there is no transition, its a non-list?
+        target = target[0] if type(target) == type([]) else target
+        targets[attr_name] = target
+
+    # When only the target arg is used, pass that directly through.
+    # Otherwise, pass a struct of the custom attributes
+    if len(targets) == 1 and targets.keys()[0] == "target":
+        target_under_test_value = targets.values()[0]
+    else:
+        target_under_test_value = struct(**targets)
+
     failures = []
     failures_env = struct(
         ctx = ctx,
@@ -76,7 +91,7 @@ def _begin_analysis_test(ctx):
         fail = truth_env.fail,
         expect = truth.expect(truth_env),
     )
-    return analysis_test_env, target
+    return analysis_test_env, target_under_test_value
 
 def _end_analysis_test(env):
     """Ends an analysis test and logs the results.
@@ -97,7 +112,8 @@ def _end_analysis_test(env):
 
 def analysis_test(
         name,
-        target,
+        *,
+        target = None,
         impl,
         expect_failure = False,
         attrs = {},
@@ -158,7 +174,6 @@ def analysis_test(
     Returns:
         (None)
     """
-
     attrs = dict(attrs)
     attrs["_impl_name"] = attr.string(default = get_test_name_from_function(impl))
 
@@ -166,17 +181,55 @@ def analysis_test(
     if expect_failure:
         changed_settings["//command_line_option:allow_analysis_failures"] = "True"
 
-    target_attr_kwargs = {}
     if changed_settings:
-        test_transition = analysis_test_transition(
+        target_under_test_cfg = analysis_test_transition(
             settings = changed_settings,
         )
-        target_attr_kwargs["cfg"] = test_transition
+    else:
+        target_under_test_cfg = None
 
-    attrs["target"] = attr.label(
-        aspects = [recursive_testing_aspect if collect_actions_recursively else testing_aspect] + extra_target_under_test_aspects,
-        mandatory = True,
-        **target_attr_kwargs
+    applied_aspects = []
+    if collect_actions_recursively:
+        applied_aspects.append(recursive_testing_aspect)
+    else:
+        applied_aspects.append(testing_aspect)
+    applied_aspects.extend(extra_target_under_test_aspects)
+
+    target_under_test_attr_names = []
+    if target:
+        target_under_test_attr_names.append("target")
+        attr_values = dicts.add(attr_values, {"target": target})
+        attrs["target"] = {"@attr": attr.label}
+
+    for attr_name, attr_value in attrs.items():
+        if not types.is_dict(attr_value):
+            # Leave attribute objects as they are
+            continue
+        target_under_test_attr_names.append(attr_name)
+        attr_kwargs = dict(attr_value)  # Copy in case its frozen
+        attr_func = attr_kwargs.pop("@attr")
+        attr_config_settings = attr_kwargs.pop("@config_settings", {})
+
+        attr_kwargs.setdefault("mandatory", True)
+
+        # Copy in case its frozen
+        attr_kwargs["aspects"] = applied_aspects + attr_kwargs.get("aspects", [])
+
+        if attr_config_settings:
+            attr_kwargs["cfg"] = analysis_test_transition(
+                settings = dicts.add(changed_settings, attr_config_settings),
+            )
+        elif target_under_test_cfg:
+            attr_kwargs["cfg"] = target_under_test_cfg
+
+        attrs[attr_name] = attr_func(**attr_kwargs)
+
+    if not target_under_test_attr_names:
+        fail("At least one target under test must be provided. Specify one " +
+             "using the `target` arg or `attr_values` args")
+
+    attrs["_target_under_test_attr_names"] = attr.string_list(
+        default = target_under_test_attr_names,
     )
 
     def wrapped_impl(ctx):
@@ -189,5 +242,5 @@ def analysis_test(
         wrapped_impl,
         attrs = attrs,
         fragments = fragments,
-        attr_values = dicts.add(attr_values, {"target": target}),
+        attr_values = attr_values,
     )

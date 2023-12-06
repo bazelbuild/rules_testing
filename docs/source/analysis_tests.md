@@ -234,6 +234,69 @@ def my_test_suite(name):
     )
 ```
 
+## Multiple targets under test
+
+If you need to compare multiple targets, or verify the effect of different
+configurations on one or more targets, then this is possible by defining custom
+attributes (`attrs` arg) using dictionaries with some special keys.
+
+In the example below, we verify:
+  * Changing the `bar` arg doesn't change the outputs generated.
+  * Changing the configuration doesn't change the runfiles.
+
+```
+def _test_multiple(name):
+    foo_binary(name = name + "_bar_true", bar=True),
+    foo_binary(name = name + "_bar_false", bar=False),
+    foo_binary(name = name + "_multi_configs"),
+    analysis_test(
+        name = name,
+        attr_values = {
+            "bar_true": name + "_bar_true",
+            "bar_false": name + "_bar_false",
+            "config_a": name + "_multi_configs",
+            "config_b": name + "_multi_configs",
+        },
+        attrs = {
+            "bar_true": {"@attr": attr.label},
+            "bar_false": {"@attr": attr.label},
+            "config_a": {
+                "@attr": attr.label,
+                "@config_settings": {"//foo:setting": "A"},
+            },
+            "config_b": {
+                "@attr": attr.label,
+                "@config_settings": {"//foo:setting": "B"},
+            },
+        },
+        impl = _test_multiple_impl,
+)
+
+def _test_multiple_impl(env, targets):
+    # Verify bar_true and bar_false have the same default outputs
+    env.expect.that_target(
+        targets.bar_true,
+    ).default_outputs().contains_exactly(
+        targets.bar_false[DefaultInfo].files
+    )
+
+    # Verify the same target under different configurations have equivalent
+    # runfiles
+    env.expect.that_target(
+        targets.config_a
+    ).default_runfiles().contains_exactly(
+        runfiles_paths(env.ctx.workspace_name, targets.config_b.default_runfiles)
+    )
+```
+
+### Gotchas when comparing across configurations
+
+* Generated files (`File` objects with `is_source=False`) include their
+  configuration, so files built in different configurations cannot compare
+  equal. This is true even if they would have identical content -- recall that
+  an analysis test doesn't read the content and only sees the metadata about
+  files.
+
 ## Tips and best practices
 
 * Use private names for your tests, `def _test_foo`. This allows buildifier to
