@@ -18,7 +18,7 @@ bazel_dep(
     dev_dependency = True,
     repo_name = "io_bazel_stardoc",
 )
-bazel_dep(name = "rules_python", version = "0.22.0", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "0.27.0", dev_dependency = True)
 
 python = use_extension(
     "@rules_python//python/extensions:python.bzl",
@@ -26,45 +26,8 @@ python = use_extension(
     dev_dependency = True,
 )
 python.toolchain(
-    name = "python_3_11",
     python_version = "3.11",
 )
-
-# NOTE: use_repo() must be called for each platform that runs the docgen tools
-use_repo(
-    python,
-    "python_3_11_toolchains",
-    "python_3_11_x86_64-unknown-linux-gnu",
-)
-
-# NOTE: This is actually a dev dependency, but due to
-# https://github.com/bazelbuild/bazel/issues/18248 it has to be non-dev to
-# generate the repo name used in the subsequent register_toolchains() call.
-# Once 6.2 is the minimum supported version, the register_toolchains
-# call can use dev_dependency=True and this can go away entirely.
-dev = use_extension(
-    "//:dev_extension.bzl",
-    "dev",
-)
-use_repo(dev, "rules_testing_dev_toolchains")
-
-# NOTE: This call will be run by downstream users, so the
-# repos it mentions must exist.
-register_toolchains(
-    "@rules_testing_dev_toolchains//:all",
-    dev_dependency = True,
-)
-
-interpreter = use_extension(
-    "@rules_python//python/extensions:interpreter.bzl",
-    "interpreter",
-    dev_dependency = True,
-)
-interpreter.install(
-    name = "python_3_11_interpreter",
-    python_name = "python_3_11",
-)
-use_repo(interpreter, "python_3_11_interpreter")
 
 pip = use_extension(
     "@rules_python//python/extensions:pip.bzl",
@@ -72,8 +35,8 @@ pip = use_extension(
     dev_dependency = True,
 )
 pip.parse(
-    name = "docs-pypi",
-    python_interpreter_target = "@python_3_11_interpreter//:python",
+    hub_name = "docs-pypi",
+    python_version = "3.11",
     requirements_lock = "//docs:requirements.txt",
 )
 use_repo(pip, "docs-pypi")
