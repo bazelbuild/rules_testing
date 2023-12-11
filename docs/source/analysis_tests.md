@@ -234,6 +234,136 @@ def my_test_suite(name):
     )
 ```
 
+## Multiple targets under test
+
+There's two ways that multiple targets can be tested in a single test: passing a
+list or dict to the `target` (singular) arg, or using the `targets` (plural)
+arg. The main difference is the `target` arg uses the same settings for each
+target. The `targets` arg, in comparison, allows you to customize the settings
+for each entry in the dict. Under the hood, the `target` arg is a single
+attribute, while the `targets` arg has a separate attribute for each dict entry.
+
+### Multiple targets with the same settings
+
+If you need to compare multiple targets with the same settings, then the simple
+way to do this is to pass a list or map of targets to the `target` arg. An
+alternative is to use the `targets` arg (see below)
+
+In the example below, we verify that changing the `bar` arg doesn't change the
+outputs generated.
+
+```
+def _test_multiple(name):
+    foo_binary(name = name + "_bar_true", bar=True),
+    foo_binary(name = name + "_bar_false", bar=False),
+    analysis_test(
+        name = name,
+        target = [name + "_bar_true", name + "_bar_false"],
+        impl = _test_multiple_impl,
+)
+
+def _test_multiple_impl(env, targets): # targets here is a list targets
+    # Verify bar_true and bar_false have the same default outputs
+    env.expect.that_target(
+        targets[0]
+    ).default_outputs().contains_exactly(
+        targets[1][DefaultInfo].files
+    )
+
+```
+
+Alternatively, the `targets` arg can be used, which is more useful if targets
+need different configurations or should have an associated name.
+
+### Multiple targets with different config settings
+
+If you need to compare multiple targets, or verify the effect of different
+configurations on one or more targets, then this is possible by using the
+`targets` arg and defining custom attributes (`attrs` arg) using dictionaries
+with some special keys.
+
+In the example below, the same target is built in two different configurations
+and then it's verified that they have the same runfiles.
+
+```
+def _test_multiple_configs(name):
+    foo_binary(name = name + "_multi_configs"),
+    analysis_test(
+        name = name,
+        targets = {
+            "config_a": name + "_multi_configs",
+            "config_b": name + "_multi_configs",
+        },
+        attrs = {
+            "config_a": {
+                "@config_settings": {"//foo:setting": "A"},
+            },
+            "config_b": {
+                "@config_settings": {"//foo:setting": "B"},
+            },
+        },
+        impl = _test_multiple_impl,
+)
+
+def _test_multiple_impl(env, targets):
+    # Verify the same target under different configurations have equivalent
+    # runfiles
+    env.expect.that_target(
+        targets.config_a
+    ).default_runfiles().contains_exactly(
+        runfiles_paths(env.ctx.workspace_name, targets.config_b.default_runfiles)
+    )
+```
+
+Note that they don't have to have custom settings. If they aren't customized,
+they will just use the base target-under-test settings. This is useful if
+you want each target to have an named identifier for clarity.
+
+### Gotchas when comparing across configurations
+
+* Generated files (`File` objects with `is_source=False`) include their
+  configuration, so files built in different configurations cannot compare
+  equal. This is true even if they would have identical content -- recall that
+  an analysis test doesn't read the content and only sees the metadata about
+  files.
+
+## Custom attributes
+
+Tests can have their attributes customized using the `attrs` arg. There are
+two different types of values that can be specified: dicts and attribute objects
+(e.g. `attr.string()` objects.
+
+When an attribute object is given, it is used as-is. These are most useful for
+specifying implicit values the implementation function might need:
+
+When a dict is given, it acts as a template that will have target-under-test
+settings mixed into it, e.g. config settings, aspects, etc. Attributes defined
+using this style are considered targets under test and will be passed as part of
+the `targets` arg to the implementation function.
+
+```
+analysis_test(
+    name = "test_custom_attributes",
+    targets = {
+          "subject": ":subject",
+    }
+    attr_values = {
+        "is_windows": select({
+            "@plaforms//os:windows": True,
+            "//conditions:default": False
+        }),
+    }
+    attrs = {
+      "is_windows": attr.bool(),
+      "subject": {
+          "@attr": attr.label,
+          "@config_settings": {...}
+          "aspects": [custom_aspect],
+      }
+    },
+)
+```
+
 ## Tips and best practices
 
 * Use private names for your tests, `def _test_foo`. This allows buildifier to

@@ -53,7 +53,7 @@ def _guard_against_stray_failures(*, env, fake_env):
     )
 
 def action_subject_test(name):
-    analysis_test(name, impl = _action_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _action_subject_test, target = "truth_tests_helper")
 
 def _action_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -129,7 +129,7 @@ def _action_subject_test(env, target):
 _suite.append(action_subject_test)
 
 def bool_subject_test(name):
-    analysis_test(name, impl = _bool_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _bool_subject_test, target = "truth_tests_helper")
 
 def _bool_subject_test(env, _target):
     fake_env = _fake_env(env)
@@ -188,7 +188,7 @@ def _bool_subject_test(env, _target):
 _suite.append(bool_subject_test)
 
 def collection_custom_expr_test(name):
-    analysis_test(name, impl = _collection_custom_expr_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_custom_expr_test, target = "truth_tests_helper")
 
 def _collection_custom_expr_test(env, _target):
     fake_env = _fake_env(env)
@@ -200,7 +200,7 @@ def _collection_custom_expr_test(env, _target):
 _suite.append(collection_custom_expr_test)
 
 def collection_has_size_test(name):
-    analysis_test(name, impl = _collection_has_size_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_has_size_test, target = "truth_tests_helper")
 
 def _collection_has_size_test(env, _target):
     fake_env = _fake_env(env)
@@ -226,7 +226,7 @@ def _collection_has_size_test(env, _target):
 _suite.append(collection_has_size_test)
 
 def collection_contains_test(name):
-    analysis_test(name, impl = _collection_contains_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_test, target = "truth_tests_helper")
 
 def _collection_contains_test(env, _target):
     fake_env = _fake_env(env)
@@ -252,7 +252,7 @@ def _collection_contains_test(env, _target):
 _suite.append(collection_contains_test)
 
 def collection_contains_predicate_test(name):
-    analysis_test(name, impl = _collection_contains_predicate_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_predicate_test, target = "truth_tests_helper")
 
 def _collection_contains_predicate_test(env, _target):
     fake_env = _fake_env(env)
@@ -277,7 +277,7 @@ def _collection_contains_predicate_test(env, _target):
 _suite.append(collection_contains_predicate_test)
 
 def collection_contains_at_least_test(name):
-    analysis_test(name, impl = _collection_contains_at_least_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_at_least_test, target = "truth_tests_helper")
 
 def _collection_contains_at_least_test(env, _target):
     fake_env = _fake_env(env)
@@ -318,7 +318,7 @@ def _collection_contains_at_least_test(env, _target):
 _suite.append(collection_contains_at_least_test)
 
 def collection_contains_at_least_predicates_test(name):
-    analysis_test(name, impl = _collection_contains_at_least_predicates_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_at_least_predicates_test, target = "truth_tests_helper")
 
 def _collection_contains_at_least_predicates_test(env, _target):
     fake_env = _fake_env(env)
@@ -357,7 +357,7 @@ def _collection_contains_at_least_predicates_test(env, _target):
 _suite.append(collection_contains_at_least_predicates_test)
 
 def collection_contains_exactly_test(name):
-    analysis_test(name, impl = _collection_contains_exactly_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_exactly_test, target = "truth_tests_helper")
 
 def _collection_contains_exactly_test(env, _target):
     fake_env = _fake_env(env)
@@ -571,7 +571,7 @@ def _collection_contains_exactly_test(env, _target):
 _suite.append(collection_contains_exactly_test)
 
 def collection_contains_exactly_predicates_test(name):
-    analysis_test(name, impl = _collection_contains_exactly_predicates_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_exactly_predicates_test, target = "truth_tests_helper")
 
 def _collection_contains_exactly_predicates_test(env, _target):
     fake_env = _fake_env(env)
@@ -754,7 +754,7 @@ def _collection_contains_exactly_predicates_test(env, _target):
 _suite.append(collection_contains_exactly_predicates_test)
 
 def collection_contains_none_of_test(name):
-    analysis_test(name, impl = _collection_contains_none_of_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_contains_none_of_test, target = "truth_tests_helper")
 
 def _collection_contains_none_of_test(env, _target):
     fake_env = _fake_env(env)
@@ -784,7 +784,7 @@ def _collection_contains_none_of_test(env, _target):
 _suite.append(collection_contains_none_of_test)
 
 def collection_not_contains_test(name):
-    analysis_test(name, impl = _collection_not_contains_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_not_contains_test, target = "truth_tests_helper")
 
 def _collection_not_contains_test(env, _target):
     fake_env = _fake_env(env)
@@ -810,7 +810,7 @@ def _collection_not_contains_test(env, _target):
 _suite.append(collection_not_contains_test)
 
 def collection_not_contains_predicate_test(name):
-    analysis_test(name, impl = _collection_not_contains_predicate_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_not_contains_predicate_test, target = "truth_tests_helper")
 
 def _collection_not_contains_predicate_test(env, _target):
     fake_env = _fake_env(env)
@@ -835,7 +835,7 @@ def _collection_not_contains_predicate_test(env, _target):
 _suite.append(collection_not_contains_predicate_test)
 
 def collection_offset_test(name):
-    analysis_test(name, impl = _collection_offset_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_offset_test, target = "truth_tests_helper")
 
 def _collection_offset_test(env, _target):
     fake_env = _fake_env(env)
@@ -861,7 +861,7 @@ def _collection_offset_test(env, _target):
 _suite.append(collection_offset_test)
 
 def _collection_transform_test(name):
-    analysis_test(name, impl = _collection_transform_test_impl, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _collection_transform_test_impl, target = "truth_tests_helper")
 
 def _collection_transform_test_impl(env, target):
     _ = target  # @unused
@@ -936,7 +936,7 @@ def _collection_transform_test_impl(env, target):
 _suite.append(_collection_transform_test)
 
 def execution_info_test(name):
-    analysis_test(name, impl = _execution_info_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _execution_info_test, target = "truth_tests_helper")
 
 def _execution_info_test(env, target):
     # TODO(rlevasseur): Remove this after cl/474597236 is released in Blaze
@@ -956,7 +956,7 @@ def _execution_info_test(env, target):
 _suite.append(execution_info_test)
 
 def depset_file_subject_test(name):
-    analysis_test(name, impl = _depset_file_subject_test, target = "truth_tests_data_files")
+    analysis_test(name = name, impl = _depset_file_subject_test, target = "truth_tests_data_files")
 
 def _depset_file_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1017,7 +1017,7 @@ def _depset_file_subject_test(env, target):
 _suite.append(depset_file_subject_test)
 
 def dict_subject_test(name):
-    analysis_test(name, impl = _dict_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _dict_subject_test, target = "truth_tests_helper")
 
 def _dict_subject_test(env, _target):
     fake_env = _fake_env(env)
@@ -1096,7 +1096,7 @@ def _dict_subject_test(env, _target):
 _suite.append(dict_subject_test)
 
 def expect_test(name):
-    analysis_test(name, impl = _expect_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _expect_test, target = "truth_tests_helper")
 
 def _expect_test(env, target):
     fake_env = _fake_env(env)
@@ -1123,7 +1123,7 @@ def _expect_test(env, target):
 _suite.append(expect_test)
 
 def file_subject_test(name):
-    analysis_test(name, impl = _file_subject_test, target = "truth_tests_data_files")
+    analysis_test(name = name, impl = _file_subject_test, target = "truth_tests_data_files")
 
 def _file_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1161,7 +1161,7 @@ def _file_subject_test(env, target):
 _suite.append(file_subject_test)
 
 def label_subject_test(name):
-    analysis_test(name, impl = _label_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _label_subject_test, target = "truth_tests_helper")
 
 def _label_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1205,7 +1205,7 @@ def _label_subject_test(env, target):
 _suite.append(label_subject_test)
 
 def runfiles_subject_test(name):
-    analysis_test(name, impl = _runfiles_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _runfiles_subject_test, target = "truth_tests_helper")
 
 def _runfiles_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1284,7 +1284,7 @@ def _runfiles_subject_test(env, target):
 _suite.append(runfiles_subject_test)
 
 def str_subject_test(name):
-    analysis_test(name, impl = _str_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _str_subject_test, target = "truth_tests_helper")
 
 def _str_subject_test(env, _target):
     fake_env = _fake_env(env)
@@ -1354,7 +1354,7 @@ def _str_subject_test(env, _target):
 _suite.append(str_subject_test)
 
 def target_subject_test(name):
-    analysis_test(name, impl = _target_subject_test, target = "truth_tests_helper")  #TODO also file target
+    analysis_test(name = name, impl = _target_subject_test, target = "truth_tests_helper")  #TODO also file target
 
 def _target_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1409,7 +1409,7 @@ def _target_subject_test(env, target):
 _suite.append(target_subject_test)
 
 def run_environment_info_subject_test(name):
-    analysis_test(name, impl = _run_environment_info_subject_test, target = "truth_tests_helper")
+    analysis_test(name = name, impl = _run_environment_info_subject_test, target = "truth_tests_helper")
 
 def _run_environment_info_subject_test(env, target):
     fake_env = _fake_env(env)
@@ -1433,7 +1433,7 @@ _suite.append(run_environment_info_subject_test)
 
 def _add_failure_works_test(name):
     analysis_test(
-        name,
+        name = name,
         impl = _add_failure_works_test_impl,
         target = "truth_tests_noop",
         expect_failure = True,

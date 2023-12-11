@@ -14,6 +14,7 @@
 
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load(":analysis_test_tests.bzl", "analysis_test_test_suite")
 load(":truth_tests.bzl", "truth_test_suite")
 load(":unit_test_tests.bzl", "unit_test_test_suite")
@@ -55,4 +56,14 @@ build_test(
         "//lib:test_suite_bzl",
         "//lib:truth_bzl",
     ],
+)
+
+string_flag(
+    name = "flag_a",
+    build_setting_default = "default",
+)
+
+string_flag(
+    name = "flag_b",
+    build_setting_default = "default",
 )
