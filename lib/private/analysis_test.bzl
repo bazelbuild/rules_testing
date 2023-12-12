@@ -115,8 +115,8 @@ def _end_analysis_test(env):
     )]
 
 def analysis_test(
-        name,
         *,
+        name,
         target = None,
         targets = None,
         impl,

@@ -4,6 +4,11 @@
 
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
+### Changed
+  * `analysis_test` now only accepts keyword args. This is to enforce the
+    convention that rules (or rule-like macros) have everything passed as
+    keyword args.
+
 ### Added
   * Custom target under test attributes. These are like regular custom
     attributes, except they can also have their config settings changed and
