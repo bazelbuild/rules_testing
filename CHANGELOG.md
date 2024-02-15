@@ -4,6 +4,10 @@
 
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
+## 0.6.0 - 2024-02-15
+
+[0.6.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.6.0
+
 ### Changed
   * `analysis_test` now only accepts keyword args. This is to enforce the
     convention that rules (or rule-like macros) have everything passed as
