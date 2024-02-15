@@ -15,6 +15,11 @@
     they have the usual target under test aspects applied. This allows
     testing multiple targets in one test with a mixture of configurations.
     ([#67](https://github.com/bazelbuild/rules_testing/issues/67))
+  * `analysis_test` now takes the parameter `provider_subject_factories`.
+    If you want to perform assertions on custom providers, you no longer need
+    to use the factory parameter each time you want to retrieve the provider.
+    instead, you now write `analysis_test(..., provider_subject_factories = [
+    type = FooInfo, name = "FooInfo", factory = FooSubjectFactory])`.
 
 ## [0.5.0] -  2023-10-04
 

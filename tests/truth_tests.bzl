@@ -25,11 +25,13 @@ _IS_BAZEL_6_OR_HIGHER = (testing.ExecutionInfo == testing.ExecutionInfo)
 _suite = []
 
 def _fake_env(env):
+    provider_subject_factories = env.expect.meta.env.provider_subject_factories
     failures = []
     env1 = struct(
         ctx = env.ctx,
         failures = failures,
         fail = lambda msg: failures.append(msg),  # Silent fail
+        provider_subject_factories = provider_subject_factories,
     )
     env2 = struct(
         ctx = env.ctx,
@@ -37,6 +39,7 @@ def _fake_env(env):
         fail = lambda msg: failures.append(msg),  # Silent fail
         expect = truth.expect(env1),
         reset = lambda: failures.clear(),
+        provider_subject_factories = provider_subject_factories,
     )
     return env2
 

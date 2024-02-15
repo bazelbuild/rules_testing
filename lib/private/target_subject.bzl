@@ -187,7 +187,7 @@ def _target_subject_has_provider(self, provider):
     if self.meta.has_provider(self.target, provider):
         return
     self.meta.add_failure(
-        "expected to have provider: {}".format(_provider_name(provider)),
+        "expected to have provider: {}".format(_provider_subject_factory(self, provider).name),
         "but provider was not found",
     )
 
@@ -233,23 +233,30 @@ def _target_subject_provider(self, provider_key, factory = None):
             the subject for the found provider. Required if the provider key is
             not an inherently supported provider. It must have the following
             signature: `def factory(value, /, *, meta)`.
+            Additional types of providers can be pre-registered by using the
+            `provider_subject_factories` arg of `analysis_test`.
 
     Returns:
         A subject wrapper of the provider value.
     """
-    if not factory:
-        for key, value in _PROVIDER_SUBJECT_FACTORIES:
-            if key == provider_key:
-                factory = value
-                break
+    if factory:
+        provider_subject_factory = struct(
+            type = provider_key,
+            # str(provider_key) just returns "<provider>", which isn't helpful.
+            # For lack of a better option, just call it unknown
+            provider_name = "<Unknown provider>",
+            factory = factory,
+        )
+    else:
+        provider_subject_factory = _provider_subject_factory(self, provider_key)
 
-    if not factory:
-        fail("Unsupported provider: {}".format(provider_key))
+    if not provider_subject_factory.factory:
+        fail("Unsupported provider: {}".format(provider_subject_factory.name))
     info = self.target[provider_key]
 
-    return factory(
+    return provider_subject_factory.factory(
         info,
-        meta = self.meta.derive("provider({})".format(provider_key)),
+        meta = self.meta.derive("provider({})".format(provider_subject_factory.name)),
     )
 
 def _target_subject_action_generating(self, short_path):
@@ -385,18 +392,35 @@ def _target_subject_attr(self, name, *, factory = None):
         meta = self.meta.derive("attr({})".format(name)),
     )
 
-# Providers aren't hashable, so we have to use a list of (key, value)
-_PROVIDER_SUBJECT_FACTORIES = [
-    (InstrumentedFilesInfo, InstrumentedFilesInfoSubject.new),
-    (RunEnvironmentInfo, RunEnvironmentInfoSubject.new),
-    (testing.ExecutionInfo, ExecutionInfoSubject.new),
-]
+def _provider_subject_factory(self, provider):
+    for provider_subject_factory in self.meta.env.provider_subject_factories:
+        if provider_subject_factory.type == provider:
+            return provider_subject_factory
 
-def _provider_name(provider):
-    # This relies on implementation details of how Starlark represents
-    # providers, and isn't entirely accurate, but works well enough
-    # for error messages.
-    return str(provider).split("<function ")[1].split(">")[0]
+    return struct(
+        type = provider,
+        name = "<Unknown provider>",
+        factory = None,
+    )
+
+# Providers aren't hashable, so we have to use a list of structs.
+PROVIDER_SUBJECT_FACTORIES = [
+    struct(
+        type = InstrumentedFilesInfo,
+        name = "InstrumentedFilesInfo",
+        factory = InstrumentedFilesInfoSubject.new,
+    ),
+    struct(
+        type = RunEnvironmentInfo,
+        name = "RunEnvironmentInfo",
+        factory = RunEnvironmentInfoSubject.new,
+    ),
+    struct(
+        type = testing.ExecutionInfo,
+        name = "testing.ExecutionInfo",
+        factory = ExecutionInfoSubject.new,
+    ),
+]
 
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
