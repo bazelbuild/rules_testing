@@ -21,6 +21,7 @@ load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:types.bzl", "types")
 load("//lib:truth.bzl", "truth")
 load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")
+load("//lib/private:target_subject.bzl", "PROVIDER_SUBJECT_FACTORIES")
 load("//lib/private:util.bzl", "get_test_name_from_function")
 
 def _fail(env, msg):
@@ -37,7 +38,7 @@ def _fail(env, msg):
     print(full_msg)
     env.failures.append(full_msg)
 
-def _begin_analysis_test(ctx):
+def _begin_analysis_test(ctx, provider_factories):
     """Begins a unit test.
 
     This should be the first function called in a unit test implementation
@@ -48,6 +49,10 @@ def _begin_analysis_test(ctx):
     Args:
       ctx: The Starlark context. Pass the implementation function's `ctx` argument
           in verbatim.
+      provider_factories: List[struct(type, name, factory)] Additional provider
+          factories that should be available to `target.provider(...)`.
+          Eg. `[struct(type=FooInfo, name="FooInfo", factory=FooInfoFactory)]`.
+
 
     Returns:
         An analysis_test "environment" struct. The following fields are public:
@@ -86,6 +91,7 @@ def _begin_analysis_test(ctx):
     truth_env = struct(
         ctx = ctx,
         fail = lambda msg: _fail(failures_env, msg),
+        providers = PROVIDER_SUBJECT_FACTORIES + provider_factories,
     )
     analysis_test_env = struct(
         ctx = ctx,
@@ -126,7 +132,8 @@ def analysis_test(
         fragments = [],
         config_settings = {},
         extra_target_under_test_aspects = [],
-        collect_actions_recursively = False):
+        collect_actions_recursively = False,
+        provider_factories = []):
     """Creates an analysis test from its implementation function.
 
     An analysis test verifies the behavior of a "real" rule target by examining
@@ -189,6 +196,7 @@ def analysis_test(
           analysis test target itself (e.g. common attributes like `tags`,
           `target_compatible_with`, or attributes from `attrs`). Note that these
           are for the analysis test target itself, not the target under test.
+
       fragments: An optional list of fragment names that can be used to give rules access to
           language-specific parts of configuration.
       config_settings: A dictionary of configuration settings to change for the target under
@@ -202,6 +210,10 @@ def analysis_test(
           in addition to those set up by default for the test harness itself.
       collect_actions_recursively: If true, runs testing_aspect over all attributes, otherwise
           it is only applied to the target under test.
+      provider_factories: Optional[List[struct(type, name, factory)]]
+          Additional provider factories that should be available to
+          `target.provider(...)`.
+          Eg. `[struct(type=FooInfo, name="FooInfo", factory=FooInfoFactory)]`.
 
     Returns:
         (None)
@@ -290,7 +302,7 @@ def analysis_test(
     )
 
     def wrapped_impl(ctx):
-        env, target = _begin_analysis_test(ctx)
+        env, target = _begin_analysis_test(ctx, provider_factories)
         impl(env, target)
         return _end_analysis_test(env)
 

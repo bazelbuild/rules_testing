@@ -237,10 +237,12 @@ def _target_subject_provider(self, provider_key, factory = None):
     Returns:
         A subject wrapper of the provider value.
     """
+    provider_name = str(factory)
     if not factory:
-        for key, value in _PROVIDER_SUBJECT_FACTORIES:
-            if key == provider_key:
-                factory = value
+        for provider in self.meta.env.providers:
+            if provider.type == provider_key:
+                factory = provider.factory
+                provider_name = provider.name
                 break
 
     if not factory:
@@ -249,7 +251,7 @@ def _target_subject_provider(self, provider_key, factory = None):
 
     return factory(
         info,
-        meta = self.meta.derive("provider({})".format(provider_key)),
+        meta = self.meta.derive("provider({})".format(provider_name)),
     )
 
 def _target_subject_action_generating(self, short_path):
@@ -385,11 +387,23 @@ def _target_subject_attr(self, name, *, factory = None):
         meta = self.meta.derive("attr({})".format(name)),
     )
 
-# Providers aren't hashable, so we have to use a list of (key, value)
-_PROVIDER_SUBJECT_FACTORIES = [
-    (InstrumentedFilesInfo, InstrumentedFilesInfoSubject.new),
-    (RunEnvironmentInfo, RunEnvironmentInfoSubject.new),
-    (testing.ExecutionInfo, ExecutionInfoSubject.new),
+# Providers aren't hashable, so we have to use a list of structs.
+PROVIDER_SUBJECT_FACTORIES = [
+    struct(
+        type = InstrumentedFilesInfo,
+        name = str(InstrumentedFilesInfo),
+        factory = InstrumentedFilesInfoSubject.new,
+    ),
+    struct(
+        type = RunEnvironmentInfo,
+        name = str(RunEnvironmentInfo),
+        factory = RunEnvironmentInfoSubject,
+    ),
+    struct(
+        type = testing.ExecutionInfo,
+        name = str(testing.ExecutionInfo),
+        factory = ExecutionInfoSubject.new,
+    ),
 ]
 
 def _provider_name(provider):
