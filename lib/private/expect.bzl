@@ -81,6 +81,7 @@ def _expect_new(env, meta):
         that_str = lambda *a, **k: _expect_that_str(self, *a, **k),
         that_struct = lambda *a, **k: _expect_that_struct(self, *a, **k),
         that_target = lambda *a, **k: _expect_that_target(self, *a, **k),
+        that_value = lambda *a, **k: _expect_that_value(self, *a, **k),
         where = lambda *a, **k: _expect_where(self, *a, **k),
         # keep sorted end
         # Attributes used by Subject classes and internal helpers
@@ -209,17 +210,24 @@ def _expect_that_str(self, value):
     """
     return StrSubject.new(value, self.meta.derive("string"))
 
-def _expect_that_struct(self, value):
+def _expect_that_struct(self, value, *, attrs, expr = "struct"):
     """Creates a subject for asserting a `struct`.
 
     Args:
         self: implicitly added.
         value: ([`struct`]) the value to check against.
+        expr: ([`str`]) The starting "value of" expression to report in errors.
+        attrs: ([`dict`] of [`str`] to [`callable`]) the functions to convert
+            attributes to subjects. The keys are attribute names that must
+            exist on `actual`. The values are functions with the signature
+            `def factory(value, *, meta)`, where `value` is the actual attribute
+            value of the struct, and `meta` is an [`ExpectMeta`] object.
+
 
     Returns:
         [`StructSubject`] object.
     """
-    return StructSubject.new(value, self.meta.derive("string"))
+    return StructSubject.new(value, meta = self.meta.derive(expr), attrs = attrs)
 
 def _expect_that_target(self, target):
     """Creates a subject for asserting a `Target`.
@@ -243,6 +251,21 @@ def _expect_that_target(self, target):
             "package": target.label.package,
         },
     ))
+
+def _expect_that_value(self, value, *, factory, expr = "value"):
+    """Creates a subject for asserting an arbitrary value of a custom type.
+
+    Args:
+        self: implicitly added.
+        value: ([`struct`]) the value to check against.
+        factory: A subject factory (a function that takes value and meta).
+            Eg. subjects.collection
+        expr: ([`str`]) The starting "value of" expression to report in errors.
+
+    Returns:
+        A subject corresponding to the type returned by the factory.
+    """
+    return factory(value, self.meta.derive(expr))
 
 def _expect_where(self, **details):
     """Add additional information about the assertion.
@@ -272,8 +295,8 @@ def _expect_where(self, **details):
 # buildifier: disable=name-conventions
 Expect = struct(
     # keep sorted start
-    new_from_env = _expect_new_from_env,
     new = _expect_new,
+    new_from_env = _expect_new_from_env,
     that_action = _expect_that_action,
     that_bool = _expect_that_bool,
     that_collection = _expect_that_collection,
@@ -284,6 +307,7 @@ Expect = struct(
     that_str = _expect_that_str,
     that_struct = _expect_that_struct,
     that_target = _expect_that_target,
+    that_value = _expect_that_value,
     where = _expect_where,
     # keep sorted end
 )
