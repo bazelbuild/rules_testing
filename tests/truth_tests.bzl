@@ -1356,6 +1356,40 @@ def _str_subject_test(env, _target):
 
 _suite.append(str_subject_test)
 
+def struct_subject_test(name):
+    analysis_test(name = name, impl = _struct_subject_test, target = "truth_tests_helper")
+
+def _struct_subject_test(env, _target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_struct(
+        struct(a = "a"),
+        attrs = {"a": subjects.str},
+    )
+
+    subject.a().equals("a")
+    _assert_no_failures(fake_env, env = env)
+
+    _end(env, fake_env)
+
+_suite.append(struct_subject_test)
+
+def custom_subject_test(name):
+    analysis_test(name = name, impl = _custom_subject_test, target = "truth_tests_helper")
+
+def _custom_subject_test(env, _target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_value(
+        ["a"],
+        factory = subjects.collection,
+    )
+
+    subject.contains_exactly(["a"])
+    _assert_no_failures(fake_env, env = env)
+
+    _end(env, fake_env)
+
+_suite.append(custom_subject_test)
+
 def target_subject_test(name):
     analysis_test(name = name, impl = _target_subject_test, target = "truth_tests_helper")  #TODO also file target
 
