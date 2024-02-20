@@ -24,6 +24,8 @@
     to use the factory parameter each time you want to retrieve the provider.
     instead, you now write `analysis_test(..., provider_subject_factories = [
     type = FooInfo, name = "FooInfo", factory = FooSubjectFactory])`.
+  * Add `env.expect.that_value(Foo(...), factory=FooSubjectFactory)`.
+    This allows you to do expectations on an arbitrary value of any type.
 
 ## [0.5.0] -  2023-10-04
 
