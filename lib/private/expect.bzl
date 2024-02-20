@@ -265,7 +265,7 @@ def _expect_that_value(self, value, *, factory, expr = "value"):
     Returns:
         A subject corresponding to the type returned by the factory.
     """
-    return factory(value, self.meta.derive(expr))
+    return factory(value, meta = self.meta.derive(expr))
 
 def _expect_where(self, **details):
     """Add additional information about the assertion.
