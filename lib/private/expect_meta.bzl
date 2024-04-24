@@ -16,7 +16,7 @@
 ExpectMeta object implementation.
 """
 
-load("@bazel_skylib//lib:unittest.bzl", ut_asserts = "asserts")
+load("//lib:unittest.bzl", ut_asserts = "asserts")
 
 def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
     """Creates a new "ExpectMeta" struct".

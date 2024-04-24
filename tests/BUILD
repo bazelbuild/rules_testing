@@ -36,8 +36,8 @@ bzl_library(
     visibility = ["//visibility:private"],
     deps = [
         "//lib:truth_bzl",
+        "//lib:unittest",
         "//lib:util_bzl",
-        "@bazel_skylib//lib:unittest",
     ],
 )
 

@@ -14,9 +14,9 @@
 
 """Tests for truth.bzl."""
 
-load("@bazel_skylib//lib:unittest.bzl", ut_asserts = "asserts")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("//lib:truth.bzl", "matching", "subjects", "truth")
+load("//lib:unittest.bzl", ut_asserts = "asserts")
 
 # Bazel 5 has a bug where every access of testing.ExecutionInfo is a new
 # object that isn't equal to itself. This is fixed in Bazel 6.

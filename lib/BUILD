@@ -56,10 +56,23 @@ bzl_library(
     srcs = ["util.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        ":unittest",
         "@bazel_skylib//lib:paths",
         "@bazel_skylib//lib:types",
-        "@bazel_skylib//lib:unittest",
         "@bazel_skylib//rules:write_file",
+    ],
+)
+
+# This version is forked from bazel_skylib
+bzl_library(
+    name = "unittest",
+    srcs = ["unittest.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bazel_skylib//lib:new_sets",
+        "@bazel_skylib//lib:partial",
+        "@bazel_skylib//lib:sets",
+        "@bazel_skylib//lib:types",
     ],
 )
 

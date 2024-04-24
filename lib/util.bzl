@@ -19,10 +19,8 @@ Various utilities to aid with testing.
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@bazel_skylib//lib:types.bzl", "types")
-
-# TODO(ilist): remove references to skylib analysistest
-load("@bazel_skylib//lib:unittest.bzl", "analysistest")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("//lib:unittest.bzl", "analysistest")
 
 _SKIP_CI_TAGS = [
     # copybara-marker: skip-ci-tag

@@ -122,7 +122,7 @@ bzl_library(
 bzl_library(
     name = "expect_meta_bzl",
     srcs = ["expect_meta.bzl"],
-    deps = ["@bazel_skylib//lib:unittest"],
+    deps = ["//lib:unittest"],
 )
 
 bzl_library(
