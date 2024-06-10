@@ -86,6 +86,12 @@ bzl_library(
 )
 
 bzl_library(
+    name = "unittest_bzl",
+    srcs = ["unittest.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
     name = "test_suite_bzl",
     srcs = ["test_suite.bzl"],
     visibility = ["//visibility:public"],
@@ -105,6 +111,7 @@ filegroup(
         ":util_bzl",
     ],
     visibility = [
+        "//tests:__pkg__",
         "//tools/build_defs/python/tests/base_rules:__pkg__",
     ],
 )
@@ -113,10 +120,12 @@ exports_files(
     srcs = [
         "analysis_test.bzl",
         "truth.bzl",
+        "unittest.bzl",
         "util.bzl",
     ],
     visibility = [
         "//docgen:__pkg__",
+        "//tests:__pkg__",
     ],
 )
 
