@@ -15,7 +15,8 @@ tasks:
   all_tests_workspace_5.0:
     name: Workspace (Bazel 5.0)
     platform: ${{platform}}
-    bazel: 5.0
+    skip_in_bazel_downstream_pipeline: Already tested on latest
+    bazel: "5.0"
     test_flags:
       - "--noexperimental_enable_bzlmod"
     test_targets:
