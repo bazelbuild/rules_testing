@@ -21,6 +21,14 @@ package(
     default_visibility = ["//:__subpackages__"],
 )
 
+config_setting(
+    name = "coverage_enabled",
+    values = {"collect_code_coverage": "true"},
+    # Not actually public: only public because its a dependency of public
+    # targets
+    visibility = ["//visibility:public"],
+)
+
 # Necessary for documentation generation
 exports_files(
     glob(["*.bzl"]),

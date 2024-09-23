@@ -24,6 +24,14 @@ load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")
 load("//lib/private:target_subject.bzl", "PROVIDER_SUBJECT_FACTORIES")
 load("//lib/private:util.bzl", "get_test_name_from_function")
 
+_ANALYSIS_TEST_TAGS = [
+    "starlark_analysis_test",
+    # copybara-marker: skip-coverage-tag
+]
+
+_COVERAGE_ENABLED = Label("//lib/private:coverage_enabled")
+_INCOMPATIBLE = Label("@platforms//:incompatible")
+
 def _fail(env, msg):
     """Unconditionally causes the current test to fail.
 
@@ -227,6 +235,16 @@ def analysis_test(
         fail("Exactly one of target and targets must be provided")
 
     attr_values = dict(attr_values)  # Copy in case its frozen
+    attr_values["tags"] = list(attr_values.get("tags") or [])
+    attr_values["tags"].extend(_ANALYSIS_TEST_TAGS)
+
+    # The coverage command triggers the execution phase, but analysis tests
+    # may not have fully buildable dependencies.
+    attr_values["target_compatible_with"] = select({
+        _COVERAGE_ENABLED: [_INCOMPATIBLE],
+        "//conditions:default": attr_values.get("target_compatible_with") or [],
+    })
+
     if target:
         targets = {"target": target}
         target = None  # Prevent later misuse
