@@ -25,16 +25,18 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'myst_parser',
     'sphinx_rtd_theme', # Necessary to get jquery to make flyout work
+    'sphinx_bzl.bzl',
 ]
 
 intersphinx_mapping = {
+  "bazel": ("https://bazel.build/", "bazel_inventory.inv"),
 }
 
 intersphinx_disabled_domains = ['std']
 
 # Prevent local refs from inadvertently linking elsewhere, per
 # https://docs.readthedocs.io/en/stable/guides/intersphinx.html#using-intersphinx
-intersphinx_disabled_reftypes = ["*"]
+##intersphinx_disabled_reftypes = ["*"]
 
 templates_path = ['_templates']
 

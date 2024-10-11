@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""# InstrumentedFilesInfoSubject"""
+"""InstrumentedFilesInfoSubject"""
 
 load(":depset_file_subject.bzl", "DepsetFileSubject")
 
@@ -21,11 +21,11 @@ def _instrumented_files_info_subject_new(info, *, meta):
     Method: InstrumentedFilesInfoSubject.new
 
     Args:
-        info: ([`InstrumentedFilesInfo`]) provider instance.
-        meta: ([`ExpectMeta`]) the meta data about the call chain.
+        info: {type}`InstrumentedFilesInfo` provider instance.
+        meta: {type}`ExpectMeta` the meta data about the call chain.
 
     Returns:
-        An `InstrumentedFilesInfoSubject` struct.
+        {type}`InstrumentedFilesInfoSubject` struct.
     """
     self = struct(
         actual = info,
@@ -39,12 +39,15 @@ def _instrumented_files_info_subject_new(info, *, meta):
     return public
 
 def _instrumented_files_info_subject_instrumented_files(self):
-    """Returns a `DesetFileSubject` of the instrumented files.
+    """Returns a `DepsetFileSubject` of the instrumented files.
 
     Method: InstrumentedFilesInfoSubject.instrumented_files
 
     Args:
         self: implicitly added
+
+    Returns:
+        {type}`DepsetFileSubject`
     """
     return DepsetFileSubject.new(
         self.actual.instrumented_files,
@@ -52,21 +55,35 @@ def _instrumented_files_info_subject_instrumented_files(self):
     )
 
 def _instrumented_files_info_subject_metadata_files(self):
-    """Returns a `DesetFileSubject` of the metadata files.
+    """Returns a `DepsetFileSubject` of the metadata files.
 
     Method: InstrumentedFilesInfoSubject.metadata_files
 
     Args:
         self: implicitly added
+
+    Returns:
+        {type}`DepsetFileSubject`
     """
     return DepsetFileSubject.new(
         self.actual.metadata_files,
         meta = self.meta.derive("metadata_files()"),
     )
 
+def _instrumented_files_info_subject_typedef():
+    """Wrapper for asserting {type}`InstrumentedFilesInfo` objects.
+
+    :::{field} actual
+    :type: InstrumentedFilesInfo
+
+    The underlying object assert against
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 InstrumentedFilesInfoSubject = struct(
+    TYPEDEF = _instrumented_files_info_subject_typedef,
     new = _instrumented_files_info_subject_new,
     instrumented_files = _instrumented_files_info_subject_instrumented_files,
     metadata_files = _instrumented_files_info_subject_metadata_files,

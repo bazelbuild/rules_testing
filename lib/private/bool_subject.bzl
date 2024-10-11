@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# BoolSubject"""
+"""BoolSubject"""
 
 load(":check_util.bzl", "check_not_equals", "common_subject_is_in")
 
@@ -22,15 +22,16 @@ def _bool_subject_new(value, meta):
     Method: BoolSubject.new
 
     Args:
-        value: ([`bool`]) the value to assert against.
-        meta: ([`ExpectMeta`]) the metadata about the call chain.
+        value: {type}`bool` the value to assert against.
+        meta: {type}`ExpectMeta` the metadata about the call chain.
 
     Returns:
-        A [`BoolSubject`].
+        {type}`BoolSubject`
     """
     self = struct(actual = value, meta = meta)
     public = struct(
         # keep sorted start
+        actual = value,
         equals = lambda *a, **k: _bool_subject_equals(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
         not_equals = lambda *a, **k: _bool_subject_not_equals(self, *a, **k),
@@ -45,7 +46,7 @@ def _bool_subject_equals(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`bool`]) the expected value.
+        expected: {type}`bool` the expected value.
     """
     if self.actual == expected:
         return
@@ -61,7 +62,7 @@ def _bool_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added.
-        unexpected: ([`bool`]) the value actual cannot equal.
+        unexpected: {type}`bool` the value actual cannot equal.
     """
     return check_not_equals(
         actual = self.actual,
@@ -69,9 +70,23 @@ def _bool_subject_not_equals(self, unexpected):
         meta = self.meta,
     )
 
+def _bool_typedef():
+    """A wrapper around {obj}`bool` objects for testing.
+
+    These can be created using {obj}`subjects.bool` or
+    {obj}`Expect.that_bool()`.
+
+    :::{field} actual
+    :type: bool | None
+
+    The underlying value that is asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 BoolSubject = struct(
+    TYPEDEF = _bool_typedef,
     new = _bool_subject_new,
     equals = _bool_subject_equals,
     not_equals = _bool_subject_not_equals,

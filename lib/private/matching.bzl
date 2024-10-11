@@ -18,11 +18,11 @@ def _match_all(*matchers):
     """Match that all of multiple matchers match.
 
     Args:
-        *matchers: `list` of [`Matcher`]. If all match, then it is
+        *matchers: {type}`list[Matcher]` If all match, then it is
             considered a match.
 
     Returns:
-        [`Matcher`] (see `_match_custom`)
+        {type}`Matcher` (see `_match_custom`)
     """
     desc = " and ".join([str(m.desc) for m in matchers])
 
@@ -37,21 +37,13 @@ def _match_all(*matchers):
 def _match_custom(desc, func):
     """Wrap an arbitrary function up as a Matcher.
 
-    Method: Matcher.new
-
-    `Matcher` struct attributes:
-
-    * `desc`: ([`str`]) a human-friendly description
-    * `match`: (callable) accepts 1 positional arg (the value to match) and
-        returns [`bool`] (`True` if it matched, `False` if not).
-
     Args:
-        desc: ([`str`]) a human-friendly string describing what is matched.
-        func: (callable) accepts 1 positional arg (the value to match) and
-            returns [`bool`] (`True` if it matched, `False` if not).
+        desc: {type}`str` a human-friendly string describing what is matched.
+        func: {type}`callable` accepts 1 positional arg (the value to match) and
+            returns `bool` (`True` if it matched, `False` if not).
 
     Returns:
-        [`Matcher`] (see above).
+        {type}`Matcher`
     """
     return struct(desc = desc, match = func)
 
@@ -65,7 +57,7 @@ def _match_equals_wrapper(value):
         value: object, the value that must be equal to.
 
     Returns:
-        [`Matcher`] (see `_match_custom()`), whose description is `value`.
+        {type}`Matcher` (see `_match_custom()`), whose description is `value`.
     """
     return _match_custom(value, lambda other: other == value)
 
@@ -73,10 +65,10 @@ def _match_file_basename_contains(substr):
     """Match that a a `File.basename` string contains a substring.
 
     Args:
-        substr: ([`str`]) the substring to match.
+        substr: {type}`str` the substring to match.
 
     Returns:
-        [`Matcher`] (see `_match_custom()`).
+        {type}`Matcher` (see `_match_custom()`).
     """
     return struct(
         desc = "<basename contains '{}'>".format(substr),
@@ -87,11 +79,11 @@ def _match_file_path_matches(pattern):
     """Match that a `File.path` string matches a glob-style pattern.
 
     Args:
-        pattern: ([`str`]) the pattern to match. "*" can be used to denote
+        pattern: {type}`str` the pattern to match. "*" can be used to denote
             "match anything".
 
     Returns:
-        [`Matcher`] (see `_match_custom`).
+        {type}`Matcher` (see `_match_custom`).
     """
     parts = pattern.split("*")
     return struct(
@@ -103,10 +95,10 @@ def _match_file_basename_equals(value):
     """Match that a `File.basename` string equals `value`.
 
     Args:
-        value: ([`str`]) the basename to match.
+        value: {type}`str` the basename to match.
 
     Returns:
-        [`Matcher`] instance
+        {type}`Matcher` instance
     """
     return struct(
         desc = "<file basename equals '{}'>".format(value),
@@ -120,10 +112,10 @@ def _match_file_extension_in(values):
     have multiple parts, e.g. `*.tar.gz` or `*.so.*`.
 
     Args:
-        values: ([`list`] of [`str`]) the extensions to match.
+        values: {type}`list[str]` the extensions to match.
 
     Returns:
-        [`Matcher`] instance
+        {type}`Matcher` instance
     """
     return struct(
         desc = "<file extension is any of {}>".format(repr(values)),
@@ -142,7 +134,7 @@ def _match_is_in(values):
         values: The collection that the value must be within.
 
     Returns:
-        [`Matcher`] (see `_match_custom()`).
+        {type}`Matcher` (see `_match_custom()`).
     """
     return struct(
         desc = "<is any of {}>".format(repr(values)),
@@ -156,10 +148,10 @@ def _match_never(desc):
     while providing a custom description.
 
     Args:
-        desc: ([`str`]) human-friendly string.
+        desc: {type}`str` human-friendly string.
 
     Returns:
-        [`Matcher`] (see `_match_custom`).
+        {type}`Matcher` (see `_match_custom`).
     """
     return struct(
         desc = desc,
@@ -173,11 +165,11 @@ def _match_any(*matchers):
     values.
 
     Args:
-        *matchers: `list` of [`Matcher`]. If any match, then it is
+        *matchers: {type}`list[Matcher]` If any match, then it is
             considered a match.
 
     Returns:
-        [`Matcher`] (see `_match_custom`)
+        {type}`Matcher` (see `_match_custom`)
     """
     desc = " or ".join([str(m.desc) for m in matchers])
 
@@ -199,7 +191,7 @@ def _match_contains(contained):
         contained: the value that to-be-matched value must contain.
 
     Returns:
-        [`Matcher`] (see `_match_custom`).
+        {type}`Matcher` (see `_match_custom`).
     """
     return struct(
         desc = "<contains {}>".format(contained),
@@ -210,10 +202,10 @@ def _match_str_endswith(suffix):
     """Match that a string contains another string.
 
     Args:
-        suffix: ([`str`]) the suffix that must be present
+        suffix: {type}`str` the suffix that must be present
 
     Returns:
-        [`Matcher`] (see `_match_custom`).
+        {type}`Matcher` (see `_match_custom`).
     """
     return struct(
         desc = "<endswith '{}'>".format(suffix),
@@ -224,12 +216,12 @@ def _match_str_matches(pattern):
     """Match that a string matches a glob-style pattern.
 
     Args:
-        pattern: ([`str`]) the pattern to match. `*` can be used to denote
+        pattern: {type}`str` the pattern to match. `*` can be used to denote
             "match anything". There is an implicit `*` at the start and
             end of the pattern.
 
     Returns:
-        [`Matcher`] object.
+        {type}`Matcher` object.
     """
     parts = pattern.split("*")
     return struct(
@@ -241,10 +233,10 @@ def _match_str_startswith(prefix):
     """Match that a string contains another string.
 
     Args:
-        prefix: ([`str`]) the prefix that must be present
+        prefix: {type}`str` the prefix that must be present
 
     Returns:
-        [`Matcher`] (see `_match_custom`).
+        {type}`Matcher` (see `_match_custom`).
     """
     return struct(
         desc = "<startswith '{}'>".format(prefix),
@@ -261,6 +253,28 @@ def _match_parts_in_order(string, parts):
 
 def _is_matcher(obj):
     return hasattr(obj, "desc") and hasattr(obj, "match")
+
+def _matcher_typedef():
+    """A struct to represent matching with information metadata.
+
+    To create a custom Matcher, use {obj}`matching.custom()`.
+
+    :::{field} desc
+    :type: str
+    A human friendly description of what matches.
+    :::
+    :::{field} match
+    :type: callable
+
+    callable that accepts 1 positional arg (the value to match) and
+    returns `bool` (`True` if it matched, `False` if not).
+    :::
+    """
+
+# buildifier: disable=name-conventions
+Matcher = struct(
+    TYPEDEF = _matcher_typedef,
+)
 
 # For the definition of a `Matcher` object, see `_match_custom`.
 matching = struct(

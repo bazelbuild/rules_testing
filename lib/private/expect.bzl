@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# Expect"""
+"""Expect"""
 
 load(":action_subject.bzl", "ActionSubject")
 load(":bool_subject.bzl", "BoolSubject")
@@ -37,18 +37,19 @@ def _expect_new_from_env(env):
     customize behavior. Usually this is helpful for testing. See `_fake_env()`
     in truth_tests.bzl for examples.
       * `fail`: callable that takes a failure message. If present, it
-        will be called instead of the regular `Expect.add_failure` logic.
+        will be called instead of the regular {obj}`Expect.add_failure()` logic.
       * `get_provider`: callable that takes 2 positional args (target and
         provider) and returns the found provider or fails.
-      * `has_provider`: callable that takes 2 positional args (a [`Target`] and
-        a [`provider`]) and returns [`bool`] (`True` if present, `False` otherwise) or fails.
+      * `has_provider`: callable that takes 2 positional args (a {obj}`Target` and
+        a {obj}`provider`) and returns {obj}`bool` (`True` if present, `False`
+        otherwise) or fails.
 
     Args:
-        env: unittest env struct, or some approximation. There are several
+        env: {type}`Env` unittest env struct, or some approximation. There are several
             attributes that override regular behavior; see above doc.
 
     Returns:
-        [`Expect`] object
+        {type}`Expect` object
     """
     return _expect_new(env, None)
 
@@ -58,11 +59,11 @@ def _expect_new(env, meta):
     Internal; only other `Expect` methods should be calling this.
 
     Args:
-        env: unittest env struct or some approximation.
-        meta: ([`ExpectMeta`]) metadata about call chain and state.
+        env: {type}`Env` unittest env struct or some approximation.
+        meta: {type}`ExpectMeta` metadata about call chain and state.
 
     Returns:
-        [`Expect`] object
+        {type}`Expect` object
     """
 
     meta = meta or ExpectMeta.new(env)
@@ -94,10 +95,10 @@ def _expect_that_action(self, action):
 
     Args:
         self: implicitly added.
-        action: ([`Action`]) the action to check.
+        action: {type}`Action` the action to check.
 
     Returns:
-        [`ActionSubject`] object.
+        {type}`ActionSubject` object.
     """
     return ActionSubject.new(
         action,
@@ -112,11 +113,11 @@ def _expect_that_bool(self, value, expr = "boolean"):
 
     Args:
         self: implicitly added.
-        value: ([`bool`]) the bool to check.
-        expr: ([`str`]) the starting "value of" expression to report in errors.
+        value: {type}`bool` the bool to check.
+        expr: {type}`str` the starting "value of" expression to report in errors.
 
     Returns:
-        [`BoolSubject`] object.
+        {type}`BoolSubject` object.
     """
     return BoolSubject.new(
         value,
@@ -129,11 +130,11 @@ def _expect_that_collection(self, collection, expr = "collection", **kwargs):
     Args:
         self: implicitly added.
         collection: The collection (list or depset) to assert.
-        expr: ([`str`]) the starting "value of" expression to report in errors.
+        expr: {type}`str` the starting "value of" expression to report in errors.
         **kwargs: Additional kwargs to pass onto CollectionSubject.new
 
     Returns:
-        [`CollectionSubject`] object.
+        {type}`CollectionSubject` object.
     """
     return CollectionSubject.new(collection, self.meta.derive(expr), **kwargs)
 
@@ -144,10 +145,10 @@ def _expect_that_depset_of_files(self, depset_files):
 
     Args:
         self: implicitly added.
-        depset_files: ([`depset`] of [`File`]) the values to assert on.
+        depset_files: {type}`depset[File]` the values to assert on.
 
     Returns:
-        [`DepsetFileSubject`] object.
+        {type}`DepsetFileSubject` object.
     """
     return DepsetFileSubject.new(depset_files, self.meta.derive("depset_files"))
 
@@ -158,11 +159,11 @@ def _expect_that_dict(self, mapping, meta = None):
 
     Args:
         self: implicitly added
-        mapping: ([`dict`]) the values to assert on
-        meta: ([`ExpectMeta`]) optional custom call chain information to use instead
+        mapping: {type}`dict` the values to assert on
+        meta: {type}`ExpectMeta` optional custom call chain information to use instead
 
     Returns:
-        [`DictSubject`] object.
+        {type}`DictSubject` object.
     """
     meta = meta or self.meta.derive("dict")
     return DictSubject.new(mapping, meta = meta)
@@ -174,11 +175,11 @@ def _expect_that_file(self, file, meta = None):
 
     Args:
         self: implicitly added.
-        file: ([`File`]) the value to assert.
-        meta: ([`ExpectMeta`]) optional custom call chain information to use instead
+        file: {type}`File` the value to assert.
+        meta: {type}`ExpectMeta` optional custom call chain information to use instead
 
     Returns:
-        [`FileSubject`] object.
+        {type}`FileSubject` object.
     """
     meta = meta or self.meta.derive("file")
     return FileSubject.new(file, meta = meta)
@@ -190,11 +191,11 @@ def _expect_that_int(self, value, expr = "integer"):
 
     Args:
         self: implicitly added.
-        value: ([`int`]) the value to check against.
-        expr: ([`str`]) the starting "value of" expression to report in errors.
+        value: {type}`int` the value to check against.
+        expr: {type}`str` the starting "value of" expression to report in errors.
 
     Returns:
-        [`IntSubject`] object.
+        {type}`IntSubject` object.
     """
     return IntSubject.new(value, self.meta.derive(expr))
 
@@ -203,10 +204,10 @@ def _expect_that_str(self, value):
 
     Args:
         self: implicitly added.
-        value: ([`str`]) the value to check against.
+        value: {type}`str` the value to check against.
 
     Returns:
-        [`StrSubject`] object.
+        {type}`StrSubject` object.
     """
     return StrSubject.new(value, self.meta.derive("string"))
 
@@ -215,17 +216,17 @@ def _expect_that_struct(self, value, *, attrs, expr = "struct"):
 
     Args:
         self: implicitly added.
-        value: ([`struct`]) the value to check against.
-        expr: ([`str`]) The starting "value of" expression to report in errors.
-        attrs: ([`dict`] of [`str`] to [`callable`]) the functions to convert
+        value: {type}`struct` the value to check against.
+        expr: {type}`str` The starting "value of" expression to report in errors.
+        attrs: {type}`dict[str, callable]` the functions to convert
             attributes to subjects. The keys are attribute names that must
             exist on `actual`. The values are functions with the signature
             `def factory(value, *, meta)`, where `value` is the actual attribute
-            value of the struct, and `meta` is an [`ExpectMeta`] object.
+            value of the struct, and `meta` is an {type}`ExpectMeta` object.
 
 
     Returns:
-        [`StructSubject`] object.
+        {type}`StructSubject` object.
     """
     return StructSubject.new(value, meta = self.meta.derive(expr), attrs = attrs)
 
@@ -238,10 +239,10 @@ def _expect_that_target(self, target):
 
     Args:
         self: implicitly added.
-        target: ([`Target`]) subject target to check against.
+        target: {obj}`Target` subject target to check against.
 
     Returns:
-        [`TargetSubject`] object.
+        {type}`TargetSubject` object.
     """
     return TargetSubject.new(target, self.meta.derive(
         expr = "target({})".format(target.label),
@@ -257,10 +258,10 @@ def _expect_that_value(self, value, *, factory, expr = "value"):
 
     Args:
         self: implicitly added.
-        value: ([`struct`]) the value to check against.
+        value: {type}`struct` the value to check against.
         factory: A subject factory (a function that takes value and meta).
             Eg. subjects.collection
-        expr: ([`str`]) The starting "value of" expression to report in errors.
+        expr: {type}`str` The starting "value of" expression to report in errors.
 
     Returns:
         A subject corresponding to the type returned by the factory.
@@ -279,21 +280,30 @@ def _expect_where(self, **details):
 
     Args:
         self: implicitly added.
-        **details: ([`dict`] of [`str`] to value) Each named arg is added to
+        **details: {type}`dict[str, value]` Each named arg is added to
             the metadata details with the provided string, which is printed as
             part of displaying any failures.
 
     Returns:
-        [`Expect`] object with separate metadata derived from the original self.
+        {type}`Expect` object with separate metadata derived from the original self.
     """
     meta = self.meta.derive(
         details = ["{}: {}".format(k, v) for k, v in details.items()],
     )
     return _expect_new(env = self.env, meta = meta)
 
+def _expect_typedef():
+    """Entry point for truth-style assertions with context.
+
+    This is typically created through `env.expect` as part of the
+    analysis test framework. It holds context related to the test
+    state for later use in asserts and error reporting.
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 Expect = struct(
+    TYPEDEF = _expect_typedef,
     # keep sorted start
     new = _expect_new,
     new_from_env = _expect_new_from_env,

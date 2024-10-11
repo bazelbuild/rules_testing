@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# RunfilesSubject"""
+"""RunfilesSubject"""
 
 load(
     "//lib:util.bzl",
@@ -43,13 +43,13 @@ def _runfiles_subject_new(runfiles, meta, kind = None):
     Method: RunfilesSubject.new
 
     Args:
-        runfiles: ([`runfiles`]) the runfiles to check against.
-        meta: ([`ExpectMeta`]) the metadata about the call chain.
-        kind: (optional [`str`]) what type of runfiles they are, usually "data"
+        runfiles: {type}`runfiles` the runfiles to check against.
+        meta: {type}`ExpectMeta` the metadata about the call chain.
+        kind: {type}`str | None` what type of runfiles they are, usually "data"
             or "default". If not known or not applicable, use None.
 
     Returns:
-        [`RunfilesSubject`] object.
+        {type}`RunfilesSubject` object.
     """
     self = struct(
         runfiles = runfiles,
@@ -81,7 +81,7 @@ def _runfiles_subject_contains(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`str`]) the path to check is present. This will be formatted
+        expected: {type}`str` the path to check is present. This will be formatted
             using `ExpectMeta.format_str` and its current contextual
             keywords. Note that paths are runfiles-root relative (i.e.
             you likely need to include the workspace name.)
@@ -100,9 +100,9 @@ def _runfiles_subject_contains_at_least(self, paths):
 
     Args:
         self: implicitly added.
-        paths: ((collection of [`str`]) | [`runfiles`]) the paths that must
+        paths: {type}`collection[str] | runfiles` the paths that must
             exist. If a collection of strings is provided, they will be
-            formatted using [`ExpectMeta.format_str`], so its template keywords
+            formatted using {type}`ExpectMeta.format_str`, so its template keywords
             can be directly passed. If a `runfiles` object is passed, it is
             converted to a set of path strings.
     """
@@ -147,8 +147,8 @@ def _runfiles_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: callable that takes 1 positional arg ([`str`] path) and returns
-            boolean.
+        matcher: {type}`callable` callable that takes 1 positional arg
+            ({type}`str` path) and returns boolean.
     """
     check_contains_predicate(
         self.actual_paths,
@@ -168,10 +168,10 @@ def _runfiles_subject_contains_exactly(self, paths):
 
     Args:
         self: implicitly added.
-        paths: ([`collection`] of [`str`]) the paths to check. These will be
-            formatted using `meta.format_str`, so its template keywords can
-            be directly passed. All the paths must exist in the runfiles exactly
-            as provided, and no extra paths may exist.
+        paths: {type}`collection[str]` the paths to check. These will be
+            formatted using {obj}`ExpectMeta.format_str()`, so its template
+            keywords can be directly passed. All the paths must exist in the
+            runfiles exactly as provided, and no extra paths may exist.
     """
     paths = [self.meta.format_str(p) for p in to_list(paths)]
     runfiles_name = "{}runfiles".format(self.kind + " " if self.kind else "")
@@ -224,11 +224,11 @@ def _runfiles_subject_contains_none_of(self, paths, require_workspace_prefix = T
 
     Args:
         self: implicitly added.
-        paths: ([`collection`] of [`str`]) the paths that should not exist. They should
+        paths: {type}`collection[str]` the paths that should not exist. They should
             be runfiles root-relative paths (not workspace relative). The value
             is formatted using `ExpectMeta.format_str` and the current
             contextual keywords.
-        require_workspace_prefix: ([`bool`]) True to check that the path includes the
+        require_workspace_prefix: {type}`bool` True to check that the path includes the
             workspace prefix. This is to guard against accidentallly passing a
             workspace relative path, which will (almost) never exist, and cause
             the test to always pass. Specify False if the file being checked for
@@ -254,11 +254,11 @@ def _runfiles_subject_not_contains(self, path, require_workspace_prefix = True):
 
     Args:
         self: implicitly added.
-        path: ([`str`]) the path that should not exist. It should be a runfiles
+        path: {type}`str` the path that should not exist. It should be a runfiles
             root-relative path (not workspace relative). The value is formatted
             using `format_str`, so its template keywords can be directly
             passed.
-        require_workspace_prefix: ([`bool`]) True to check that the path includes the
+        require_workspace_prefix: {type}`bool` True to check that the path includes the
             workspace prefix. This is to guard against accidentallly passing a
             workspace relative path, which will (almost) never exist, and cause
             the test to always pass. Specify False if the file being checked for
@@ -284,7 +284,7 @@ def _runfiles_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: [`Matcher`] that accepts a string (runfiles root-relative path).
+        matcher: {type}`Matcher` that accepts a string (runfiles root-relative path).
     """
     check_not_contains_predicate(self.actual_paths, matcher, meta = self.meta)
 
@@ -311,9 +311,20 @@ def _runfiles_subject_check_workspace_prefix(self, path):
              "require_workspace_prefix=False if the path is truly " +
              "runfiles-root relative, not workspace relative.\npath=" + path)
 
+def _runfiles_subject_typedef():
+    """Subject for asserting runfiles objects
+
+    :::{field} actual
+    :type: runfiles
+
+    Underlying object to assert against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 RunfilesSubject = struct(
+    TYPEDEF = _runfiles_subject_typedef,
     new = _runfiles_subject_new,
     contains = _runfiles_subject_contains,
     contains_at_least = _runfiles_subject_contains_at_least,

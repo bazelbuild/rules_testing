@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# ExecutionInfoSubject"""
+"""ExecutionInfoSubject"""
 
 load(":dict_subject.bzl", "DictSubject")
 load(":str_subject.bzl", "StrSubject")
@@ -23,16 +23,17 @@ def _execution_info_subject_new(info, *, meta):
     Method: ExecutionInfoSubject.new
 
     Args:
-        info: ([`testing.ExecutionInfo`]) provider instance.
-        meta: ([`ExpectMeta`]) of call chain information.
+        info: {type}`testing.ExecutionInfo` provider instance.
+        meta: {type}`ExpectMeta` of call chain information.
 
     Returns:
-        `ExecutionInfoSubject` struct.
+        {type}`ExecutionInfoSubject` struct.
     """
 
     # buildifier: disable=uninitialized
     public = struct(
         # keep sorted start
+        actual = info,
         requirements = lambda *a, **k: _execution_info_subject_requirements(self, *a, **k),
         exec_group = lambda *a, **k: _execution_info_subject_exec_group(self, *a, **k),
         # keep sorted end
@@ -52,7 +53,7 @@ def _execution_info_subject_requirements(self):
         self: implicitly added
 
     Returns:
-        `DictSubject` of the requirements.
+        {type}`DictSubject` of the requirements.
     """
     return DictSubject.new(
         self.actual.requirements,
@@ -68,16 +69,27 @@ def _execution_info_subject_exec_group(self):
         self: implicitly added
 
     Returns:
-        A [`StrSubject`] for the exec group.
+        {type}`StrSubject` for the exec group.
     """
     return StrSubject.new(
         self.actual.exec_group,
         meta = self.meta.derive("exec_group()"),
     )
 
+def _execution_info_subject_typedef():
+    """Subject for {obj}`testing.ExecutionInfo`
+
+    :::{field} actual
+    :type: testing.ExecutionInfo
+
+    The underlying object asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 ExecutionInfoSubject = struct(
+    TYPEDEF = _execution_info_subject_typedef,
     new = _execution_info_subject_new,
     requirements = _execution_info_subject_requirements,
     exec_group = _execution_info_subject_exec_group,

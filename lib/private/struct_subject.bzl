@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""# StructSubject
+"""StructSubject
 
 A subject for arbitrary structs. This is most useful when wrapping an ad-hoc
 struct (e.g. a struct specific to a particular function). Such ad-hoc structs
@@ -63,22 +63,19 @@ def _foo_test(env):
 """
 
 def _struct_subject_new(actual, *, meta, attrs):
-    """Creates a `StructSubject`, which is a thin wrapper around a [`struct`].
+    """Creates a `StructSubject`, which is a thin wrapper around a {type}`struct`.
 
     Args:
-        actual: ([`struct`]) the struct to wrap.
-        meta: ([`ExpectMeta`]) object of call context information.
-        attrs: ([`dict`] of [`str`] to [`callable`]) the functions to convert
+        actual: {type}`struct` the struct to wrap.
+        meta: {type}`ExpectMeta` object of call context information.
+        attrs: {type}`dict[str, callable]` the functions to convert
             attributes to subjects. The keys are attribute names that must
             exist on `actual`. The values are functions with the signature
             `def factory(value, *, meta)`, where `value` is the actual attribute
-            value of the struct, and `meta` is an [`ExpectMeta`] object.
+            value of the struct, and `meta` is an {type}`ExpectMeta` object.
 
     Returns:
-        [`StructSubject`] object, which is a struct with the following shape:
-          * `actual` attribute, the underlying struct that was wrapped.
-          * A callable attribute for each `attrs` entry; it takes no args
-            and returns what the corresponding factory from `attrs` returns.
+        {type}`StructSubject` object
     """
     attr_accessors = {}
     for name, factory in attrs.items():
@@ -100,9 +97,28 @@ def _make_attr_accessor(actual, name, factory, meta):
 
     return attr_accessor
 
+def _struct_subject_typedef():
+    """Subject for wrapping arbitrary structs.
+
+    :::{field} actual
+    :type: struct
+
+    The underlying struct being asserted against.
+    :::
+
+    :::{field} <various>
+    :type: callable
+
+    A callable attribute exists for each attribute of `actual`. Each callable
+    takes no args and returns what the corresponding factory from `attrs`
+    returns.
+    :::
+    """
+
 # buildifier: disable=name-conventions
 StructSubject = struct(
     # keep sorted start
+    TYPEDEF = _struct_subject_typedef,
     new = _struct_subject_new,
     # keep sorted end
 )

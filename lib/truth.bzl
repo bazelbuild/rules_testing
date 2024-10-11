@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# Truth
-
-Truth-style asserts for Bazel's Starlark.
+"""Truth-style asserts for Bazel's Starlark.
 
 These asserts follow the Truth-style way of performing assertions. This
 basically means the actual value is wrapped in a type-specific object that
@@ -26,10 +24,13 @@ provides type-specific assertion methods. This style provides several benefits:
 
 For more detailed documentation, see the docs on GitHub.
 
-## Basic usage
+::::{topic} Basic usage
 
-NOTE: This example assumes usage of [`rules_testing`]'s [`analysis_test`]
+:::{note}
+This example assumes usage of [`rules_testing`]'s [`analysis_test`]
 framework, but that framework is not required.
+:::
+::::
 
 ```
 def foo_test(env, target):
@@ -40,6 +41,7 @@ def foo_test(env, target):
     subject = env.expect.that_action(...)
     subject.contains_at_least_args(...)
 ```
+::::
 """
 
 load("//lib/private:bool_subject.bzl", "BoolSubject")
