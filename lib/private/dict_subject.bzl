@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# DictSubject"""
+"""DictSubject"""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":compare_util.bzl", "compare_dicts")
@@ -28,13 +28,13 @@ def _dict_subject_new(actual, meta, container_name = "dict", key_plural_name = "
     Method: DictSubject.new
 
     Args:
-        actual: ([`dict`]) the dict to assert against.
-        meta: ([`ExpectMeta`]) of call chain information.
-        container_name: ([`str`]) conceptual name of the dict.
-        key_plural_name: ([`str`]) the plural word for the keys of the dict.
+        actual: {type}`dict` the dict to assert against.
+        meta: {type}`ExpectMeta` of call chain information.
+        container_name: {type}`str` conceptual name of the dict.
+        key_plural_name: {type}`str` the plural word for the keys of the dict.
 
     Returns:
-        New `DictSubject` struct.
+        {type}`DictSubject` struct.
     """
 
     # buildifier: disable=uninitialized
@@ -62,7 +62,7 @@ def _dict_subject_contains_at_least(self, at_least):
 
     Args:
         self: implicitly added.
-        at_least: ([`dict`]) the subset of keys/values that must exist. Extra
+        at_least: {type}`dict` the subset of keys/values that must exist. Extra
             keys are allowed. Order is not checked.
     """
     result = compare_dicts(
@@ -91,7 +91,7 @@ def _dict_subject_contains_exactly(self, expected):
 
     Args:
         self: implicitly added
-        expected: ([`dict`]) the values that must exist. Missing values or
+        expected: {type}`dict` the values that must exist. Missing values or
             extra values are not allowed. Order is not checked.
     """
     result = compare_dicts(
@@ -122,7 +122,7 @@ def _dict_subject_contains_none_of(self, none_of):
 
     Args:
         self: implicitly added
-        none_of: ([`dict`]) the keys/values that must not exist. Order is not
+        none_of: {type}`dict` the keys/values that must not exist. Order is not
             checked.
     """
     result = compare_dicts(
@@ -160,8 +160,8 @@ def _dict_subject_get(self, key, *, factory):
 
     Args:
         self: implicitly added.
-        key: ([`object`]) the key to fetch.
-        factory: ([`callable`]) subject factory function, with the signature
+        key: {type}`object` the key to fetch.
+        factory: {type}`callable` subject factory function, with the signature
             of `def factory(value, *, meta)`, and returns the wrapped value.
 
     Returns:
@@ -183,7 +183,7 @@ def _dict_subject_keys(self):
         self: implicitly added
 
     Returns:
-        [`CollectionSubject`] of the keys.
+        {type}`CollectionSubject` of the keys.
     """
     return CollectionSubject.new(
         self.actual.keys(),
@@ -192,9 +192,20 @@ def _dict_subject_keys(self):
         element_plural_name = "keys",
     )
 
+def _dict_subject_typedef():
+    """Subject for `dict` assertions.
+
+    :::{field} actual
+    :type: dict
+
+    Underlying object asserted against
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 DictSubject = struct(
+    TYPEDEF = _dict_subject_typedef,
     new = _dict_subject_new,
     contains_at_least = _dict_subject_contains_at_least,
     contains_exactly = _dict_subject_contains_exactly,

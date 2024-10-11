@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# CollectionSubject"""
+"""CollectionSubject"""
 
 load(
     ":check_util.bzl",
@@ -54,18 +54,15 @@ def _collection_subject_new(
 
     Method: CollectionSubject.new
 
-    Public Attributes:
-    * `actual`: The wrapped collection.
-
     Args:
-        values: ([`collection`]) the values to assert against.
-        meta: ([`ExpectMeta`]) the metadata about the call chain.
-        container_name: ([`str`]) conceptual name of the container.
-        sortable: ([`bool`]) True if output should be sorted for display, False if not.
-        element_plural_name: ([`str`]) the plural word for the values in the container.
+        values: {type}`collection` the values to assert against.
+        meta: {type}`ExpectMeta` the metadata about the call chain.
+        container_name: {type}`str` conceptual name of the container.
+        sortable: {type}`bool` True if output should be sorted for display, False if not.
+        element_plural_name: {type}`str` the plural word for the values in the container.
 
     Returns:
-        [`CollectionSubject`].
+        {type}`CollectionSubject`
     """
 
     # buildifier: disable=uninitialized
@@ -104,7 +101,7 @@ def _collection_subject_has_size(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`int`]) the expected size of the collection.
+        expected: {type}`int` the expected size of the collection.
     """
     return IntSubject.new(
         len(self.actual),
@@ -118,7 +115,7 @@ def _collection_subject_contains(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`str`]) the value that must be present.
+        expected: {type}`str` the value that must be present.
     """
     matcher = matching.equals_wrapper(expected)
     return self.contains_predicate(matcher)
@@ -139,10 +136,10 @@ def _collection_subject_contains_exactly(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`list`]) values that must exist.
+        expected: {type}`list` values that must exist.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
     return check_contains_exactly(
@@ -195,10 +192,10 @@ def _collection_subject_contains_exactly_predicates(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`list`] of [`Matcher`]) that must match.
+        expected: {type}`list[Matcher]` that must match.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
     return check_contains_exactly_predicates(
@@ -232,7 +229,7 @@ def _collection_subject_contains_none_of(self, values):
 
     Args:
         self: implicitly added
-        values: ([`collection`]) values of which none of are allowed to exist.
+        values: {type}`collection` values of which none of are allowed to exist.
     """
     check_contains_none_of(
         collection = self.actual,
@@ -248,7 +245,7 @@ def _collection_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: ([`Matcher`]) (see `matchers` struct).
+        matcher: {type}`Matcher` (see `matchers` struct).
     """
     check_contains_predicate(
         self.actual,
@@ -274,10 +271,10 @@ def _collection_subject_contains_at_least(self, expect_contains):
 
     Args:
         self: implicitly added.
-        expect_contains: ([`list`]) values that must be in the collection.
+        expect_contains: {type}`list` values that must be in the collection.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     matchers = [
         matching.equals_wrapper(expected)
@@ -297,10 +294,10 @@ def _collection_subject_contains_at_least_predicates(self, matchers):
 
     Args:
         self: implicitly added.
-        matchers: ([`list`] of [`Matcher`]) (see `matchers` struct).
+        matchers: {type}`list[Matcher]` (see `matchers` struct).
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     ordered = check_contains_at_least_predicates(
         self.actual,
@@ -335,7 +332,7 @@ def _collection_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: [`Matcher`] object (see `matchers` struct).
+        matcher: {type}`Matcher` object (see `matchers` struct).
     """
     check_not_contains_predicate(
         self.actual,
@@ -349,8 +346,8 @@ def _collection_subject_offset(self, offset, factory):
 
     Args:
         self: implicitly added.
-        offset: ([`int`]) the offset to fetch
-        factory: ([`callable`]). The factory function to use to create
+        offset: {type}`int` the offset to fetch
+        factory: {type}`callable`. The factory function to use to create
             the subject for the offset's value. It must have the following
             signature: `def factory(value, *, meta)`.
 
@@ -381,20 +378,20 @@ def _collection_subject_transform(
 
     Args:
         self: implicitly added.
-        desc: (optional [`str`]) a human-friendly description of the transform
+        desc: {type}`str|None` a human-friendly description of the transform
             for use in error messages. Required when a description can't be
             inferred from the other args. The description can be inferred if the
             filter arg is a named function (non-lambda) or Matcher object.
-        map_each: (optional [`callable`]) function to transform an element in
+        map_each: {type}`callable|None` function to transform an element in
             the collection. It takes one positional arg, the loop's
             current iteration value, and its return value will be the element's
             new value. If not specified, the values from the loop iteration are
             returned unchanged.
-        loop: (optional [`callable`]) function to produce values from the
+        loop: {type}`callable | None` function to produce values from the
             original collection and whose values are iterated over. It takes one
             positional arg, which is the original collection. If not specified,
             the original collection values are iterated over.
-        filter: (optional [`callable`]) function that decides what values are
+        filter: {type}`callable|None` function that decides what values are
             passed onto `map_each` for inclusion in the final result. It takes
             one positional arg, the value to match (which is the current
             iteration value before `map_each` is applied), and returns a bool
@@ -402,7 +399,7 @@ def _collection_subject_transform(
             should be skipped).
 
     Returns:
-        [`CollectionSubject`] of the transformed values.
+        {type}`CollectionSubject` of the transformed values.
     """
     if not desc:
         if map_each or loop:
@@ -444,9 +441,23 @@ def _collection_subject_transform(
         element_plural_name = self.element_plural_name,
     )
 
+def _collection_subject_typedef():
+    """A wrapper around collection objects for testing.
+
+    These can be created using {obj}`subjects.collection` or
+    {obj}`Expect.that_collection()`.
+
+    :::{field} actual
+    :type: collection | None
+
+    The underlying value that is asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 CollectionSubject = struct(
+    TYPEDEF = _collection_subject_typedef,
     # keep sorted start
     contains = _collection_subject_contains,
     contains_at_least = _collection_subject_contains_at_least,

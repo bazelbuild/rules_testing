@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# ActionSubject"""
+""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":depset_file_subject.bzl", "DepsetFileSubject")
@@ -36,11 +36,11 @@ def _action_subject_new(action, meta):
         expect(env).that_action(action).not_contains_arg("foo")
 
     Args:
-        action: ([`Action`]) value to check against.
-        meta: ([`ExpectMeta`]) of call chain information.
+        action: {type}`Action` value to check against.
+        meta: {type}`ExpectMeta` of call chain information.
 
     Returns:
-        [`ActionSubject`] object.
+        {type}`ActionSubject` object.
     """
 
     # buildifier: disable=uninitialized
@@ -98,7 +98,7 @@ def _action_subject_argv(self):
     Method: ActionSubject.argv
 
     Returns:
-        [`CollectionSubject`] object.
+        {type}`CollectionSubject` object.
     """
     meta = self.meta.derive("argv()")
     return CollectionSubject.new(
@@ -118,11 +118,11 @@ def _action_subject_contains_at_least_args(self, args):
 
     Args:
         self: implicitly added.
-        args: ([`list`] of [`str`]) all the args must be in the argv exactly
+        args: {type}`list[str]` all the args must be in the argv exactly
             as provided. Multiplicity is respected.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     return CollectionSubject.new(
         self.action.argv,
@@ -140,7 +140,7 @@ def _action_subject_not_contains_arg(self, arg):
 
     Args:
         self: implicitly added.
-        arg: ([`str`]) the arg that cannot be present in the argv.
+        arg: {type}`str` the arg that cannot be present in the argv.
     """
     if arg in self.action.argv:
         problem, actual = format_failure_unexpected_value(
@@ -160,7 +160,7 @@ def _action_subject_substitutions(self):
         self: implicitly added
 
     Returns:
-        `DictSubject` struct.
+        {type}`DictSubject` struct.
     """
     return DictSubject.new(
         actual = self.action.substitutions,
@@ -181,13 +181,13 @@ def _action_subject_has_flags_specified(self, flags):
 
     Args:
         self: implicitly added.
-        flags: ([`list`] of [`str`]) The flags to check for. Include the leading "--".
+        flags: {type}`list[str]` The flags to check for. Include the leading "--".
             Multiplicity is respected. A flag is considered present if any of
             these forms are detected: `--flag=value`, `--flag value`, or a lone
             `--flag`.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     return CollectionSubject.new(
         # Starlark dict keys maintain insertion order, so it's OK to
@@ -205,7 +205,7 @@ def _action_subject_mnemonic(self):
     Method: ActionSubject.mnemonic
 
     Returns:
-        [`StrSubject`] object.
+        {type}`StrSubject` object.
     """
     return StrSubject.new(
         self.action.mnemonic,
@@ -218,7 +218,7 @@ def _action_subject_inputs(self):
     Method: ActionSubject.inputs
 
     Returns:
-        `DepsetFileSubject` of the action's inputs.
+        {type}`DepsetFileSubject` of the action's inputs.
     """
     meta = self.meta.derive("inputs()")
     return DepsetFileSubject.new(self.action.inputs, meta)
@@ -247,9 +247,10 @@ def _action_subject_contains_flag_values(self, flag_values):
 
     Args:
         self: implicitly added.
-        flag_values: ([`list`] of ([`str`] name, [`str`]) tuples) Include the
-            leading "--" in the flag name. Order and duplicates aren't checked.
-            Flags without a value found use `None` as their value.
+        flag_values: {type}`list[tuple[str, str]]`, where the first tuple
+            element is the flag name, and the second is the flag value. Include
+            the leading "--" in the flag name. Order and duplicates aren't
+            checked. Flags without a value found use `None` as their value.
     """
     missing = []
     for flag, value in sorted(flag_values):
@@ -285,7 +286,8 @@ def _action_subject_contains_none_of_flag_values(self, flag_values):
 
     Args:
         self: implicitly added.
-        flag_values: ([`list`] of ([`str`] name, [`str`] value) tuples) Include
+        flag_values: {type}`list[tuple[str, str]]`, where the first tuple
+            element is the flag name, and the second is the flag value. Include
             the leading "--" in the flag name. Order and duplicates aren't
             checked.
     """
@@ -316,11 +318,11 @@ def _action_subject_contains_at_least_inputs(self, inputs):
 
     Args:
         self: implicitly added.
-        inputs: (collection of [`File`]) All must be present. Multiplicity
+        inputs: {type}`collection[File]` All must be present. Multiplicity
             is respected.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     return DepsetFileSubject.new(
         self.action.inputs,
@@ -335,7 +337,7 @@ def _action_subject_content(self):
     Method: ActionSubject.content
 
     Returns:
-        [`StrSubject`] object.
+        {type}`StrSubject` object.
     """
     return StrSubject.new(
         self.action.content,
@@ -357,9 +359,24 @@ def _action_subject_env(self):
         key_plural_name = "envvars",
     )
 
+def _action_subject_typedef():
+    """A wrapper around {obj}`Action` objects for testing.
+
+    These can be created using {obj}`subjects.action`, but more typically
+    are created through {obj}`Expect.that_action()` or
+    {obj}`TargetSubject.action_generating`.
+
+    :::{field} actual
+    :type: Action
+
+    The underlying action that is asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 ActionSubject = struct(
+    TYPEDEF = _action_subject_typedef,
     new = _action_subject_new,
     parse_flags = _action_subject_parse_flags,
     argv = _action_subject_argv,

@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# Analysis test
-
-Support for testing analysis phase logic, such as rules.
-"""
+"""Support for testing analysis phase logic, such as rules."""
 
 load("//lib:test_suite.bzl", _test_suite = "test_suite")
 load("//lib/private:analysis_test.bzl", _analysis_test = "analysis_test")
@@ -23,7 +20,7 @@ load("//lib/private:analysis_test.bzl", _analysis_test = "analysis_test")
 analysis_test = _analysis_test
 
 def test_suite(**kwargs):
-    """This is an alias to lib/test_suite.bzl#test_suite.
+    """This is an alias to {obj}`//lib:test_suite.bzl%test_suite`
 
     Args:
         **kwargs: Args passed through to test_suite

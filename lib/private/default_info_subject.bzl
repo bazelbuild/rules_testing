@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# DefaultInfoSubject"""
+"""DefaultInfoSubject"""
 
 load(":depset_file_subject.bzl", "DepsetFileSubject")
 load(":file_subject.bzl", "FileSubject")
@@ -22,11 +22,11 @@ def _default_info_subject_new(info, *, meta):
     """Creates a `DefaultInfoSubject`
 
     Args:
-        info: ([`DefaultInfo`]) the DefaultInfo object to wrap.
-        meta: ([`ExpectMeta`]) call chain information.
+        info: {type}`DefaultInfo` the DefaultInfo object to wrap.
+        meta: {type}`ExpectMeta` call chain information.
 
     Returns:
-        [`DefaultInfoSubject`] object.
+        {type}`DefaultInfoSubject` object.
     """
     self = struct(actual = info, meta = meta)
     public = struct(
@@ -48,7 +48,7 @@ def _default_info_subject_runfiles(self):
         self: implicitly added.
 
     Returns:
-        [`RunfilesSubject`] object
+        {type}`RunfilesSubject` object
     """
     return RunfilesSubject.new(
         self.actual.default_runfiles,
@@ -63,7 +63,7 @@ def _default_info_subject_data_runfiles(self):
         self: implicitly added.
 
     Returns:
-        [`RunfilesSubject`] object
+        {type}`RunfilesSubject` object
     """
     return RunfilesSubject.new(
         self.actual.data_runfiles,
@@ -78,7 +78,7 @@ def _default_info_subject_default_outputs(self):
         self: implicitly added.
 
     Returns:
-        [`DepsetFileSubject`] object.
+        {type}`DepsetFileSubject` object.
     """
     return DepsetFileSubject.new(
         self.actual.files,
@@ -92,7 +92,7 @@ def _default_info_subject_executable(self):
         self: implicitly added.
 
     Returns:
-        [`FileSubject`] object.
+        {type}`FileSubject` object.
     """
     return FileSubject.new(
         self.actual.files_to_run.executable,
@@ -106,16 +106,27 @@ def _default_info_subject_runfiles_manifest(self):
         self: implicitly added.
 
     Returns:
-        [`FileSubject`] object.
+        {type}`FileSubject` object.
     """
     return FileSubject.new(
         self.actual.files_to_run.runfiles_manifest,
         meta = self.meta.derive("runfiles_manifest()"),
     )
 
+def _default_info_subject_typedef():
+    """Subject for {obj}`DefaultInfo`
+
+    :::{field} actual
+    :type: DefaultInfo
+
+    The underlying object asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 DefaultInfoSubject = struct(
+    TYPEDEF = _default_info_subject_typedef,
     # keep sorted start
     new = _default_info_subject_new,
     runfiles = _default_info_subject_runfiles,
