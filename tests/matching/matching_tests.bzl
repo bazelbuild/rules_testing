@@ -27,6 +27,44 @@ def _verify_matcher(env, matcher, match_true, match_false):
         expr = "matcher.match(value)",
     ).equals(False)
 
+def _any_test(env):
+    match_one = matching.equals_wrapper("one")
+    match_two = matching.equals_wrapper("two")
+
+    _verify_matcher(
+        env,
+        matching.any(match_one, match_two),
+        match_true = "one",
+        match_false = "nope",
+    )
+    _verify_matcher(
+        env,
+        matching.any(match_one, match_two),
+        match_true = "two",
+        match_false = "nope",
+    )
+
+_tests.append(_any_test)
+
+def _all_test(env):
+    contains_x = matching.contains("x")
+    contains_y = matching.contains("y")
+
+    _verify_matcher(
+        env,
+        matching.all(contains_x, contains_y),
+        match_true = "xy",
+        match_false = "xN",
+    )
+    _verify_matcher(
+        env,
+        matching.all(contains_x, contains_y),
+        match_true = "yx",
+        match_false = "yN",
+    )
+
+_tests.append(_all_test)
+
 def _contains_test(env):
     _verify_matcher(
         env,

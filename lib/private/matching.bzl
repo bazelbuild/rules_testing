@@ -14,6 +14,26 @@
 
 """Implementation of matchers."""
 
+def _match_all(*matchers):
+    """Match that all of multiple matchers match.
+
+    Args:
+        *matchers: `list` of [`Matcher`]. If all match, then it is
+            considered a match.
+
+    Returns:
+        [`Matcher`] (see `_match_custom`)
+    """
+    desc = " and ".join([str(m.desc) for m in matchers])
+
+    def _and(value):
+        for m in matchers:
+            if not m.match(value):
+                return False
+        return True
+
+    return struct(desc = desc, match = _and)
+
 def _match_custom(desc, func):
     """Wrap an arbitrary function up as a Matcher.
 
@@ -116,6 +136,8 @@ def _match_is_in(values):
     This is equivalent to: `to_be_matched in values`. See `_match_contains`
     for the reversed operation.
 
+    See also: `matching.any` for matching amongst arbitrary other matchers.
+
     Args:
         values: The collection that the value must be within.
 
@@ -143,6 +165,29 @@ def _match_never(desc):
         desc = desc,
         match = lambda value: False,
     )
+
+def _match_any(*matchers):
+    """Match that any of multiple matchers match.
+
+    See also: `is_in` for checking if a value is one amongst multiple
+    values.
+
+    Args:
+        *matchers: `list` of [`Matcher`]. If any match, then it is
+            considered a match.
+
+    Returns:
+        [`Matcher`] (see `_match_custom`)
+    """
+    desc = " or ".join([str(m.desc) for m in matchers])
+
+    def _or(value):
+        for m in matchers:
+            if m.match(value):
+                return True
+        return False
+
+    return struct(desc = desc, match = _or)
 
 def _match_contains(contained):
     """Match that `contained` is within the to-be-matched value.
@@ -220,18 +265,20 @@ def _is_matcher(obj):
 # For the definition of a `Matcher` object, see `_match_custom`.
 matching = struct(
     # keep sorted start
+    all = _match_all,
+    any = _match_any,
     contains = _match_contains,
     custom = _match_custom,
     equals_wrapper = _match_equals_wrapper,
     file_basename_contains = _match_file_basename_contains,
     file_basename_equals = _match_file_basename_equals,
-    file_path_matches = _match_file_path_matches,
     file_extension_in = _match_file_extension_in,
+    file_path_matches = _match_file_path_matches,
     is_in = _match_is_in,
+    is_matcher = _is_matcher,
     never = _match_never,
     str_endswith = _match_str_endswith,
     str_matches = _match_str_matches,
     str_startswith = _match_str_startswith,
-    is_matcher = _is_matcher,
     # keep sorted end
 )
