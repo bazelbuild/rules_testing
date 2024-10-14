@@ -1264,6 +1264,25 @@ def _runfiles_subject_test(env, target):
         msg = "check contains_exactly fails",
     )
 
+    subject.contains_exactly_predicates([
+        matching.str_matches("runfile1.txt"),
+        matching.str_matches("helper.txt"),
+    ])
+    _assert_no_failures(fake_env, env = env)
+    subject.contains_exactly_predicates([
+        matching.str_matches("runfile1.txt"),
+        matching.str_matches("does-not-match"),
+    ])
+    _assert_failure(
+        fake_env,
+        [
+            "1 missing",
+            "<matches 'does-not-match'>",
+        ],
+        env = env,
+        msg = "check contains_exactly_predicates",
+    )
+
     subject.contains_at_least([
         "{workspace}/{package}/default_runfile1.txt",
     ])
@@ -1281,6 +1300,26 @@ def _runfiles_subject_test(env, target):
         env = env,
         msg = "check contains_at_least fails",
     )
+
+    subject.contains_at_least_predicates([
+        matching.str_matches("runfile1.txt"),
+    ])
+    _assert_no_failures(fake_env, env = env)
+    subject.contains_at_least_predicates([
+        matching.str_matches("does-not-match"),
+    ])
+    _assert_failure(
+        fake_env,
+        [
+            "1 expected paths missing",
+            "<matches 'does-not-match'>",
+        ],
+        env = env,
+        msg = "check contains_at_least_predicates",
+    )
+
+    subject.paths().contains_predicate(matching.str_matches("runfile1.txt"))
+    _assert_no_failures(fake_env, env = env)
 
     _end(env, fake_env)
 

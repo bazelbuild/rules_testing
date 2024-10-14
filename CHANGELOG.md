@@ -4,6 +4,15 @@
 
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
+### Added
+* `matching.any()` and `matching.all()` for composing `Matcher` objects using
+  "or" and "and" semantics, respectively
+* Predicate-variants for RunfilesSubject methods:
+  `RunfilesSubject.contains_exactly_predicates()`,
+  `RunfilesSubject.contains_at_least_predicates()`
+* `RunfilesSubject.paths()`, which returns a `CollectionSubject` of the
+  runfiles paths.
+
 ## 0.6.0 - 2024-02-15
 
 [0.6.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.6.0

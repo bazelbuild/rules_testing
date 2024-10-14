@@ -62,11 +62,14 @@ def _runfiles_subject_new(runfiles, meta, kind = None):
         actual = runfiles,
         contains = lambda *a, **k: _runfiles_subject_contains(self, *a, **k),
         contains_at_least = lambda *a, **k: _runfiles_subject_contains_at_least(self, *a, **k),
+        contains_at_least_predicates = lambda *a, **k: _runfiles_subject_contains_at_least_predicates(self, *a, **k),
         contains_exactly = lambda *a, **k: _runfiles_subject_contains_exactly(self, *a, **k),
+        contains_exactly_predicates = lambda *a, **k: _runfiles_subject_contains_exactly_predicates(self, *a, **k),
         contains_none_of = lambda *a, **k: _runfiles_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _runfiles_subject_contains_predicate(self, *a, **k),
         not_contains = lambda *a, **k: _runfiles_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _runfiles_subject_not_contains_predicate(self, *a, **k),
+        paths = lambda *a, **k: _runfiles_subject_paths(self, *a, **k),
         # keep sorted end
     )
     return public
@@ -116,6 +119,26 @@ def _runfiles_subject_contains_at_least(self, paths):
         element_plural_name = "paths",
         container_name = "{}runfiles".format(self.kind + " " if self.kind else ""),
     ).contains_at_least(paths)
+
+def _runfiles_subject_contains_at_least_predicates(self, matchers):
+    """Assert that the runfiles contains at least all of the provided matchers.
+
+    The runfile paths must match all the matchers. It can contain extra elements.
+    The multiplicity of matchers is respected. Checking that the relative order
+    of matches is the same as the passed-in matchers order can done by calling
+    `in_order()`.
+
+    Args:
+        self: implicitly added.
+        matchers: ([`list`] of [`Matcher`]) (see `matchers` struct). They are
+            passed string paths.
+    """
+    return CollectionSubject.new(
+        self.actual_paths,
+        meta = self.meta,
+        element_plural_name = "paths",
+        container_name = "{}runfiles".format(self.kind + " " if self.kind else ""),
+    ).contains_at_least_predicates(matchers)
 
 def _runfiles_subject_contains_predicate(self, matcher):
     """Asserts that `matcher` matches at least one value.
@@ -172,6 +195,27 @@ def _runfiles_subject_contains_exactly(self, paths):
         format_out_of_order = lambda matches: fail("Should not be called"),
         meta = self.meta,
     )
+
+def _runfiles_subject_contains_exactly_predicates(self, expected):
+    """Asserts the runfiles contains exactly the given matchers.
+
+    See `CollectionSubject.contains_exactly_predicates` for details on
+    behavior.
+
+    Args:
+        self: implicitly added.
+        expected: ([`list`] of [`Matcher`]) that must match. They are passed
+            string paths.
+
+    Returns:
+        [`Ordered`] (see `_ordered_incorrectly_new`).
+    """
+    return CollectionSubject.new(
+        self.actual_paths,
+        meta = self.meta,
+        element_plural_name = "paths",
+        container_name = "{}runfiles".format(self.kind + " " if self.kind else ""),
+    ).contains_exactly_predicates(expected)
 
 def _runfiles_subject_contains_none_of(self, paths, require_workspace_prefix = True):
     """Asserts the runfiles contain none of `paths`.
@@ -244,6 +288,22 @@ def _runfiles_subject_not_contains_predicate(self, matcher):
     """
     check_not_contains_predicate(self.actual_paths, matcher, meta = self.meta)
 
+def _runfiles_subject_paths(self):
+    """Returns a `CollectionSubject` of the computed runfile path strings.
+
+    Args:
+        self: implicitly added
+
+    Returns:
+        [`CollectionSubject`] of the runfile path strings.
+    """
+    return CollectionSubject.new(
+        self.actual_paths,
+        meta = self.meta.derive("paths()"),
+        element_plural_name = "paths",
+        container_name = "{}runfiles".format(self.kind + " " if self.kind else ""),
+    )
+
 def _runfiles_subject_check_workspace_prefix(self, path):
     if not path.startswith(self.meta.ctx.workspace_name + "/"):
         fail("Rejecting path lacking workspace prefix: this often indicates " +
@@ -257,8 +317,10 @@ RunfilesSubject = struct(
     new = _runfiles_subject_new,
     contains = _runfiles_subject_contains,
     contains_at_least = _runfiles_subject_contains_at_least,
+    contains_at_least_predicates = _runfiles_subject_contains_at_least_predicates,
     contains_predicate = _runfiles_subject_contains_predicate,
     contains_exactly = _runfiles_subject_contains_exactly,
+    contains_exactly_predicates = _runfiles_subject_contains_exactly_predicates,
     contains_none_of = _runfiles_subject_contains_none_of,
     not_contains = _runfiles_subject_not_contains,
     not_contains_predicate = _runfiles_subject_not_contains_predicate,
