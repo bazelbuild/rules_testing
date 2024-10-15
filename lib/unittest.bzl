@@ -14,7 +14,7 @@
 
 """Unit testing support.
 
-Unlike most Skylib files, this exports four modules:
+This exports four modules:
 * `unittest` contains functions to declare and define unit tests for ordinary
    Starlark functions;
 * `analysistest` contains functions to declare and define tests for analysis
@@ -37,11 +37,11 @@ load("@bazel_skylib//lib:types.bzl", "types")
 def register_unittest_toolchains():
     """Registers the toolchains for unittest users."""
     native.register_toolchains(
-        "@bazel_skylib//toolchains/unittest:cmd_toolchain",
-        "@bazel_skylib//toolchains/unittest:bash_toolchain",
+        "//tests/unittest_toolchains:cmd_toolchain",
+        "//tests/unittest_toolchains:bash_toolchain",
     )
 
-TOOLCHAIN_TYPE = "@bazel_skylib//toolchains/unittest:toolchain_type"
+TOOLCHAIN_TYPE = "//tests/unittest_toolchains:toolchain_type"
 
 _UnittestToolchainInfo = provider(
     doc = "Execution platform information for rules in the bazel_skylib repository.",
