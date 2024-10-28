@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# DepsetFileSubject"""
+"""DepsetFileSubject"""
 
 load("//lib:util.bzl", "is_file")
 load(
@@ -42,18 +42,19 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
     Method: DepsetFileSubject.new
 
     Args:
-        files: ([`depset`] of [`File`]) the values to assert on.
-        meta: ([`ExpectMeta`]) of call chain information.
-        container_name: ([`str`]) conceptual name of the container.
-        element_plural_name: ([`str`]) the plural word for the values in the container.
+        files: {type}`depset[File]` the values to assert on.
+        meta: {type}`ExpectMeta` of call chain information.
+        container_name: {type}`str` conceptual name of the container.
+        element_plural_name: {type}`str` the plural word for the values in the container.
 
     Returns:
-        [`DepsetFileSubject`] object.
+        {type}`DepsetFileSubject` object.
     """
 
     # buildifier: disable=uninitialized
     public = struct(
         # keep sorted start
+        actual = files,
         contains = lambda *a, **k: _depset_file_subject_contains(self, *a, **k),
         contains_any_in = lambda *a, **k: _depset_file_subject_contains_any_in(self, *a, **k),
         contains_at_least = lambda *a, **k: _depset_file_subject_contains_at_least(self, *a, **k),
@@ -81,9 +82,9 @@ def _depset_file_subject_contains(self, expected):
 
     Args:
         self: implicitly added
-        expected: ([`str`] | [`File`]) If a string path is provided, it is
+        expected: {type}`str | File` If a string path is provided, it is
             compared to the short path of the files and are formatted using
-            [`ExpectMeta.format_str`] and its current contextual keywords. Note
+            {obj}`ExpectMeta.format_str()` and its current contextual keywords. Note
             that, when using `File` objects, two files' configurations must be
             the same for them to be considered equal.
     """
@@ -107,15 +108,15 @@ def _depset_file_subject_contains_at_least(self, expected):
 
     Args:
         self: implicitly added
-        expected: ([`collection`] of [`str`] | collection of [`File`]) multiplicity
+        expected: {type}`collection[str] | collection[File]` multiplicity
             is respected. If string paths are provided, they are compared to the
             short path of the files and are formatted using
-            `ExpectMeta.format_str` and its current contextual keywords. Note
+            {obj}`ExpectMeta.format_str()` and its current contextual keywords. Note
             that, when using `File` objects, two files' configurations must be the
             same for them to be considered equal.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
     if len(expected) < 1 or is_file(expected[0]):
@@ -138,11 +139,11 @@ def _depset_file_subject_contains_any_in(self, expected):
 
     Args:
         self: implicitly added.
-        expected: ([`collection`] of [`str`] paths | [`collection`] of [`File`])
-            at least one of the values must exist. Note that, when using `File`
-            objects, two files' configurations must be the same for them to be
-            considered equal. When string paths are provided, they are compared
-            to `File.short_path`.
+        expected: {type}`collection[str] | collection[File]` at least one of the
+            values must exist. Note that, when using `File` objects, two files'
+            configurations must be the same for them to be considered equal.
+            When string paths are provided, they are compared to
+            `File.short_path`.
     """
     expected = to_list(expected)
     if len(expected) < 1 or is_file(expected[0]):
@@ -175,11 +176,10 @@ def _depset_file_subject_contains_at_least_predicates(self, matchers):
 
     Args:
         self: implicitly added.
-        matchers: ([`list`] of [`Matcher`]) (see `matchers` struct) that
-            accept [`File`] objects.
+        matchers: {type}`list[Matcher]` that accept `File` objects.
 
     Returns:
-        [`Ordered`] (see `_ordered_incorrectly_new`).
+        {type}`Ordered` (see `_ordered_incorrectly_new`).
     """
     ordered = check_contains_at_least_predicates(
         self.files,
@@ -205,7 +205,7 @@ def _depset_file_subject_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: [`Matcher`] (see `matching` struct) that accepts `File` objects.
+        matcher: {type}`Matcher` (see `matching` struct) that accepts `File` objects.
     """
     check_contains_predicate(
         self.files,
@@ -225,7 +225,7 @@ def _depset_file_subject_contains_exactly(self, paths):
 
     Args:
         self: implicitly added.
-        paths: ([`collection`] of [`str`]) the paths that must exist. These are
+        paths: {type}`collection[str]` the paths that must exist. These are
             compared to the `short_path` values of the files in the depset.
             All the paths, and no more, must exist.
     """
@@ -260,7 +260,7 @@ def _depset_file_subject_not_contains(self, short_path):
 
     Args:
         self: implicitly added.
-        short_path: ([`str`]) the short path that should not be present.
+        short_path: {type}`str` the short path that should not be present.
     """
     short_path = self.meta.format_str(short_path)
     matcher = matching.custom(short_path, lambda f: f.short_path == short_path)
@@ -273,13 +273,24 @@ def _depset_file_subject_not_contains_predicate(self, matcher):
 
     Args:
         self: implicitly added.
-        matcher: ([`Matcher`]) that must match. It operates on [`File`] objects.
+        matcher: {type}`Matcher` that must match. It operates on {obj}`File` objects.
     """
     check_not_contains_predicate(self.files, matcher, meta = self.meta)
+
+def _depset_file_subject_typedef():
+    """Subject for {obj}`depset` of {obj}`File`.
+
+    :::{field} actual
+    :type: depset[File]
+
+    The underlying object asserted against.
+    :::
+    """
 
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 DepsetFileSubject = struct(
+    TYPEDEF = _depset_file_subject_typedef,
     new = _depset_file_subject_new,
     contains = _depset_file_subject_contains,
     contains_at_least = _depset_file_subject_contains_at_least,

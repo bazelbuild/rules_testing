@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# TargetSubject
+"""TargetSubject
 
-`TargetSubject` wraps a [`Target`] object and provides method for asserting
+`TargetSubject` wraps a {type}`Target` object and provides method for asserting
 its state.
 """
 
@@ -40,14 +40,14 @@ def _target_subject_new(target, meta):
     Method: TargetSubject.new
 
     **Public attributes**:
-      * `actual`: The wrapped [`Target`] object.
+      * `actual`: The wrapped {type}`Target` object.
 
     Args:
-        target: ([`Target`]) the target to check against.
-        meta: ([`ExpectMeta`]) metadata about the call chain.
+        target: {type}`Target` the target to check against.
+        meta: {type}`ExpectMeta` metadata about the call chain.
 
     Returns:
-        [`TargetSubject`] object
+        {type}`TargetSubject` object
     """
     self = struct(target = target, meta = meta)
     public = struct(
@@ -80,7 +80,7 @@ def _target_subject_runfiles(self):
         self: implicitly added.
 
     Returns:
-        [`RunfilesSubject`] object.
+        {type}`RunfilesSubject` object.
     """
     meta = self.meta.derive("runfiles()")
     return RunfilesSubject.new(self.target[DefaultInfo].default_runfiles, meta, "default")
@@ -94,7 +94,7 @@ def _target_subject_tags(self):
         self: implicitly added
 
     Returns:
-        [`CollectionSubject`] asserting the target's tags.
+        {type}`CollectionSubject` asserting the target's tags.
     """
     return CollectionSubject.new(
         _target_subject_get_attr(self, "tags"),
@@ -121,7 +121,7 @@ def _target_subject_data_runfiles(self):
         self: implicitly added.
 
     Returns:
-        [`RunfilesSubject`] object
+        {type}`RunfilesSubject` object
     """
     meta = self.meta.derive("data_runfiles()")
     return RunfilesSubject.new(self.target[DefaultInfo].data_runfiles, meta, "data")
@@ -135,7 +135,7 @@ def _target_subject_default_outputs(self):
         self: implicitly added.
 
     Returns:
-        [`DepsetFileSubject`] object.
+        {type}`DepsetFileSubject` object.
     """
     meta = self.meta.derive("default_outputs()")
     return DepsetFileSubject.new(self.target[DefaultInfo].files, meta)
@@ -149,7 +149,7 @@ def _target_subject_executable(self):
         self: implicitly added.
 
     Returns:
-        [`FileSubject`] object.
+        {type}`FileSubject` object.
     """
     meta = self.meta.derive("executable()")
     return FileSubject.new(self.target[DefaultInfo].files_to_run.executable, meta)
@@ -163,7 +163,7 @@ def _target_subject_failures(self):
         self: implicitly added
 
     Returns:
-        [`CollectionSubject`] of [`str`].
+        {type}`CollectionSubject[str]`
     """
     meta = self.meta.derive("failures()")
     if AnalysisFailureInfo in self.target:
@@ -208,7 +208,7 @@ def _target_subject_output_group(self, name):
 
     Args:
         self: implicitly added.
-        name: ([`str`]) an output group name. If it isn't present, an error is raised.
+        name: {type}`str` an output group name. If it isn't present, an error is raised.
 
     Returns:
         DepsetFileSubject of the named output group.
@@ -269,12 +269,12 @@ def _target_subject_action_generating(self, short_path):
 
     Args:
         self: implicitly added.
-        short_path: ([`str`]) the output's short_path to match. The value is
-            formatted using [`format_str`], so its template keywords can be
+        short_path: {type}`str` the output's short_path to match. The value is
+            formatted using {obj}`format_str`, so its template keywords can be
             directly passed.
 
     Returns:
-        [`ActionSubject`] for the matching action. If no action is found, or
+        {type}`ActionSubject` for the matching action. If no action is found, or
         more than one action matches, then an error is raised.
     """
 
@@ -309,15 +309,15 @@ def _target_subject_action_named(self, mnemonic):
 
     Method: TargetSubject.action_named
 
-    NOTE: in order to use this method, the target must have the [`TestingAspectInfo`]
-    provider (added by the [`testing_aspect`] aspect.)
+    NOTE: in order to use this method, the target must have the {obj}`TestingAspectInfo`
+    provider (added by the {obj}`testing_aspect`] aspect.)
 
     Args:
         self: implicitly added.
-        mnemonic: ([`str`]) the mnemonic to match
+        mnemonic: {type}`str` the mnemonic to match
 
     Returns:
-        [`ActionSubject`]. If no action matches, or more than one action matches, an error
+        {type}`ActionSubject`. If no action matches, or more than one action matches, an error
         is raised.
     """
     if TestingAspectInfo not in self.target:
@@ -364,9 +364,9 @@ def _target_subject_attr(self, name, *, factory = None):
 
     Args:
         self: implicitly added
-        name: ([`str`]) the attribute to get. If it's an unsupported attribute, and
+        name: {type}`str` the attribute to get. If it's an unsupported attribute, and
             no explicit factory was provided, an error will be raised.
-        factory: (callable) function to create the returned subject based on
+        factory: {type}`callable` function to create the returned subject based on
             the attribute value. If specified, it takes precedence over the
             attributes that are inherently understood. It must have the
             following signature: `def factory(value, *, meta)`, where `value` is
@@ -422,9 +422,20 @@ PROVIDER_SUBJECT_FACTORIES = [
     ),
 ]
 
+def _target_subject_typedef():
+    """Subject for `Target` objects.
+
+    :::{field} actual
+    :type: Target
+
+    Underlying object asserted against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 TargetSubject = struct(
+    TYPEDEF = _target_subject_typedef,
     new = _target_subject_new,
     runfiles = _target_subject_runfiles,
     tags = _target_subject_tags,

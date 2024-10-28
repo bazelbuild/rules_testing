@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# IntSubject"""
+"""IntSubject"""
 
 load("@bazel_skylib//lib:types.bzl", "types")
 load(":check_util.bzl", "check_not_equals", "common_subject_is_in")
@@ -24,11 +24,11 @@ def _int_subject_new(value, meta):
     Method: IntSubject.new
 
     Args:
-        value: (optional [`int`]) the value to perform asserts against may be None.
-        meta: ([`ExpectMeta`]) the meta data about the call chain.
+        value: {type}`int | None` the value to perform asserts against may be None.
+        meta: {type}`ExpectMeta` the meta data about the call chain.
 
     Returns:
-        [`IntSubject`].
+        {type}`IntSubject`
     """
     if not types.is_int(value) and value != None:
         fail("int required, got: {}".format(repr_with_type(value)))
@@ -36,6 +36,7 @@ def _int_subject_new(value, meta):
     # buildifier: disable=uninitialized
     public = struct(
         # keep sorted start
+        actual = value,
         equals = lambda *a, **k: _int_subject_equals(self, *a, **k),
         is_greater_than = lambda *a, **k: _int_subject_is_greater_than(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
@@ -52,7 +53,7 @@ def _int_subject_equals(self, other):
 
     Args:
         self: implicitly added.
-        other: ([`int`]) value the subject must be equal to.
+        other: {type}`int` value the subject must be equal to.
     """
     if self.actual == other:
         return
@@ -68,7 +69,7 @@ def _int_subject_is_greater_than(self, other):
 
     Args:
         self: implicitly added.
-        other: ([`int`]) value the subject must be greater than.
+        other: {type}`int` value the subject must be greater than.
     """
     if self.actual != None and other != None and self.actual > other:
         return
@@ -84,7 +85,7 @@ def _int_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added
-        unexpected: ([`int`]) the value actual cannot equal.
+        unexpected: {type}`int` the value actual cannot equal.
     """
     return check_not_equals(
         actual = self.actual,
@@ -92,9 +93,20 @@ def _int_subject_not_equals(self, unexpected):
         meta = self.meta,
     )
 
+def _int_subject_typedef():
+    """Wrapper for asserting int values.
+
+    :::{field} actual
+    :type: int | None
+
+    The underlying value to assert against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 IntSubject = struct(
+    TYPEDEF = _int_subject_typedef,
     new = _int_subject_new,
     equals = _int_subject_equals,
     is_greater_than = _int_subject_is_greater_than,

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# RunEnvironmentInfoSubject"""
+"""RunEnvironmentInfoSubject"""
 
 load(":collection_subject.bzl", "CollectionSubject")
 load(":dict_subject.bzl", "DictSubject")
@@ -23,8 +23,8 @@ def _run_environment_info_subject_new(info, *, meta):
     Method: RunEnvironmentInfoSubject.new
 
     Args:
-        info: ([`RunEnvironmentInfo`]) provider instance.
-        meta: ([`ExpectMeta`]) of call chain information.
+        info: {type}`RunEnvironmentInfo` provider instance.
+        meta: {type}`ExpectMeta` of call chain information.
     """
 
     # buildifier: disable=uninitialized
@@ -47,7 +47,7 @@ def _run_environment_info_subject_environment(self):
         self: implicitly added
 
     Returns:
-        [`DictSubject`] of the str->str environment map.
+        {type}`DictSubject[str, str]` of the str->str environment map.
     """
     return DictSubject.new(
         self.actual.environment,
@@ -63,17 +63,28 @@ def _run_environment_info_subject_inherited_environment(self):
         self: implicitly added
 
     Returns:
-        [`CollectionSubject`] of [`str`]; from the
-        [`RunEnvironmentInfo.inherited_environment`] list.
+        {type}`CollectionSubject[str]` from
+        {obj}`RunEnvironmentInfo.inherited_environment` list.
     """
     return CollectionSubject.new(
         self.actual.inherited_environment,
         meta = self.meta.derive("inherited_environment()"),
     )
 
+def _run_environment_info_subject_typedef():
+    """Subject for {obj}`RunEnvironmentInfo` object
+
+    :::{field} actual
+    :type: RunEnvironmentInfo
+
+    The underlying value to assert against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 RunEnvironmentInfoSubject = struct(
+    TYPEDEF = _run_environment_info_subject_typedef,
     new = _run_environment_info_subject_new,
     environment = _run_environment_info_subject_environment,
     inherited_environment = _run_environment_info_subject_inherited_environment,

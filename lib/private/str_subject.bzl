@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# StrSubject"""
+"""StrSubject"""
 
 load(
     ":check_util.bzl",
@@ -27,15 +27,16 @@ def _str_subject_new(actual, meta):
     Method: StrSubject.new
 
     Args:
-        actual: ([`str`]) the string to check against.
-        meta: ([`ExpectMeta`]) of call chain information.
+        actual: {type}`str` the string to check against.
+        meta: {type}`ExpectMeta` of call chain information.
 
     Returns:
-        [`StrSubject`] object.
+        {type}`StrSubject` object.
     """
     self = struct(actual = actual, meta = meta)
     public = struct(
         # keep sorted start
+        actual = actual,
         contains = lambda *a, **k: _str_subject_contains(self, *a, **k),
         equals = lambda *a, **k: _str_subject_equals(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
@@ -52,7 +53,7 @@ def _str_subject_contains(self, substr):
 
     Args:
         self: implicitly added.
-        substr: ([`str`]) the substring to check for.
+        substr: {type}`str` the substring to check for.
     """
     if substr in self.actual:
         return
@@ -68,7 +69,7 @@ def _str_subject_equals(self, other):
 
     Args:
         self: implicitly added.
-        other: ([`str`]) the expected value it should equal.
+        other: {type}`str` the expected value it should equal.
     """
     if self.actual == other:
         return
@@ -84,7 +85,7 @@ def _str_subject_not_equals(self, unexpected):
 
     Args:
         self: implicitly added.
-        unexpected: ([`str`]) the value actual cannot equal.
+        unexpected: {type}`str` the value actual cannot equal.
     """
     return check_not_equals(
         actual = self.actual,
@@ -96,6 +97,13 @@ def _str_subject_split(self, sep):
     """Return a `CollectionSubject` for the actual string split by `sep`.
 
     Method: StrSubject.split
+
+    Args:
+        self: implicitly added.
+        sep: {type}`str` string to split by
+
+    Returns:
+        {type}`CollectionSubject[str]`
     """
     return CollectionSubject.new(
         self.actual.split(sep),
@@ -105,9 +113,20 @@ def _str_subject_split(self, sep):
         element_plural_name = "parts",
     )
 
+def _str_subject_typedef():
+    """Subject for asserting strings.
+
+    :::{field} actual
+    :type: str
+
+    Underlying object to assert against.
+    :::
+    """
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 StrSubject = struct(
+    TYPEDEF = _str_subject_typedef,
     new = _str_subject_new,
     contains = _str_subject_contains,
     equals = _str_subject_equals,

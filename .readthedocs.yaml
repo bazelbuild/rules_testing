@@ -1,23 +1,14 @@
 
 version: 2
 
-formats:
-  - pdf
-  - htmlzip
-
-sphinx:
-  configuration: docs/source/conf.py
-
 build:
   os: "ubuntu-22.04"
   tools:
-    python: "3.11"
     nodejs: "19"
-  jobs:
-    pre_build:
-      - npm install -g @bazel/bazelisk
-      - bazel run //docs:run_sphinx_build
-
-python:
-  install:
-    - requirements: docs/requirements.txt
+  commands:
+    - env
+    - npm install -g @bazel/bazelisk
+    - bazel version
+    # Put the actual action behind a shell script because it's
+    # easier to modify than the yaml config.
+    - docs/readthedocs_build.sh

@@ -3,3 +3,5 @@
 sphinx
 myst-parser
 sphinx_rtd_theme
+typing-extensions
+readthedocs-sphinx-ext

@@ -12,63 +12,99 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@docs-pypi//:requirements.bzl", "requirement")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
-load("@rules_python//python:py_binary.bzl", "py_binary")
+load("@rules_python//sphinxdocs:readthedocs.bzl", "readthedocs_install")
+load("@rules_python//sphinxdocs:sphinx.bzl", "sphinx_build_binary", "sphinx_docs")
+load("@rules_python//sphinxdocs:sphinx_stardoc.bzl", "sphinx_stardocs")
+load(":bzlmod.bzl", "BZLMOD_ENABLED")
 
 package(
     default_applicable_licenses = ["//:package_license"],
 )
 
-sh_binary(
-    name = "run_sphinx_build",
-    srcs = ["run_sphinx_build.sh"],
-    args = [
-        "$(rootpath :sphinx_build)",
-        "$(rootpath :crossrefs.md)",
-        "$(rootpaths //docgen:docs)",
-    ],
-    data = [
-        "crossrefs.md",
-        ":sphinx_build",
-        ":sphinx_sources",
-        "//docgen:docs",
+# Building docs only works with bzlmod enabled
+_TARGET_COMPATIBLE_WITH = (
+    ["@platforms//os:linux"] if BZLMOD_ENABLED else ["@platforms//:incompatible"]
+)
+
+sphinx_docs(
+    name = "docs",
+    srcs = glob(
+        include = [
+            "*.md",
+            "**/*.md",
+        ],
+        exclude = ["README.md"],
+    ),
+    config = "conf.py",
+    formats = ["html"],
+    renamed_srcs = {
+        "@rules_python//sphinxdocs/inventories:bazel_inventory": "bazel_inventory.inv",
+    },
+    sphinx = ":sphinx-build",
+    strip_prefix = package_name() + "/",
+    target_compatible_with = _TARGET_COMPATIBLE_WITH,
+    deps = [
+        ":bzl_docs",
     ],
 )
 
-py_binary(
-    name = "sphinx_build",
-    srcs = ["sphinx_build.py"],
-    deps = [
-        requirement("sphinx"),
-        requirement("sphinx_rtd_theme"),
-        requirement("myst_parser"),
+sphinx_stardocs(
+    name = "bzl_docs",
+    srcs = [
+        "//lib:analysis_test_bzl",
+        "//lib:truth_bzl",
+        "//lib:util_bzl",
+        "//lib/private:action_subject_bzl",
+        "//lib/private:bool_subject_bzl",
+        "//lib/private:collection_subject_bzl",
+        "//lib/private:default_info_subject_bzl",
+        "//lib/private:depset_file_subject_bzl",
+        "//lib/private:dict_subject_bzl",
+        "//lib/private:execution_info_subject_bzl",
+        "//lib/private:expect_bzl",
+        "//lib/private:expect_meta_bzl",
+        "//lib/private:file_subject_bzl",
+        "//lib/private:instrumented_files_info_subject_bzl",
+        "//lib/private:int_subject_bzl",
+        "//lib/private:label_subject_bzl",
+        "//lib/private:ordered_bzl",
+        "//lib/private:run_environment_info_subject_bzl",
+        "//lib/private:runfiles_subject_bzl",
+        "//lib/private:str_subject_bzl",
+        "//lib/private:struct_subject_bzl",
+        "//lib/private:target_subject_bzl",
     ],
+    prefix = "api/",
+    target_compatible_with = _TARGET_COMPATIBLE_WITH,
+)
+
+sphinx_build_binary(
+    name = "sphinx-build",
+    target_compatible_with = _TARGET_COMPATIBLE_WITH,
+    deps = [
+        "@docs-pypi//myst_parser",
+        "@docs-pypi//readthedocs_sphinx_ext",
+        "@docs-pypi//sphinx",
+        "@docs-pypi//sphinx_rtd_theme",
+        "@docs-pypi//typing_extensions",
+        "@rules_python//sphinxdocs/src/sphinx_bzl",
+    ],
+)
+
+readthedocs_install(
+    name = "readthedocs_install",
+    docs = [":docs"],
+    target_compatible_with = _TARGET_COMPATIBLE_WITH,
 )
 
 # Run bazel run //docs:requirements.update
 compile_pip_requirements(
     name = "requirements",
+    extra_args = ["--upgrade"],
     requirements_in = "requirements.in",
     requirements_txt = "requirements.txt",
     # The requirements output differs on Windows, so just restrict it to Linux.
     # The build process is only run on, and only works for, Linux anyways.
-    target_compatible_with = ["@platforms//os:linux"],
-)
-
-filegroup(
-    name = "sphinx_sources",
-    srcs = [
-        # This isn't generated like the other files under the api directory,
-        # but it can't go in the glob because the exclude param will ignore it.
-        "source/api/index.md",
-    ] + glob(
-        [
-            "**",
-        ],
-        exclude = [
-            "source/api/**",  # These are all generated files
-            "_build/**",
-        ],
-    ),
+    target_compatible_with = _TARGET_COMPATIBLE_WITH,
 )

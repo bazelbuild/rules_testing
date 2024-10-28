@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""# Ordered"""
+"""Ordered"""
 
 # This is just a stub so doc generation is nicer.
 def _ordered_in_order():
     """Checks that the values were in order."""
 
+def _in_order_typedef():
+    """Singleton Ordered implementation for when order was respected."""
+
 IN_ORDER = struct(
+    TYPEDEF = _in_order_typedef,
     in_order = _ordered_in_order,
 )
 
@@ -56,9 +60,22 @@ def _ordered_incorrectly_in_order(self):
     """
     self.meta.add_failure(self.format_problem(), self.format_actual())
 
+def _ordered_incorrectly_typedef():
+    """Ordered implementation for when order was not respected."""
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 OrderedIncorrectly = struct(
+    TYPEDEF = _ordered_incorrectly_typedef,
     new = _ordered_incorrectly_new,
     in_order = _ordered_incorrectly_in_order,
+)
+
+def _ordered_typedef():
+    """Interface for asserting values were matched in order."""
+
+# buildifier: disable=name-conventions
+Ordered = struct(
+    TYPEDEF = _ordered_typedef,
+    in_order = _ordered_in_order,
 )
