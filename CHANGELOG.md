@@ -4,6 +4,16 @@
 
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
+## Changed
+* Nothing yet
+
+### Added
+* Nothing yet
+
+## [0.7.0] - 2024-10-29
+
+[0.7.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.7.0
+
 ### Added
 * `matching.any()` and `matching.all()` for composing `Matcher` objects using
   "or" and "and" semantics, respectively
