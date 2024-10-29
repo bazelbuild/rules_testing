@@ -10,8 +10,6 @@ bazel_dep(name = "rules_license", version = "0.0.4")
 
 # ===== The rest of these are development dependencies =====
 
-# TODO(https://github.com/bazelbuild/stardoc/issues/117): stardoc doesn't yet
-# work with bzlmod enabled. This defines the repo so load() works.
 bazel_dep(
     name = "stardoc",
     version = "0.7.1",
