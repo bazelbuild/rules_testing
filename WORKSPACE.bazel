@@ -101,3 +101,8 @@ pip_parse(
 load("@docs-pypi//:requirements.bzl", "install_deps")
 
 install_deps()
+
+# TODO(b/380296146): move unittest toolchain from skylib into rules_testing
+load("@bazel_skylib//lib:unittest.bzl", "register_unittest_toolchains")
+
+register_unittest_toolchains()
