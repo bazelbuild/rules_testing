@@ -12,15 +12,15 @@ tasks:
       - "--enable_workspace"
     test_targets:
       - "..."
-  all_tests_workspace_5.x:
-    name: Workspace (Bazel 5.x)
+  all_tests_workspace_6.x:
+    name: Workspace (Bazel 6.x)
     platform: ${{platform}}
     skip_in_bazel_downstream_pipeline: Already tested on latest
-    bazel: "5.x"
+    bazel: "6.x"
     test_flags:
-      - "--noexperimental_enable_bzlmod"
+      - "--noenable_bzlmod"
     test_targets:
-      - "..."
+      - "//tests/..."
   all_tests_bzlmod:
     name: Bzlmod
     platform: ${{platform}}
