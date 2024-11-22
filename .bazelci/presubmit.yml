@@ -19,7 +19,7 @@ tasks:
     bazel: "6.x"
     test_flags:
       - "--noenable_bzlmod"
-      - "--enable_workspace"
+      - "--test_tag_filters=-docs"
     test_targets:
       - "..."
   all_tests_bzlmod:
