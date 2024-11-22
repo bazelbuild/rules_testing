@@ -18,7 +18,8 @@ tasks:
     skip_in_bazel_downstream_pipeline: Already tested on latest
     bazel: "6.x"
     test_flags:
-      - "--noexperimental_enable_bzlmod"
+      - "--noenable_bzlmod"
+      - "--enable_workspace"
     test_targets:
       - "..."
   all_tests_bzlmod:
