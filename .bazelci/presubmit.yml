@@ -20,9 +20,7 @@ tasks:
     test_flags:
       - "--noenable_bzlmod"
     test_targets:
-      - "..."
-      - "-//docgen/..."
-      - "-//docs/..."      
+      - "//tests/..." 
   all_tests_bzlmod:
     name: Bzlmod
     platform: ${{platform}}
