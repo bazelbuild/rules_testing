@@ -19,9 +19,10 @@ tasks:
     bazel: "6.x"
     test_flags:
       - "--noenable_bzlmod"
-      - "--test_tag_filters=-docs"
     test_targets:
       - "..."
+      - "-//docgen/..."
+      - "-//docs/..."      
   all_tests_bzlmod:
     name: Bzlmod
     platform: ${{platform}}
