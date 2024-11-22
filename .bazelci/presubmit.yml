@@ -20,7 +20,7 @@ tasks:
     test_flags:
       - "--noenable_bzlmod"
     test_targets:
-      - "//tests/..." 
+      - "//tests/..."
   all_tests_bzlmod:
     name: Bzlmod
     platform: ${{platform}}
