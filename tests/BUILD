@@ -18,6 +18,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load(":analysis_test_tests.bzl", "analysis_test_test_suite")
 load(":truth_tests.bzl", "truth_test_suite")
 load(":unit_test_tests.bzl", "unit_test_test_suite")
+load(":unittest_tests.bzl", "unittest_passing_tests_suite")
 
 licenses(["notice"])
 
@@ -46,6 +47,8 @@ analysis_test_test_suite(name = "analysis_test_test_suite")
 truth_test_suite(name = "truth_tests")
 
 unit_test_test_suite(name = "unit_test_test_suite")
+
+unittest_passing_tests_suite()
 
 build_test(
     name = "build_tests",
