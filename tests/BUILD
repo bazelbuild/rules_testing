@@ -42,6 +42,27 @@ bzl_library(
     ],
 )
 
+bzl_library(
+    name = "unittest_tests_bzl",
+    srcs = ["unittest_tests.bzl"],
+    visibility = ["//visibility:private"],
+    deps = ["//lib:unittest"],
+)
+
+sh_test(
+    name = "unittest_e2e_test",
+    srcs = ["unittest_test.sh"],
+    data = [
+        ":unittest_tests_bzl",
+        "//bazel/src/test/shell:bashunit",
+        "//lib:test_deps",
+        "//lib:unittest.bzl",
+        "//tests/unittest_toolchains:test_deps",
+        "@bazel_tools//bash/runfiles",
+    ],
+    tags = ["local"],
+)
+
 analysis_test_test_suite(name = "analysis_test_test_suite")
 
 truth_test_suite(name = "truth_tests")
