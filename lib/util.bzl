@@ -33,6 +33,7 @@ _SKIP_CI_TAGS = [
 PREVENT_IMPLICIT_BUILDING_TAGS = [
     "manual",  # Prevent `bazel ...` from directly building them
     # copybara-marker: skip-coverage-tag
+    "nobuilder",  # Prevent Tricorder from building them
 ] + _SKIP_CI_TAGS
 PREVENT_IMPLICIT_BUILDING = {"tags": PREVENT_IMPLICIT_BUILDING_TAGS}
 
