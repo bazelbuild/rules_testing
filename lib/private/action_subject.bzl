@@ -106,6 +106,7 @@ def _action_subject_argv(self):
         meta,
         container_name = "argv",
         sortable = False,
+        format = True,
     )
 
 def _action_subject_contains_at_least_args(self, args):

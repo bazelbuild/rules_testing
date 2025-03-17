@@ -75,6 +75,21 @@ def _action_subject_test(env, target):
         msg = "check contains_flag_values success",
     )
 
+    subject.argv().contains_at_least([
+        "arg1",
+        "--boolflag",
+        "--arg1flag",
+        "arg1value",
+        "--arg2flag=arg2value",
+        "--generated_input",
+        "{bindir}/{package}/input.gen.txt",
+    ])
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check argv success",
+    )
+
     subject.contains_flag_values([
         ("--missingflag", "whatever"),
         ("--arg1flag", "wrongvalue"),

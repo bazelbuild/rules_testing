@@ -7,6 +7,10 @@
 ## Changed
 * Add `{bindir}` to formatting variables.
 * Format values in `ActionsSubject.contains_flag_values()`.
+* `CollectionSubject` accepts new constructor parameter `format`. When used
+  all asserts are formatted.
+* `Actionsubjects.argv()` formats all asserts, for example
+  `action.argv().contains_at_least(["-f", "{bindir}/{package}/input.txt"])`.
 
 ### Added
 * Nothing yet

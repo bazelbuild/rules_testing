@@ -49,7 +49,8 @@ def _collection_subject_new(
         meta,
         container_name = "values",
         sortable = True,
-        element_plural_name = "elements"):
+        element_plural_name = "elements",
+        format = False):
     """Creates a "CollectionSubject" struct.
 
     Method: CollectionSubject.new
@@ -63,6 +64,7 @@ def _collection_subject_new(
         container_name: ([`str`]) conceptual name of the container.
         sortable: ([`bool`]) True if output should be sorted for display, False if not.
         element_plural_name: ([`str`]) the plural word for the values in the container.
+        format: ([`bool`]) True if asserted values should be formatted.
 
     Returns:
         [`CollectionSubject`].
@@ -94,6 +96,7 @@ def _collection_subject_new(
         sortable = sortable,
         contains_predicate = public.contains_predicate,
         contains_at_least_predicates = public.contains_at_least_predicates,
+        format = format,
     )
     return public
 
@@ -120,6 +123,8 @@ def _collection_subject_contains(self, expected):
         self: implicitly added.
         expected: ([`str`]) the value that must be present.
     """
+    if self.format:
+        expected = self.meta.format_str(expected)
     matcher = matching.equals_wrapper(expected)
     return self.contains_predicate(matcher)
 
@@ -145,6 +150,8 @@ def _collection_subject_contains_exactly(self, expected):
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
     expected = to_list(expected)
+    if self.format:
+        expected = [self.meta.format_str(v) for v in expected]
     return check_contains_exactly(
         actual_container = self.actual,
         expect_contains = expected,
@@ -234,6 +241,8 @@ def _collection_subject_contains_none_of(self, values):
         self: implicitly added
         values: ([`collection`]) values of which none of are allowed to exist.
     """
+    if self.format:
+        values = self.meta.format_str(values)
     check_contains_none_of(
         collection = self.actual,
         none_of = values,
@@ -262,7 +271,7 @@ def _collection_subject_contains_predicate(self, matcher):
         meta = self.meta,
     )
 
-def _collection_subject_contains_at_least(self, expect_contains):
+def _collection_subject_contains_at_least(self, expected):
     """Assert that the collection is a subset of the given predicates.
 
     Method: CollectionSubject.contains_at_least
@@ -274,14 +283,17 @@ def _collection_subject_contains_at_least(self, expect_contains):
 
     Args:
         self: implicitly added.
-        expect_contains: ([`list`]) values that must be in the collection.
+        expected: ([`list`]) values that must be in the collection.
 
     Returns:
         [`Ordered`] (see `_ordered_incorrectly_new`).
     """
+    expected = to_list(expected)
+    if self.format:
+        expected = [self.meta.format_str(v) for v in expected]
     matchers = [
-        matching.equals_wrapper(expected)
-        for expected in to_list(expect_contains)
+        matching.equals_wrapper(e)
+        for e in expected
     ]
     return self.contains_at_least_predicates(matchers)
 
@@ -321,6 +333,8 @@ def _collection_subject_contains_at_least_predicates(self, matchers):
     return ordered
 
 def _collection_subject_not_contains(self, value):
+    if self.format:
+        value = self.meta.format_str(value)
     check_not_contains_predicate(
         self.actual,
         matcher = matching.equals_wrapper(value),
