@@ -177,16 +177,6 @@ testing_aspect = aspect(
     implementation = _testing_aspect_impl,
 )
 
-# The same as `testing_aspect`, but recurses through all attributes in the
-# whole graph. This is useful if you need to extract information about
-# targets that aren't direct dependencies of the target under test, or to
-# reconstruct a more complete graph of inputs/outputs/generating-target.
-# TODO(ilist): make private, after switching python tests to new testing framework
-recursive_testing_aspect = aspect(
-    implementation = _testing_aspect_impl,
-    attr_aspects = ["*"],
-)
-
 def get_target_attrs(env):
     return analysistest.target_under_test(env)[TestingAspectInfo].attrs
 
@@ -264,7 +254,6 @@ util = struct(
     force_exec_config = force_exec_config,
     helper_target = helper_target,
     merge_kwargs = merge_kwargs,
-    recursive_testing_aspect = recursive_testing_aspect,
     runfiles_map = runfiles_map,
     runfiles_paths = runfiles_paths,
     short_paths = short_paths,

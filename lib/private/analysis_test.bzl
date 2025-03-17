@@ -20,7 +20,7 @@ Support for testing analysis phase logic, such as rules.
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//lib:types.bzl", "types")
 load("//lib:truth.bzl", "truth")
-load("//lib:util.bzl", "recursive_testing_aspect", "testing_aspect")
+load("//lib:util.bzl", "testing_aspect")
 load("//lib/private:target_subject.bzl", "PROVIDER_SUBJECT_FACTORIES")
 load("//lib/private:util.bzl", "get_test_name_from_function")
 
@@ -140,7 +140,6 @@ def analysis_test(
         fragments = [],
         config_settings = {},
         extra_target_under_test_aspects = [],
-        collect_actions_recursively = False,
         provider_subject_factories = []):
     """Creates an analysis test from its implementation function.
 
@@ -216,8 +215,6 @@ def analysis_test(
           in your repository's context, not rule_testing's.
       extra_target_under_test_aspects: An optional list of aspects to apply to the target_under_test
           in addition to those set up by default for the test harness itself.
-      collect_actions_recursively: If true, runs testing_aspect over all attributes, otherwise
-          it is only applied to the target under test.
       provider_subject_factories: Optional list of ProviderSubjectFactory structs,
           these are additional provider factories on top of built in ones.
           A ProviderSubjectFactory is a struct with the following fields:
@@ -264,10 +261,7 @@ def analysis_test(
         target_under_test_cfg = None
 
     applied_aspects = []
-    if collect_actions_recursively:
-        applied_aspects.append(recursive_testing_aspect)
-    else:
-        applied_aspects.append(testing_aspect)
+    applied_aspects.append(testing_aspect)
     applied_aspects.extend(extra_target_under_test_aspects)
 
     target_under_test_attr_names = []

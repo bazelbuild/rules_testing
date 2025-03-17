@@ -5,6 +5,7 @@
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
 ## Changed
+
 * Add `{bindir}` to formatting variables.
 * Format values in `ActionsSubject.contains_flag_values()`.
 * `CollectionSubject` accepts new constructor parameter `format`. When used
@@ -13,13 +14,21 @@
   `action.argv().contains_at_least(["-f", "{bindir}/{package}/input.txt"])`.
 
 ### Added
+
 * Nothing yet
+
+### Removed
+
+* Removed `util.recursive_testing_aspect` and
+  `analysis_test.collect_actions_recursively`. They were never properly
+  implemented.
 
 ## [0.7.0] - 2024-10-29
 
 [0.7.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.7.0
 
 ### Added
+
 * `matching.any()` and `matching.all()` for composing `Matcher` objects using
   "or" and "and" semantics, respectively
 * Predicate-variants for RunfilesSubject methods:
