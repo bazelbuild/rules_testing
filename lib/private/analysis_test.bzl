@@ -139,6 +139,7 @@ def analysis_test(
         attr_values = {},
         fragments = [],
         config_settings = {},
+        testing_aspect = testing_aspect,
         extra_target_under_test_aspects = [],
         provider_subject_factories = []):
     """Creates an analysis test from its implementation function.
@@ -213,6 +214,7 @@ def analysis_test(
           --platforms flag), it's suggested to always explicitly call `Label()`
           on the value before passing it in. This ensures the label is resolved
           in your repository's context, not rule_testing's.
+      testing_aspect: An optional override of testing_aspect. See `util.make_testing_aspect`.
       extra_target_under_test_aspects: An optional list of aspects to apply to the target_under_test
           in addition to those set up by default for the test harness itself.
       provider_subject_factories: Optional list of ProviderSubjectFactory structs,

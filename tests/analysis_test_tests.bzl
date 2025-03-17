@@ -17,7 +17,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("//lib:truth.bzl", "matching")
-load("//lib:util.bzl", "TestingAspectInfo")
+load("//lib:util.bzl", "TestingAspectInfo", "util")
 
 _TestingFlagsInfo = provider(
     doc = "Flags used for testing",
@@ -222,6 +222,42 @@ def test_inspect_aspect(name):
 
 def _test_inspect_aspect(env, target):
     env.expect.that_str(target[_AddedByAspectInfo].value).equals("attached by aspect")
+
+####################################
+####### inspect_aspect_actions_test #######
+####################################
+def _inspect_actions_fake_aspect_impl(_target, ctx):
+    out_file = ctx.actions.declare_file("aspect_out.txt")
+    ctx.actions.run_shell(
+        command = "echo 'hello' > %s" % out_file.basename,
+        outputs = [out_file],
+        mnemonic = "RunningHello",
+    )
+    return []
+
+_inspect_actions_fake_aspect = aspect(
+    implementation = _inspect_actions_fake_aspect_impl,
+)
+
+_inspect_actions_fake_aspect_testing_aspect = util.make_testing_aspect(
+    aspects = [_inspect_actions_fake_aspect],
+)
+
+def test_inspect_aspect_actions(name):
+    """Test verifying actions registered by an aspect."""
+    native.filegroup(name = name + "_subject")
+
+    analysis_test(
+        name = name,
+        target = name + "_subject",
+        impl = _test_inspect_aspect_actions,
+        testing_aspect = _inspect_actions_fake_aspect_testing_aspect,
+    )
+
+def _test_inspect_aspect_actions(env, target):
+    env.expect.that_int(len(target[TestingAspectInfo].actions)).equals(1)
+    action_output = target[TestingAspectInfo].actions[0].outputs.to_list()[0]
+    env.expect.that_str(action_output.basename).equals("aspect_out.txt")
 
 ########################################
 ####### inspect_output_dirs_test #######
@@ -449,5 +485,6 @@ def analysis_test_test_suite(name):
             test_change_setting_with_failure,
             test_inspect_actions,
             test_inspect_aspect,
+            test_inspect_aspect_actions,
         ],
     )

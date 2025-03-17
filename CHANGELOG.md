@@ -15,7 +15,8 @@
 
 ### Added
 
-* Nothing yet
+* Added support for testing actions created in an aspect, via
+  `util.make_testing_aspect` and `analysis_test`'s `testing_aspect` parameter.
 
 ### Removed
 

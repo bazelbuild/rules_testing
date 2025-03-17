@@ -244,13 +244,27 @@ def _expect_that_target(self, target):
     Returns:
         [`TargetSubject`] object.
     """
+    format_str_kwargs = {
+        "name": target.label.name,
+        "package": target.label.package,
+    }
+    expr = "target({})".format(target.label)
+    details = ["target: {}".format(target.label)]
+    if TestingAspectInfo in target:
+        format_str_kwargs["bindir"] = target[TestingAspectInfo].bin_path
+        if target[TestingAspectInfo].required_aspects:
+            expr = "aspect({aspects} over {target})".format(
+                aspects = ", ".join(target[TestingAspectInfo].required_aspects),
+                target = target.label,
+            )
+            details.extend([
+                "aspect: {}".format(aspect)
+                for aspect in target[TestingAspectInfo].required_aspects
+            ])
     return TargetSubject.new(target, self.meta.derive(
-        expr = "target({})".format(target.label),
-        details = ["target: {}".format(target.label)],
-        format_str_kwargs = {
-            "name": target.label.name,
-            "package": target.label.package,
-        } | {"bindir": target[TestingAspectInfo].bin_path} if TestingAspectInfo in target else {},
+        expr = expr,
+        details = details,
+        format_str_kwargs = format_str_kwargs,
     ))
 
 def _expect_that_value(self, value, *, factory, expr = "value"):

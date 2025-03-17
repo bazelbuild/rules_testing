@@ -161,6 +161,7 @@ TestingAspectInfo = provider(
         "actions": "The actions registered for the target under test.",
         "vars": "The var dict (ctx.var) for the target under text.",
         "bin_path": "str; the ctx.bin_dir.path value (aka execroot).",
+        "required_aspects": "list[str]: aspects applied over this target",
     },
 )
 
@@ -170,12 +171,30 @@ def _testing_aspect_impl(target, ctx):
         actions = target.actions,
         vars = ctx.var,
         bin_path = ctx.bin_dir.path,
+        required_aspects = ctx.aspect_ids[:-1],
     )]
 
 # TODO(ilist): make private, after switching python tests to new testing framework
 testing_aspect = aspect(
     implementation = _testing_aspect_impl,
 )
+
+def _make_testing_aspect(aspects = []):
+    """Makes a testing_aspect
+
+    Use when you need to test actions created by aspect. Pass
+    the returned aspect to analysis_test as `testing_aspect`.
+
+    Args:
+      aspects: a list of aspects to apply testing aspect over.
+
+    Returns:
+      custom testing aspect
+    """
+    return aspect(
+        implementation = _testing_aspect_impl,
+        requires = aspects,
+    )
 
 def get_target_attrs(env):
     return analysistest.target_under_test(env)[TestingAspectInfo].attrs
@@ -253,6 +272,7 @@ util = struct(
     empty_file = empty_file,
     force_exec_config = force_exec_config,
     helper_target = helper_target,
+    make_testing_aspect = _make_testing_aspect,
     merge_kwargs = merge_kwargs,
     runfiles_map = runfiles_map,
     runfiles_paths = runfiles_paths,

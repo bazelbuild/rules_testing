@@ -1240,7 +1240,7 @@ def _runfiles_subject_test(env, target):
             "expected to contain: does-not-exist",
             "actual default runfiles:",
             "default_runfile1.txt",
-            "target: ".format(target.label),
+            "target: {}".format(target.label),
         ],
         env = env,
         msg = "check contains",
