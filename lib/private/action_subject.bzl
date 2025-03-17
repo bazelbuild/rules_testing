@@ -253,6 +253,7 @@ def _action_subject_contains_flag_values(self, flag_values):
     """
     missing = []
     for flag, value in sorted(flag_values):
+        value = self.meta.format_str(value)
         if flag not in self.parsed_flags:
             missing.append("'{}' (not specified)".format(flag))
         elif value not in self.parsed_flags[flag]:
@@ -291,6 +292,7 @@ def _action_subject_contains_none_of_flag_values(self, flag_values):
     """
     unexpected = []
     for flag, value in sorted(flag_values):
+        value = self.meta.format_str(value)
         if flag not in self.parsed_flags:
             continue
         elif value in self.parsed_flags[flag]:

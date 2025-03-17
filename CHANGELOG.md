@@ -5,7 +5,8 @@
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
 ## Changed
-* Nothing yet
+* Add `{bindir}` to formatting variables.
+* Format values in `ActionsSubject.contains_flag_values()`.
 
 ### Added
 * Nothing yet

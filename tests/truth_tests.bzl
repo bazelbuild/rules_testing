@@ -67,6 +67,7 @@ def _action_subject_test(env, target):
     subject.contains_flag_values([
         ("--arg1flag", "arg1value"),
         ("--arg2flag", "arg2value"),
+        ("--generated_input", "{bindir}/{package}/input.gen.txt"),
     ])
     _assert_no_failures(
         fake_env,
@@ -1575,16 +1576,18 @@ def _assert_failure(fake_env, expected_strs, *, env, msg = ""):
 
 def _test_helper_impl(ctx):
     action_output = ctx.actions.declare_file("action.txt")
+    generated_input = _empty_file(ctx, "input.gen.txt")
+    args = ctx.actions.args()
+    args.add("arg1")
+    args.add("--boolflag")
+    args.add("--arg1flag", "arg1value")
+    args.add("arg2value", format = "--arg2flag=%s")
+    args.add("--generated_input", generated_input)
     ctx.actions.run(
+        inputs = [generated_input],
         outputs = [action_output],
         executable = ctx.executable.tool,
-        arguments = [
-            "arg1",
-            "--boolflag",
-            "--arg1flag",
-            "arg1value",
-            "--arg2flag=arg2value",
-        ],
+        arguments = [args],
         mnemonic = "Action1",
     )
     if _IS_BAZEL_6_OR_HIGHER:

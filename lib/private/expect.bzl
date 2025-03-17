@@ -14,6 +14,7 @@
 
 """# Expect"""
 
+load("//lib:util.bzl", "TestingAspectInfo")
 load(":action_subject.bzl", "ActionSubject")
 load(":bool_subject.bzl", "BoolSubject")
 load(":collection_subject.bzl", "CollectionSubject")
@@ -249,7 +250,7 @@ def _expect_that_target(self, target):
         format_str_kwargs = {
             "name": target.label.name,
             "package": target.label.package,
-        },
+        } | {"bindir": target[TestingAspectInfo].bin_path} if TestingAspectInfo in target else {},
     ))
 
 def _expect_that_value(self, value, *, factory, expr = "value"):
