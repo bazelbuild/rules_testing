@@ -4,7 +4,19 @@
 
 [0.X.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.X.0
 
-## Changed
+### Changed
+
+* Nothing yet
+
+### Added
+
+* Nothing yet
+
+## [0.8.0] - 2025-03-17
+
+[0.8.0]: https://github.com/bazelbuild/rules_testing/releases/tag/v0.8.0
+
+### Changed
 
 * Add `{bindir}` to formatting variables.
 * Format values in `ActionsSubject.contains_flag_values()`.
