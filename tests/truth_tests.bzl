@@ -147,6 +147,62 @@ def _action_subject_test(env, target):
 
 _suite.append(action_subject_test)
 
+def provider_subject_test(name):
+    analysis_test(name = name, impl = _provider_subject_test, target = "truth_tests_helper")
+
+_UnusedInfo = provider("unused testing provider", fields = [])
+
+def _provider_subject_test(env, target):
+    fake_env = _fake_env(env)
+    fake_env.expect.that_target(target).has_provider(_UnusedInfo)
+    _assert_failure(
+        fake_env,
+        ["expected to have provider: <Unknown provider>"],
+        env = env,
+        msg = "check has_provider() failure uses Unknown provider name",
+    )
+
+    fake_env.expect.that_target(target).has_provider(_UnusedInfo, provider_name = "MyInfo")
+    _assert_failure(
+        fake_env,
+        ["expected to have provider: MyInfo"],
+        env = env,
+        msg = "check has_provider() failure uses supplied provider name",
+    )
+
+    def _factory(_unused, meta):
+        return struct(
+            always_fails = lambda: meta.add_failure("Expected error msg", "Actual error msg"),
+        )
+
+    fake_env.expect.that_target(target).provider(_TestHelperInfo, _factory).always_fails()
+    _assert_failure(
+        fake_env,
+        [
+            ".provider(<Unknown provider>)",
+            "Expected error msg",
+            "Actual error msg",
+        ],
+        env = env,
+        msg = "check has_provider() failure uses Unknown provider name",
+    )
+
+    fake_env.expect.that_target(target).provider(_TestHelperInfo, _factory, provider_name = "MyInfo").always_fails()
+    _assert_failure(
+        fake_env,
+        [
+            ".provider(MyInfo)",
+            "Expected error msg",
+            "Actual error msg",
+        ],
+        env = env,
+        msg = "check provider() failure uses supplied provider name",
+    )
+
+    _end(env, fake_env)
+
+_suite.append(provider_subject_test)
+
 def bool_subject_test(name):
     analysis_test(name = name, impl = _bool_subject_test, target = "truth_tests_helper")
 
@@ -1589,6 +1645,8 @@ def _assert_failure(fake_env, expected_strs, *, env, msg = ""):
 
     fake_env.reset()
 
+_TestHelperInfo = provider("empty provider for testing", fields = [])
+
 def _test_helper_impl(ctx):
     action_output = ctx.actions.declare_file("action.txt")
     generated_input = _empty_file(ctx, "input.gen.txt")
@@ -1627,6 +1685,7 @@ def _test_helper_impl(ctx):
         OutputGroupInfo(
             some_group = depset([_empty_file(ctx, "output_group_file.txt")]),
         ),
+        _TestHelperInfo(),
     ]
 
 test_helper = rule(

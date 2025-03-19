@@ -175,7 +175,7 @@ def _target_subject_failures(self):
         failure_messages = []
     return CollectionSubject.new(failure_messages, meta, container_name = "failure messages")
 
-def _target_subject_has_provider(self, provider):
+def _target_subject_has_provider(self, provider, provider_name = "<Unknown provider>"):
     """Asserts that the target as provider `provider`.
 
     Method: TargetSubject.has_provider
@@ -183,11 +183,12 @@ def _target_subject_has_provider(self, provider):
     Args:
         self: implicitly added.
         provider: The provider object to check for.
+        provider_name: The display name of the provider
     """
     if self.meta.has_provider(self.target, provider):
         return
     self.meta.add_failure(
-        "expected to have provider: {}".format(_provider_subject_factory(self, provider).name),
+        "expected to have provider: {}".format(_provider_subject_factory(self, provider, provider_name).name),
         "but provider was not found",
     )
 
@@ -221,7 +222,7 @@ def _target_subject_output_group(self, name):
         meta = self.meta.derive("output_group({})".format(name)),
     )
 
-def _target_subject_provider(self, provider_key, factory = None):
+def _target_subject_provider(self, provider_key, factory = None, provider_name = "<Unknown provider>"):
     """Returns a subject for a provider in the target.
 
     Method: TargetSubject.provider
@@ -235,6 +236,10 @@ def _target_subject_provider(self, provider_key, factory = None):
             signature: `def factory(value, /, *, meta)`.
             Additional types of providers can be pre-registered by using the
             `provider_subject_factories` arg of `analysis_test`.
+        provider_name: The display name of the provider. This must be supplied
+            separately because str(provider_key) just returns "<provider>",
+            which isn't helpful. For lack of a better option, this defaults to
+            <Unknown provider>.
 
     Returns:
         A subject wrapper of the provider value.
@@ -242,13 +247,11 @@ def _target_subject_provider(self, provider_key, factory = None):
     if factory:
         provider_subject_factory = struct(
             type = provider_key,
-            # str(provider_key) just returns "<provider>", which isn't helpful.
-            # For lack of a better option, just call it unknown
-            name = "<Unknown provider>",
+            name = provider_name,
             factory = factory,
         )
     else:
-        provider_subject_factory = _provider_subject_factory(self, provider_key)
+        provider_subject_factory = _provider_subject_factory(self, provider_key, provider_name)
 
     if not provider_subject_factory.factory:
         fail("Unsupported provider: {}".format(provider_subject_factory.name))
@@ -392,14 +395,14 @@ def _target_subject_attr(self, name, *, factory = None):
         meta = self.meta.derive("attr({})".format(name)),
     )
 
-def _provider_subject_factory(self, provider):
+def _provider_subject_factory(self, provider, provider_name = "<Unknown provider>"):
     for provider_subject_factory in self.meta.env.provider_subject_factories:
         if provider_subject_factory.type == provider:
             return provider_subject_factory
 
     return struct(
         type = provider,
-        name = "<Unknown provider>",
+        name = provider_name,
         factory = None,
     )
 
