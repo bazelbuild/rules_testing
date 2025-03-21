@@ -1206,6 +1206,7 @@ def _file_subject_test(env, target):
     expect = truth.expect(fake_env)
     subject = expect.that_file(target.files.to_list()[0])
     subject.short_path_equals(package + "/testdata/file1.txt")
+    subject.basename().equals("file1.txt")
     _assert_no_failures(fake_env, env = env)
 
     subject.short_path_equals("landon-and-hope-forever.txt")

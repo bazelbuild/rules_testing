@@ -32,6 +32,8 @@ def _file_subject_new(file, meta):
     # buildifier: disable=uninitialized
     public = struct(
         # keep sorted start
+        actual = file,
+        basename = lambda *a, **k: _file_subject_basename(self, *a, **k),
         equals = lambda *a, **k: _file_subject_equals(self, *a, **k),
         path = lambda *a, **k: _file_subject_path(self, *a, **k),
         short_path_equals = lambda *a, **k: _file_subject_short_path_equals(self, *a, **k),
@@ -39,6 +41,19 @@ def _file_subject_new(file, meta):
     )
     self = struct(file = file, meta = meta, public = public)
     return public
+
+def _file_subject_basename(self):
+    """Returns a `StrSubject` asserting on the files `basename` value.
+
+    Method: FileSubject.basename
+
+    Returns:
+        [`StrSubject`] object.
+    """
+    return StrSubject.new(
+        self.file.basename,
+        meta = self.meta.derive("basename()"),
+    )
 
 def _file_subject_equals(self, expected):
     """Asserts that `expected` references the same file as `self`.
@@ -100,5 +115,6 @@ FileSubject = struct(
     new = _file_subject_new,
     equals = _file_subject_equals,
     path = _file_subject_path,
+    basename = _file_subject_basename,
     short_path_equals = _file_subject_short_path_equals,
 )
