@@ -32,6 +32,7 @@ load(":instrumented_files_info_subject.bzl", "InstrumentedFilesInfoSubject")
 load(":label_subject.bzl", "LabelSubject")
 load(":run_environment_info_subject.bzl", "RunEnvironmentInfoSubject")
 load(":runfiles_subject.bzl", "RunfilesSubject")
+load(":template_variable_info_subject.bzl", "TemplateVariableInfoSubject")
 load(":truth_common.bzl", "enumerate_list_as_lines")
 
 def _target_subject_new(target, meta):
@@ -422,6 +423,11 @@ PROVIDER_SUBJECT_FACTORIES = [
         type = testing.ExecutionInfo,
         name = "testing.ExecutionInfo",
         factory = ExecutionInfoSubject.new,
+    ),
+    struct(
+        type = platform_common.TemplateVariableInfo,
+        name = "platform_common.TemplateVariableInfo",
+        factory = TemplateVariableInfoSubject.new,
     ),
 ]
 
