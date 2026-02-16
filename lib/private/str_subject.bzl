@@ -39,6 +39,7 @@ def _str_subject_new(actual, meta):
         contains = lambda *a, **k: _str_subject_contains(self, *a, **k),
         equals = lambda *a, **k: _str_subject_equals(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
+        matches_predicate = lambda *a, **k: _str_subject_matches_predicate(self, *a, **k),
         not_equals = lambda *a, **k: _str_subject_not_equals(self, *a, **k),
         split = lambda *a, **k: _str_subject_split(self, *a, **k),
         # keep sorted end
@@ -58,6 +59,22 @@ def _str_subject_contains(self, substr):
         return
     self.meta.add_failure(
         "expected to contain: {}".format(substr),
+        "actual: {}".format(self.actual),
+    )
+
+def _str_subject_matches_predicate(self, matcher):
+    """Assert that the subject matches the predicate `matcher`.
+
+    Method: StrSubject.matches_predicate
+
+    Args:
+        self: implicitly added.
+        matcher: ([`Matcher`]) (see `matchers` struct).
+    """
+    if matcher.match(self.actual):
+        return
+    self.meta.add_failure(
+        "expected to match: {}".format(matcher),
         "actual: {}".format(self.actual),
     )
 
@@ -111,6 +128,7 @@ StrSubject = struct(
     new = _str_subject_new,
     contains = _str_subject_contains,
     equals = _str_subject_equals,
+    matches_predicate = _str_subject_matches_predicate,
     not_equals = _str_subject_not_equals,
     split = _str_subject_split,
 )
