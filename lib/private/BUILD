@@ -252,8 +252,17 @@ bzl_library(
         ":label_subject_bzl",
         ":run_environment_info_subject_bzl",
         ":runfiles_subject_bzl",
+        ":template_variable_info_subject_bzl",
         ":truth_common_bzl",
         "//lib:util_bzl",
+    ],
+)
+
+bzl_library(
+    name = "template_variable_info_subject_bzl",
+    srcs = ["template_variable_info_subject.bzl"],
+    deps = [
+        ":dict_subject_bzl",
     ],
 )
 
