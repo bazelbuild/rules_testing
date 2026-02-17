@@ -1464,6 +1464,48 @@ def _str_subject_test(env, _target):
         env = env,
         msg = "check is_in with matching values",
     )
+
+    subject.matches(matching.str_matches("f*z"))
+    _assert_failure(
+        fake_env,
+        ["expected to match:", "<matches 'f*z'>", "actual: foobar"],
+        env = env,
+        msg = "check matches with non-matching value",
+    )
+    subject.matches(matching.str_matches("f*b"))
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check matches with matching value",
+    )
+
+    subject.starts_with("fa")
+    _assert_failure(
+        fake_env,
+        ["expected to start with:", "fa", "actual: foobar"],
+        env = env,
+        msg = "check matches with non-matching value",
+    )
+    subject.starts_with("foo")
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check matches with matching value",
+    )
+
+    subject.ends_with("or")
+    _assert_failure(
+        fake_env,
+        ["expected to end with:", "or", "actual: foobar"],
+        env = env,
+        msg = "check matches with non-matching value",
+    )
+    subject.ends_with("bar")
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check matches with matching value",
+    )
     _end(env, fake_env)
 
 _suite.append(str_subject_test)

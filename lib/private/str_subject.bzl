@@ -37,10 +37,13 @@ def _str_subject_new(actual, meta):
     public = struct(
         # keep sorted start
         contains = lambda *a, **k: _str_subject_contains(self, *a, **k),
+        ends_with = lambda *a, **k: _str_subject_ends_with(self, *a, **k),
         equals = lambda *a, **k: _str_subject_equals(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
+        matches = lambda *a, **k: _str_subject_matches(self, *a, **k),
         not_equals = lambda *a, **k: _str_subject_not_equals(self, *a, **k),
         split = lambda *a, **k: _str_subject_split(self, *a, **k),
+        starts_with = lambda *a, **k: _str_subject_starts_with(self, *a, **k),
         # keep sorted end
     )
     return public
@@ -58,6 +61,54 @@ def _str_subject_contains(self, substr):
         return
     self.meta.add_failure(
         "expected to contain: {}".format(substr),
+        "actual: {}".format(self.actual),
+    )
+
+def _str_subject_starts_with(self, substr):
+    """Assert that the subject starts with the substring `substr`.
+
+    Method: StrSubject.starts_with
+
+    Args:
+        self: implicitly added.
+        substr: ([`str`]) the substring to check for.
+    """
+    if self.actual.startswith(substr):
+        return
+    self.meta.add_failure(
+        "expected to start with: {}".format(substr),
+        "actual: {}".format(self.actual),
+    )
+
+def _str_subject_ends_with(self, substr):
+    """Assert that the subject starts with the substring `substr`.
+
+    Method: StrSubject.ends_with
+
+    Args:
+        self: implicitly added.
+        substr: ([`str`]) the substring to check for.
+    """
+    if self.actual.endswith(substr):
+        return
+    self.meta.add_failure(
+        "expected to end with: {}".format(substr),
+        "actual: {}".format(self.actual),
+    )
+
+def _str_subject_matches(self, matcher):
+    """Assert that the subject matches the predicate `matcher`.
+
+    Method: StrSubject.matches
+
+    Args:
+        self: implicitly added.
+        matcher: ([`Matcher`]) (see `matchers` struct).
+    """
+    if matcher.match(self.actual):
+        return
+    self.meta.add_failure(
+        "expected to match: {}".format(matcher),
         "actual: {}".format(self.actual),
     )
 
@@ -110,7 +161,10 @@ def _str_subject_split(self, sep):
 StrSubject = struct(
     new = _str_subject_new,
     contains = _str_subject_contains,
+    ends_with = _str_subject_ends_with,
     equals = _str_subject_equals,
+    matches = _str_subject_matches,
     not_equals = _str_subject_not_equals,
     split = _str_subject_split,
+    starts_with = _str_subject_starts_with,
 )
