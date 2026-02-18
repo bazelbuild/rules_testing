@@ -1622,6 +1622,27 @@ def _run_environment_info_subject_test(env, target):
 
 _suite.append(run_environment_info_subject_test)
 
+def template_variable_info_subject_test(name):
+    analysis_test(
+        name = name,
+        impl = _template_variable_info_subject_test,
+        target = "truth_tests_helper",
+    )
+
+def _template_variable_info_subject_test(env, target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_target(target).provider(
+        platform_common.TemplateVariableInfo,
+    )
+    subject.variables().contains_exactly({
+        "TVKEY1": "TVVALUE1",
+        "TVKEY2": "TVVALUE2",
+    })
+    _assert_no_failures(fake_env, env = env)
+    _end(env, fake_env)
+
+_suite.append(template_variable_info_subject_test)
+
 def _add_failure_works_test(name):
     analysis_test(
         name = name,
@@ -1725,6 +1746,9 @@ def _test_helper_impl(ctx):
             inherited_environment = ["INHERIT1", "INHERIT2"],
         ),
         testing.ExecutionInfo({"EIKEY1": "EIVALUE1"}, **exec_info_bazel_6_kwargs),
+        platform_common.TemplateVariableInfo(
+            vars = {"TVKEY1": "TVVALUE1", "TVKEY2": "TVVALUE2"},
+        ),
         OutputGroupInfo(
             some_group = depset([_empty_file(ctx, "output_group_file.txt")]),
         ),

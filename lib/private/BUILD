@@ -221,6 +221,15 @@ bzl_library(
 )
 
 bzl_library(
+    name = "template_variable_info_subject_bzl",
+    srcs = ["template_variable_info_subject.bzl"],
+    deps = [
+        ":dict_subject_bzl",
+        ":str_subject_bzl",
+    ],
+)
+
+bzl_library(
     name = "runfiles_subject_bzl",
     srcs = ["runfiles_subject.bzl"],
     deps = [
@@ -252,6 +261,7 @@ bzl_library(
         ":label_subject_bzl",
         ":run_environment_info_subject_bzl",
         ":runfiles_subject_bzl",
+        ":template_variable_info_subject_bzl",
         ":truth_common_bzl",
         "//lib:util_bzl",
     ],
