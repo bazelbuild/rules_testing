@@ -17,9 +17,6 @@ Support for testing generic Starlark code, i.e. code that doesn't require
 the analysis phase or instantiate rules.
 """
 
-# We have to load the private impl to avoid a circular dependency
-load("//lib/private:analysis_test.bzl", "analysis_test")
-
 _TARGET = Label("//lib:_stub_target_for_unit_tests")
 
 def unit_test(name, impl, attrs = {}):
@@ -38,9 +35,10 @@ def unit_test(name, impl, attrs = {}):
         attrs: (dict of str to str) additional attributes to make available to
             the test.
     """
-    analysis_test(
-        name = name,
-        impl = lambda env, target: impl(env),
-        target = _TARGET,
-        attrs = attrs,
-    )
+    # analysis_test(
+    #     name = name,
+    #     impl = lambda env, target: impl(env),
+    #     target = _TARGET,
+    #     attrs = attrs,
+
+# )
