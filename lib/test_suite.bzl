@@ -6,7 +6,7 @@ Aggregates multiple Starlark tests in a single test_suite.
 load("//lib:unit_test.bzl", "unit_test")
 load("//lib/private:util.bzl", "get_test_name_from_function")
 
-def test_suite(name, *, tests = [], basic_tests = [], test_kwargs = {}):
+def test_suite(name, *, tests = [], basic_tests = [], test_kwargs = {}, test_name_resolver = get_test_name_from_function):
     """Instantiates given test macros/implementations and gathers their main targets into a `test_suite`.
 
     Use this function to wrap all tests into a single target.
@@ -45,16 +45,18 @@ def test_suite(name, *, tests = [], basic_tests = [], test_kwargs = {}):
             become the name of the test.
         test_kwargs: (dict) Additional kwargs to pass onto each test (both
             regular and basic test callables).
+        test_name_resolver: (callable) A function to map test function to the
+            test name.
     """
     test_targets = []
 
     for setup_func in tests:
-        test_name = get_test_name_from_function(setup_func)
+        test_name = test_name_resolver(setup_func)
         setup_func(name = test_name, **test_kwargs)
         test_targets.append(test_name)
 
     for impl in basic_tests:
-        test_name = get_test_name_from_function(impl)
+        test_name = test_name_resolver(impl)
         unit_test(name = test_name, impl = impl, **test_kwargs)
         test_targets.append(test_name)
 
