@@ -9,6 +9,9 @@
 * `TargetSubject.provider()` and `TargetSubject.has_provider()` accept a
   `provider_name` for better error messaging.
 * Added `FileSubject.basename()` and `FileSubject.actual`
+* The `testing_aspect` is applied to `util.force_exec_config`'s `tools` attribute
+  allowing tests to assert on it like a regular target-under-test
+
 ### Added
 
 * Nothing yet

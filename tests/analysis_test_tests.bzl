@@ -16,7 +16,7 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//lib:analysis_test.bzl", "analysis_test", "test_suite")
-load("//lib:truth.bzl", "matching")
+load("//lib:truth.bzl", "matching", "subjects")
 load("//lib:util.bzl", "TestingAspectInfo", "util")
 
 _TestingFlagsInfo = provider(
@@ -470,6 +470,31 @@ def _test_target_dict_value_impl(env, targets):
         env.ctx.label.relative(env.ctx.label.name + "_subject2"): "subject-two",
     })
 
+def _test_force_exec_config(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "_fg",
+        srcs = ["f1.txt", "f2.pb"],
+    )
+    util.helper_target(
+        util.force_exec_config,
+        name = name + "_exec_fg",
+        tools = [name + "_fg"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_force_exec_config_impl,
+        target = name + "_exec_fg",
+    )
+
+def _test_force_exec_config_impl(env, target):
+    assert_that_tool = env.expect.that_target(target).attr(
+        "tools",
+        factory = lambda value, meta: subjects.target(value[0], meta),
+    )
+    assert_that_tool.attr("srcs", factory = subjects.collection).has_size(2)
+
 def analysis_test_test_suite(name):
     test_suite(
         name = name,
@@ -486,5 +511,6 @@ def analysis_test_test_suite(name):
             test_inspect_actions,
             test_inspect_aspect,
             test_inspect_aspect_actions,
+            _test_force_exec_config,
         ],
     )

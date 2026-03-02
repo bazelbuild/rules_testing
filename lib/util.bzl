@@ -260,8 +260,8 @@ force_exec_config = rule(
           "tested when used as tools.",
     attrs = {
         "tools": attr.label_list(
+            aspects = [testing_aspect],
             cfg = "exec",
-            allow_files = True,
             doc = "A list of tools to force into the exec config",
         ),
     },
