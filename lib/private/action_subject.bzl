@@ -63,6 +63,7 @@ def _action_subject_new(action, meta):
         env = mkmethod(self, _action_subject_env),
         has_flags_specified = mkmethod(self, _action_subject_has_flags_specified),
         inputs = mkmethod(self, _action_subject_inputs),
+        meta = meta,
         mnemonic = mkmethod(self, _action_subject_mnemonic),
         not_contains_arg = mkmethod(self, _action_subject_not_contains_arg),
         substitutions = mkmethod(self, _action_subject_substitutions),
