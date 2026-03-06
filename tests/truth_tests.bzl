@@ -828,6 +828,34 @@ def _collection_contains_exactly_predicates_test(env, _target):
 
 _suite.append(collection_contains_exactly_predicates_test)
 
+def collection_contains_no_duplicates_test(name):
+    analysis_test(name = name, impl = _collection_contains_no_duplicates_test, target = "truth_tests_helper")
+
+def _collection_contains_no_duplicates_test(env, _target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_collection(["a", "b", "c"])
+    subject.contains_no_duplicates()
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check actual contains no duplicates",
+    )
+    subject = truth.expect(fake_env).that_collection([1, 2, 3, 1, 4, 3])
+    subject.contains_no_duplicates()
+    _assert_failure(
+        fake_env,
+        [
+            "expected no duplicates",
+            "actual: [1, 2, 3, 1, 4, 3]",
+            "duplicates: [1, 3]",
+        ],
+        env = env,
+        msg = "check actual contains duplicates",
+    )
+    _end(env, fake_env)
+
+_suite.append(collection_contains_no_duplicates_test)
+
 def collection_contains_none_of_test(name):
     analysis_test(name = name, impl = _collection_contains_none_of_test, target = "truth_tests_helper")
 

@@ -12,6 +12,7 @@
 * The `testing_aspect` is applied to `util.force_exec_config`'s `tools` attribute
   allowing tests to assert on it like a regular target-under-test
 * Added `ActionSubject.meta`, exposing the subject's `ExpectMeta` object.
+* Added `CollectionSubject.contains_no_duplicates()` assertion.
 
 ### Added
 
