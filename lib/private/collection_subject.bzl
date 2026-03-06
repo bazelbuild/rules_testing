@@ -79,6 +79,7 @@ def _collection_subject_new(
         contains_at_least_predicates = lambda *a, **k: _collection_subject_contains_at_least_predicates(self, *a, **k),
         contains_exactly = lambda *a, **k: _collection_subject_contains_exactly(self, *a, **k),
         contains_exactly_predicates = lambda *a, **k: _collection_subject_contains_exactly_predicates(self, *a, **k),
+        contains_no_duplicates = lambda *a, **k: _collection_subject_contains_no_duplicates(self, *a, **k),
         contains_none_of = lambda *a, **k: _collection_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _collection_subject_contains_predicate(self, *a, **k),
         has_size = lambda *a, **k: _collection_subject_has_size(self, *a, **k),
@@ -358,6 +359,24 @@ def _collection_subject_not_contains_predicate(self, matcher):
         sort = self.sortable,
     )
 
+def _collection_subject_contains_no_duplicates(self):
+    """Asserts that the collection contains no duplicates.
+
+    Method: CollectionSubject.contains_no_duplicates
+
+    Args:
+        self: implicitly added.
+    """
+    already_seen = set()
+    for value in self.actual:
+        if value in already_seen:
+            self.meta.add_failure(
+                "expected no duplicates",
+                "actual: {}, duplicate: {}".format(self.actual, value),
+            )
+            return
+        already_seen.add(value)
+
 def _collection_subject_offset(self, offset, factory):
     """Fetches an element from the collection as a subject.
 
@@ -467,6 +486,7 @@ CollectionSubject = struct(
     contains_at_least_predicates = _collection_subject_contains_at_least_predicates,
     contains_exactly = _collection_subject_contains_exactly,
     contains_exactly_predicates = _collection_subject_contains_exactly_predicates,
+    contains_no_duplicates = _collection_subject_contains_no_duplicates,
     contains_none_of = _collection_subject_contains_none_of,
     contains_predicate = _collection_subject_contains_predicate,
     has_size = _collection_subject_has_size,
