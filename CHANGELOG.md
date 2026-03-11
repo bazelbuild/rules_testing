@@ -13,6 +13,7 @@
   allowing tests to assert on it like a regular target-under-test
 * Added `ActionSubject.meta`, exposing the subject's `ExpectMeta` object.
 * Added `CollectionSubject.contains_no_duplicates()` assertion.
+* Added `DepsetFileSubject.contains_none_of()` assertion.
 
 ### Added
 

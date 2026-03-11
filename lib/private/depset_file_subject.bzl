@@ -59,6 +59,7 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         contains_at_least = lambda *a, **k: _depset_file_subject_contains_at_least(self, *a, **k),
         contains_at_least_predicates = lambda *a, **k: _depset_file_subject_contains_at_least_predicates(self, *a, **k),
         contains_exactly = lambda *a, **k: _depset_file_subject_contains_exactly(self, *a, **k),
+        contains_none_of = lambda *a, **k: _depset_file_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _depset_file_subject_contains_predicate(self, *a, **k),
         not_contains = lambda *a, **k: _depset_file_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _depset_file_subject_not_contains_predicate(self, *a, **k),
@@ -253,6 +254,34 @@ def _depset_file_subject_contains_exactly(self, paths):
         meta = self.meta,
     )
 
+def _depset_file_subject_contains_none_of(self, values):
+    """Asserts that the depset of files contains none of the provided paths.
+
+    Method: DepsetFileSubject.contains_none_of
+
+    Args:
+        self: implicitly added
+        values: (['collection'] of ['str'] | collection of ['File']. If string
+            paths are provided then they are compared to the short path of the
+            files and are formatted using 'ExpectMeta.format_str' and its
+            current contextual keywords.  Note that, when using `File` objects,
+            two files' configurations must be the same for them to be
+            considered equal.
+    """
+    values = to_list(values)
+    if len(values) < 1 or is_file(values[0]):
+        actual = self.files
+    else:
+        values = [self.meta.format_str(v) for v in values]
+        actual = self.actual_paths
+
+    return CollectionSubject.new(
+        actual,
+        meta = self.meta,
+        container_name = self.container_name,
+        element_plural_name = self.element_plural_name,
+    ).contains_none_of(values)
+
 def _depset_file_subject_not_contains(self, short_path):
     """Asserts that `short_path` is not in the depset.
 
@@ -287,6 +316,7 @@ DepsetFileSubject = struct(
     contains_at_least_predicates = _depset_file_subject_contains_at_least_predicates,
     contains_predicate = _depset_file_subject_contains_predicate,
     contains_exactly = _depset_file_subject_contains_exactly,
+    contains_none_of = _depset_file_subject_contains_none_of,
     not_contains = _depset_file_subject_not_contains,
     not_contains_predicate = _depset_file_subject_not_contains_predicate,
 )

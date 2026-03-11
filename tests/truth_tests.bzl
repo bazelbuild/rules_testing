@@ -1115,6 +1115,16 @@ def _depset_file_subject_test(env, target):
         msg = "DepsetFilesubject.not_contains failure test",
     )
 
+    subject.contains_none_of(["NOT THERE", "ALSO NOT THERE"])
+    _assert_no_failures(fake_env, env = env)
+    subject.contains_none_of(["NOT THERE", "{package}/testdata/file1.txt"])
+    _assert_failure(
+        fake_env,
+        ["expected not to contain any of", "file1.txt"],
+        env = env,
+        msg = "DepsetFilesubject.contains_none_of failure test",
+    )
+
     _end(env, fake_env)
 
 _suite.append(depset_file_subject_test)
