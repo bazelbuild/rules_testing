@@ -41,6 +41,7 @@ def _str_subject_new(actual, meta):
         equals = lambda *a, **k: _str_subject_equals(self, *a, **k),
         is_in = lambda *a, **k: common_subject_is_in(self, *a, **k),
         matches = lambda *a, **k: _str_subject_matches(self, *a, **k),
+        not_contains = lambda *a, **k: _str_subject_not_contains(self, *a, **k),
         not_equals = lambda *a, **k: _str_subject_not_equals(self, *a, **k),
         split = lambda *a, **k: _str_subject_split(self, *a, **k),
         starts_with = lambda *a, **k: _str_subject_starts_with(self, *a, **k),
@@ -61,6 +62,22 @@ def _str_subject_contains(self, substr):
         return
     self.meta.add_failure(
         "expected to contain: {}".format(substr),
+        "actual: {}".format(self.actual),
+    )
+
+def _str_subject_not_contains(self, substr):
+    """Assert that the subject does not contain the substring `substr`.
+
+    Method: StrSubject.not_contains
+
+    Args:
+        self: implicitly added.
+        substr: ([`str`]) the substring to check for.
+    """
+    if substr not in self.actual:
+        return
+    self.meta.add_failure(
+        "expected not to contain: {}".format(substr),
         "actual: {}".format(self.actual),
     )
 
@@ -164,6 +181,7 @@ StrSubject = struct(
     ends_with = _str_subject_ends_with,
     equals = _str_subject_equals,
     matches = _str_subject_matches,
+    not_contains = _str_subject_not_contains,
     not_equals = _str_subject_not_equals,
     split = _str_subject_split,
     starts_with = _str_subject_starts_with,

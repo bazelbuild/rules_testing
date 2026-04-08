@@ -1454,6 +1454,17 @@ def _str_subject_test(env, _target):
         msg = "check contains",
     )
 
+    subject.not_contains("nope")
+    _assert_no_failures(fake_env, env = env)
+
+    subject.not_contains("ob")
+    _assert_failure(
+        fake_env,
+        ["expected not to contain: ob", "actual: foobar"],
+        env = env,
+        msg = "check not_contains",
+    )
+
     subject.equals("foobar")
     _assert_no_failures(fake_env, env = env)
 

@@ -14,6 +14,7 @@
 * Added `ActionSubject.meta`, exposing the subject's `ExpectMeta` object.
 * Added `CollectionSubject.contains_no_duplicates()` assertion.
 * Added `DepsetFileSubject.contains_none_of()` assertion.
+* Added `not_contains` to StrSubject.
 
 ### Added
 
