@@ -1724,6 +1724,19 @@ def _add_failure_works_test_impl(env, target):
 
 _suite.append(_add_failure_works_test)
 
+def action_subject_execution_info_test(name):
+    analysis_test(name = name, impl = _action_subject_execution_info_test, target = "truth_tests_helper")
+
+def _action_subject_execution_info_test(env, target):
+    fake_env = _fake_env(env)
+    subject = truth.expect(fake_env).that_target(target).action_named("Action1")
+    if getattr(subject.actual, "execution_info", None):
+        subject.execution_info().contains_exactly({"foo": "bar"})
+    _assert_no_failures(fake_env, env = env)
+    _end(env, fake_env)
+
+_suite.append(action_subject_execution_info_test)
+
 def _assert_no_failures(fake_env, *, env, msg = ""):
     fail_lines = [
         "expected no failures, but found failures",
@@ -1775,6 +1788,7 @@ def _test_helper_impl(ctx):
         executable = ctx.executable.tool,
         arguments = [args],
         mnemonic = "Action1",
+        execution_requirements = {"foo": "bar"},
     )
     if _IS_BAZEL_6_OR_HIGHER:
         exec_info_bazel_6_kwargs = {"exec_group": "THE_EXEC_GROUP"}

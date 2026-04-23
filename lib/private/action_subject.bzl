@@ -61,6 +61,7 @@ def _action_subject_new(action, meta):
         contains_none_of_flag_values = mkmethod(self, _action_subject_contains_none_of_flag_values),
         content = mkmethod(self, _action_subject_content),
         env = mkmethod(self, _action_subject_env),
+        execution_info = mkmethod(self, _action_subject_execution_info),
         has_flags_specified = mkmethod(self, _action_subject_has_flags_specified),
         inputs = mkmethod(self, _action_subject_inputs),
         meta = meta,
@@ -361,6 +362,26 @@ def _action_subject_env(self):
         key_plural_name = "envvars",
     )
 
+def _action_subject_execution_info(self):
+    """Returns a `DictSubject` for `Action.execution_info`.
+
+    Method: ActionSubject.execution_info
+
+    NOTE: This method only works if `execution_info` is available in Bazel's `ActionApi`.
+
+    Returns:
+        [`DictSubject`] object.
+    """
+    info = getattr(self.action, "execution_info", None)
+    if info == None:
+        fail("Action.execution_info is not available in this version of Bazel")
+    return DictSubject.new(
+        info,
+        self.meta.derive("execution_info()"),
+        container_name = "execution_info",
+        key_plural_name = "execution_info keys",
+    )
+
 # We use this name so it shows up nice in docs.
 # buildifier: disable=name-conventions
 ActionSubject = struct(
@@ -378,4 +399,5 @@ ActionSubject = struct(
     contains_at_least_inputs = _action_subject_contains_at_least_inputs,
     content = _action_subject_content,
     env = _action_subject_env,
+    execution_info = _action_subject_execution_info,
 )
