@@ -20,6 +20,8 @@ load(":truth_tests.bzl", "truth_test_suite")
 load(":unit_test_tests.bzl", "unit_test_test_suite")
 load(":unittest_tests.bzl", "unittest_passing_tests_suite")
 
+package(default_applicable_licenses = ["//:package_license"])
+
 licenses(["notice"])
 
 bzl_library(
