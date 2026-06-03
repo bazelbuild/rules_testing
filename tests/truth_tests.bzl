@@ -1034,6 +1034,31 @@ def _collection_transform_test_impl(env, target):
         msg = "transform with all args",
     )
 
+    meta = truth.expect(fake_env).meta.derive(
+        format_str_kwargs = {
+            "key": "val",
+        },
+    )
+    starter = subjects.collection(["foo", "bar"], meta = meta, format = True)
+
+    actual = starter.transform()
+    actual.contains("not-present-{key}")
+    _assert_failure(
+        fake_env,
+        ["expected to contain: not-present-val"],
+        env = env,
+        msg = "transform with formatting enabled (inherited)",
+    )
+
+    actual = starter.transform(format = False)
+    actual.contains("not-present-{key}")
+    _assert_failure(
+        fake_env,
+        ["expected to contain: not-present-{key}"],
+        env = env,
+        msg = "transform with formatting disabled (overriden)",
+    )
+
     _end(env, fake_env)
 
 _suite.append(_collection_transform_test)

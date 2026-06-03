@@ -15,6 +15,8 @@
 * Added `CollectionSubject.contains_no_duplicates()` assertion.
 * Added `DepsetFileSubject.contains_none_of()` assertion.
 * Added `not_contains` to StrSubject.
+* Fixed a bug where `CollectionSubject.transform` did not respect the value of
+  `format` on the original subject.
 
 ### Added
 

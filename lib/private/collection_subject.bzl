@@ -404,7 +404,8 @@ def _collection_subject_transform(
         *,
         map_each = None,
         loop = None,
-        filter = None):
+        filter = None,
+        format = None):
     """Transforms a collections's value and returns another CollectionSubject.
 
     This is equivalent to applying a list comprehension over the collection values,
@@ -435,6 +436,9 @@ def _collection_subject_transform(
             iteration value before `map_each` is applied), and returns a bool
             (True if the value should be included in the result, False if it
             should be skipped).
+        format: (optional [`bool`]) If asserted values should be formatted. If
+            unset, will default to the value of `format` passed while creating
+            the original collection subject.
 
     Returns:
         [`CollectionSubject`] of the transformed values.
@@ -477,6 +481,7 @@ def _collection_subject_transform(
         container_name = self.container_name,
         sortable = self.sortable,
         element_plural_name = self.element_plural_name,
+        format = self.format if format == None else format,
     )
 
 # We use this name so it shows up nice in docs.
