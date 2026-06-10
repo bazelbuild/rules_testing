@@ -300,6 +300,64 @@ def _collection_has_size_test(env, _target):
 
 _suite.append(collection_has_size_test)
 
+def collection_is_empty_test(name):
+    analysis_test(name = name, impl = _collection_is_empty_test, target = "truth_tests_helper")
+
+def _collection_is_empty_test(env, _target):
+    fake_env = _fake_env(env)
+
+    # Test empty collection
+    subject_empty = fake_env.expect.that_collection([])
+    subject_empty.is_empty()
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check empty collection is empty",
+    )
+
+    # Test non-empty collection (should fail)
+    subject_non_empty = fake_env.expect.that_collection(["a"])
+    subject_non_empty.is_empty()
+    _assert_failure(
+        fake_env,
+        ["value of: collection.size()", "expected: 0", "actual: 1"],
+        env = env,
+        msg = "check non-empty collection is not empty",
+    )
+
+    _end(env, fake_env)
+
+_suite.append(collection_is_empty_test)
+
+def collection_is_not_empty_test(name):
+    analysis_test(name = name, impl = _collection_is_not_empty_test, target = "truth_tests_helper")
+
+def _collection_is_not_empty_test(env, _target):
+    fake_env = _fake_env(env)
+
+    # Test non-empty collection
+    subject_non_empty = fake_env.expect.that_collection(["a"])
+    subject_non_empty.is_not_empty()
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "check non-empty collection is not empty",
+    )
+
+    # Test empty collection (should fail)
+    subject_empty = fake_env.expect.that_collection([])
+    subject_empty.is_not_empty()
+    _assert_failure(
+        fake_env,
+        ["value of: collection.size()", "expected not to be: 0", "actual: 0"],
+        env = env,
+        msg = "check empty collection is empty",
+    )
+
+    _end(env, fake_env)
+
+_suite.append(collection_is_not_empty_test)
+
 def collection_contains_test(name):
     analysis_test(name = name, impl = _collection_contains_test, target = "truth_tests_helper")
 

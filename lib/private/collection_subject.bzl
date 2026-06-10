@@ -83,6 +83,8 @@ def _collection_subject_new(
         contains_none_of = lambda *a, **k: _collection_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _collection_subject_contains_predicate(self, *a, **k),
         has_size = lambda *a, **k: _collection_subject_has_size(self, *a, **k),
+        is_empty = lambda *a, **k: _collection_subject_is_empty(self, *a, **k),
+        is_not_empty = lambda *a, **k: _collection_subject_is_not_empty(self, *a, **k),
         not_contains = lambda *a, **k: _collection_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _collection_subject_not_contains_predicate(self, *a, **k),
         offset = lambda *a, **k: _collection_subject_offset(self, *a, **k),
@@ -114,6 +116,23 @@ def _collection_subject_has_size(self, expected):
         len(self.actual),
         meta = self.meta.derive("size()"),
     ).equals(expected)
+
+def _collection_subject_is_empty(self):
+    """Asserts that the collection is empty.
+
+    Method: CollectionSubject.is_empty
+    """
+    return _collection_subject_has_size(self, 0)
+
+def _collection_subject_is_not_empty(self):
+    """Asserts that the collection is not empty.
+
+    Method: CollectionSubject.is_not_empty
+    """
+    return IntSubject.new(
+        len(self.actual),
+        meta = self.meta.derive("size()"),
+    ).not_equals(0)
 
 def _collection_subject_contains(self, expected):
     """Asserts that `expected` is within the collection.
@@ -497,6 +516,8 @@ CollectionSubject = struct(
     contains_none_of = _collection_subject_contains_none_of,
     contains_predicate = _collection_subject_contains_predicate,
     has_size = _collection_subject_has_size,
+    is_empty = _collection_subject_is_empty,
+    is_not_empty = _collection_subject_is_not_empty,
     new = _collection_subject_new,
     not_contains_predicate = _collection_subject_not_contains_predicate,
     offset = _collection_subject_offset,
