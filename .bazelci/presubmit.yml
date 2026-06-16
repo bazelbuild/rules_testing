@@ -1,7 +1,7 @@
 buildifier: latest
 validate_config: 1
 matrix:
-  platform: ["ubuntu2004", "windows", "macos"]
+  platform: ["ubuntu2004", "windows", "macos_arm64"]
 tasks:
   all_tests_workspace_latest:
     name: Workspace (latest Bazel)
