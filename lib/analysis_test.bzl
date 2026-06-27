@@ -29,3 +29,5 @@ def test_suite(**kwargs):
         **kwargs: Args passed through to test_suite
     """
     _test_suite(**kwargs)
+
+# FOO
