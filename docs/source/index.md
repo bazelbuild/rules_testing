@@ -3,7 +3,6 @@
 rules_testing is a collection of utilities, libraries, and frameworks to make
 testing Starlark and Bazel rules easy and pleasant.
 
-version |version|
 
 ## Installation
 
