@@ -203,6 +203,7 @@ def _inspect_actions_test(ctx):
 def _inspect_actions_fake_rule(ctx):
     out_file = ctx.actions.declare_file("out.txt")
     ctx.actions.run_shell(
+        mnemonic = "InspectActionsFakeRule",
         command = "echo 'hello' > %s" % out_file.basename,
         outputs = [out_file],
     )
@@ -247,6 +248,7 @@ def _inspect_aspect_test(ctx):
 def _inspect_aspect_fake_rule(ctx):
     out_file = ctx.actions.declare_file("out.txt")
     ctx.actions.run_shell(
+        mnemonic = "InspectAspectFakeRule",
         command = "echo 'hello' > %s" % out_file.basename,
         outputs = [out_file],
     )
