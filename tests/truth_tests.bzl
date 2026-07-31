@@ -320,7 +320,7 @@ def _collection_is_empty_test(env, _target):
     subject_non_empty.is_empty()
     _assert_failure(
         fake_env,
-        ["value of: collection.size()", "expected: 0", "actual: 1"],
+        ["value of: collection", "expected to be empty", "actual: [\"a\"]"],
         env = env,
         msg = "check non-empty collection is not empty",
     )
@@ -349,7 +349,7 @@ def _collection_is_not_empty_test(env, _target):
     subject_empty.is_not_empty()
     _assert_failure(
         fake_env,
-        ["value of: collection.size()", "expected not to be: 0", "actual: 0"],
+        ["value of: collection", "expected non-empty collection", "actual: []"],
         env = env,
         msg = "check empty collection is empty",
     )
@@ -1206,6 +1206,21 @@ def _depset_file_subject_test(env, target):
         ["expected not to contain any of", "file1.txt"],
         env = env,
         msg = "DepsetFilesubject.contains_none_of failure test",
+    )
+
+    subject.is_empty()
+    _assert_failure(
+        fake_env,
+        ["expected to be empty", "file1.txt"],
+        env = env,
+        msg = "DepsetFileSubject.is_empty failure test",
+    )
+
+    subject.is_not_empty()
+    _assert_no_failures(
+        fake_env,
+        env = env,
+        msg = "DepsetFileSubject.is_not_empty success test",
     )
 
     _end(env, fake_env)

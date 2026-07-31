@@ -122,17 +122,24 @@ def _collection_subject_is_empty(self):
 
     Method: CollectionSubject.is_empty
     """
-    return _collection_subject_has_size(self, 0)
+    values = to_list(self.actual)
+    if len(values) != 0:
+        self.meta.add_failure(
+            "expected to be empty",
+            "actual: {}".format(values),
+        )
 
 def _collection_subject_is_not_empty(self):
     """Asserts that the collection is not empty.
 
     Method: CollectionSubject.is_not_empty
     """
-    return IntSubject.new(
-        len(self.actual),
-        meta = self.meta.derive("size()"),
-    ).not_equals(0)
+    values = to_list(self.actual)
+    if len(values) == 0:
+        self.meta.add_failure(
+            "expected non-empty collection.",
+            "actual: {}".format(self.actual),
+        )
 
 def _collection_subject_contains(self, expected):
     """Asserts that `expected` is within the collection.

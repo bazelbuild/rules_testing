@@ -61,6 +61,8 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         contains_exactly = lambda *a, **k: _depset_file_subject_contains_exactly(self, *a, **k),
         contains_none_of = lambda *a, **k: _depset_file_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _depset_file_subject_contains_predicate(self, *a, **k),
+        is_empty = lambda *a, **k: _depset_file_subject_is_empty(self, *a, **k),
+        is_not_empty = lambda *a, **k: _depset_file_subject_is_not_empty(self, *a, **k),
         not_contains = lambda *a, **k: _depset_file_subject_not_contains(self, *a, **k),
         not_contains_predicate = lambda *a, **k: _depset_file_subject_not_contains_predicate(self, *a, **k),
         # keep sorted end
@@ -74,6 +76,31 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         element_plural_name = element_plural_name,
     )
     return public
+
+def _depset_file_subject_is_empty(self):
+    """Asserts that the depset of files is empty.
+
+    Method: DepsetFileSubject.is_empty
+    """
+
+    return CollectionSubject.new(
+        self.files,
+        meta = self.meta,
+        container_name = self.container_name,
+        element_plural_name = self.element_plural_name,
+    ).is_empty()
+
+def _depset_file_subject_is_not_empty(self):
+    """Asserts that the depset of files is not empty.
+
+    Method: DepsetFileSubject.is_not_empty
+    """
+    return CollectionSubject.new(
+        self.files,
+        meta = self.meta,
+        container_name = self.container_name,
+        element_plural_name = self.element_plural_name,
+    ).is_not_empty()
 
 def _depset_file_subject_contains(self, expected):
     """Asserts that the depset of files contains the provided path/file.
@@ -310,6 +337,8 @@ def _depset_file_subject_not_contains_predicate(self, matcher):
 # buildifier: disable=name-conventions
 DepsetFileSubject = struct(
     new = _depset_file_subject_new,
+    is_empty = _depset_file_subject_is_empty,
+    is_not_empty = _depset_file_subject_is_not_empty,
     contains = _depset_file_subject_contains,
     contains_at_least = _depset_file_subject_contains_at_least,
     contains_any_in = _depset_file_subject_contains_any_in,
