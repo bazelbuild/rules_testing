@@ -61,6 +61,7 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         contains_exactly = lambda *a, **k: _depset_file_subject_contains_exactly(self, *a, **k),
         contains_none_of = lambda *a, **k: _depset_file_subject_contains_none_of(self, *a, **k),
         contains_predicate = lambda *a, **k: _depset_file_subject_contains_predicate(self, *a, **k),
+        has_size = lambda *a, **k: _depset_file_subject_has_size(self, *a, **k),
         is_empty = lambda *a, **k: _depset_file_subject_is_empty(self, *a, **k),
         is_not_empty = lambda *a, **k: _depset_file_subject_is_not_empty(self, *a, **k),
         not_contains = lambda *a, **k: _depset_file_subject_not_contains(self, *a, **k),
@@ -76,6 +77,22 @@ def _depset_file_subject_new(files, meta, container_name = "depset", element_plu
         element_plural_name = element_plural_name,
     )
     return public
+
+def _depset_file_subject_has_size(self, expected):
+    """Asserts that `expected` is the size of the depset of files.
+
+    Method: DepsetFileSubject.has_size
+
+    Args:
+        self: implicitly added.
+        expected: ([`int`]) the expected size of the depset of files.
+    """
+    return CollectionSubject.new(
+        self.files,
+        meta = self.meta,
+        container_name = self.container_name,
+        element_plural_name = self.element_plural_name,
+    ).has_size(expected)
 
 def _depset_file_subject_is_empty(self):
     """Asserts that the depset of files is empty.

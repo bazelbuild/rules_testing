@@ -67,6 +67,7 @@ def _action_subject_new(action, meta):
         meta = meta,
         mnemonic = mkmethod(self, _action_subject_mnemonic),
         not_contains_arg = mkmethod(self, _action_subject_not_contains_arg),
+        outputs = mkmethod(self, _action_subject_outputs),
         substitutions = mkmethod(self, _action_subject_substitutions),
         # keep sorted end
     )
@@ -225,6 +226,17 @@ def _action_subject_inputs(self):
     """
     meta = self.meta.derive("inputs()")
     return DepsetFileSubject.new(self.action.inputs, meta)
+
+def _action_subject_outputs(self):
+    """Returns a DepsetFileSubject for the action's outputs.
+
+    Method: ActionSubject.outputs
+
+    Returns:
+        `DepsetFileSubject` of the action's outputs.
+    """
+    meta = self.meta.derive("outputs()")
+    return DepsetFileSubject.new(self.action.outputs, meta)
 
 def _action_subject_contains_flag_values(self, flag_values):
     """Assert that an action's argv has the given ("--flag", "value") entries.
