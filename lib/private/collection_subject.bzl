@@ -268,8 +268,9 @@ def _collection_subject_contains_none_of(self, values):
         self: implicitly added
         values: ([`collection`]) values of which none of are allowed to exist.
     """
+    values = to_list(values)
     if self.format:
-        values = self.meta.format_str(values)
+        values = [self.meta.format_str(v) for v in values]
     check_contains_none_of(
         collection = self.actual,
         none_of = values,

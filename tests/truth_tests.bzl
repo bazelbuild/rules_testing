@@ -90,6 +90,23 @@ def _action_subject_test(env, target):
         msg = "check argv success",
     )
 
+    subject.argv().contains_none_of([
+        "arg1",
+        "arg3",
+        "{bindir}/{package}/input.gen.txt",
+    ])
+    _assert_failure(
+        fake_env,
+        [
+            "expected not to contain any of",
+            "but 2 found",
+            "arg1",
+            "input.gen.txt",
+        ],
+        env = env,
+        msg = "check contains_none_of failure",
+    )
+
     subject.contains_flag_values([
         ("--missingflag", "whatever"),
         ("--arg1flag", "wrongvalue"),
