@@ -1,5 +1,7 @@
 """Shared private utilities."""
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
 def _do_nothing_impl(ctx):
     _ = ctx  # @unused
     return []
@@ -33,3 +35,20 @@ def get_test_name_from_function(func):
     return func_name.strip("_")
 
 get_function_name = get_test_name_from_function
+
+def get_config_stripped_execpath(root):
+    """Derives the bazel root path when path-stripping is in use.
+
+    Args:
+      root: (root) The root to convert to a config-stripped root path
+
+    Returns:
+      (str) The config-stripped root path
+    """
+
+    # Replicates https://github.com/bazelbuild/bazel/blob/40f1c7d30b4b227ff4815d0ae03b2d797fd20462/src/main/java/com/google/devtools/build/lib/analysis/actions/StrippingPathMapper.java#L415-L421
+    # Note: this does not perform the transform for tree artifact paths since
+    # we're only dealing with an artifact root here
+    segments = root.path.split("/")
+    segments[1] = "cfg"
+    return paths.join(*segments)

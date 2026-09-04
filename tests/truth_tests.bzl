@@ -56,12 +56,27 @@ def _guard_against_stray_failures(*, env, fake_env):
     )
 
 def action_subject_test(name):
-    analysis_test(name = name, impl = _action_subject_test, target = "truth_tests_helper")
+    analysis_test(
+        name = name,
+        impl = _action_subject_test,
+        targets = {
+            "normal": "truth_tests_helper",
+            "stripped": "truth_tests_helper",
+        },
+        attrs = {
+            "normal": {
+                "@config_settings": {"//command_line_option:experimental_output_paths": "off"},
+            },
+            "stripped": {
+                "@config_settings": {"//command_line_option:experimental_output_paths": "strip"},
+            },
+        },
+    )
 
-def _action_subject_test(env, target):
+def _action_subject_test(env, targets):
     fake_env = _fake_env(env)
     subject = fake_env.expect.that_target(
-        target,
+        targets.normal,
     ).action_named("Action1")
 
     subject.contains_flag_values([
@@ -160,6 +175,18 @@ def _action_subject_test(env, target):
         env = env,
         msg = "check contains_none_of_flag_values failure",
     )
+
+    fake_env.expect.that_target(
+        targets.normal,
+    ).action_named("PathStrippedAction1").contains_flag_values([
+        ("--out", "{bindir}/{package}/path-stripped-action.txt"),
+    ])
+    fake_env.expect.that_target(
+        targets.stripped,
+    ).action_named("PathStrippedAction1").contains_flag_values([
+        ("--out", "{cfg_stripped_bindir}/{package}/path-stripped-action.txt"),
+    ])
+
     _end(env, fake_env)
 
 _suite.append(action_subject_test)
@@ -1909,6 +1936,17 @@ def _test_helper_impl(ctx):
         exec_info_bazel_6_kwargs = {"exec_group": "THE_EXEC_GROUP"}
     else:
         exec_info_bazel_6_kwargs = {}
+
+    path_stripped_out = ctx.actions.declare_file("path-stripped-action.txt")
+    args = ctx.actions.args()
+    args.add("--out", path_stripped_out)
+    ctx.actions.run(
+        outputs = [path_stripped_out],
+        executable = ctx.executable.tool,
+        arguments = [args],
+        mnemonic = "PathStrippedAction1",
+        execution_requirements = {"supports-path-mapping": "1"},
+    )
 
     return [
         DefaultInfo(

@@ -17,6 +17,7 @@ ExpectMeta object implementation.
 """
 
 load("//lib:unittest.bzl", ut_asserts = "asserts")
+load(":util.bzl", "get_config_stripped_execpath")
 
 def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
     """Creates a new "ExpectMeta" struct".
@@ -71,6 +72,7 @@ def _expect_meta_new(env, exprs = [], details = [], format_str_kwargs = None):
         format_str_kwargs = {}
     format_str_kwargs.setdefault("workspace", env.ctx.workspace_name)
     format_str_kwargs.setdefault("test_name", env.ctx.label.name)
+    format_str_kwargs.setdefault("cfg_stripped_bindir", get_config_stripped_execpath(env.ctx.bin_dir))
 
     # buildifier: disable=uninitialized
     self = struct(

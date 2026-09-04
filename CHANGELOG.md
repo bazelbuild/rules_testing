@@ -20,7 +20,7 @@
 
 ### Added
 
-* Nothing yet
+* Add a `{cfg_stripped_bindir}` formatting variable for use with path-stripping.
 
 ## [0.8.0] - 2025-03-17
 

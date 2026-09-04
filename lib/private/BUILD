@@ -130,7 +130,10 @@ bzl_library(
 bzl_library(
     name = "expect_meta_bzl",
     srcs = ["expect_meta.bzl"],
-    deps = ["//lib:unittest"],
+    deps = [
+        ":util_bzl",
+        "//lib:unittest",
+    ],
 )
 
 bzl_library(
@@ -288,4 +291,5 @@ bzl_library(
 bzl_library(
     name = "util_bzl",
     srcs = ["util.bzl"],
+    deps = ["@bazel_skylib//lib:paths"],
 )
